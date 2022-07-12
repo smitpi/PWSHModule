@@ -81,13 +81,21 @@ Function New-PWSHModuleConfigFile {
 		[ValidateScript( { if (Test-Path $_) { $true }
 				else { New-Item -Path $_ -ItemType Directory -Force | Out-Null; $true }
 			})]
-		[System.IO.DirectoryInfo]$Path
+		[System.IO.DirectoryInfo]$Path,
+		[string]$Description = 'Created by PWSHModule PowerShell Module.'
 	)
 	$NewConfig = [PSCustomObject]@{
-		Name       = 'PWSHModule'
-		Repository = 'PSGallery'
-		Version    = 'Latest'
-	} | ConvertTo-Json
+		Date        = (Get-Date -Format u)
+		Description = $Description
+		Author      = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
+		Modules     = [PSCustomObject]@{
+			Name        = 'PWSHModule'
+			Repository  = 'PSGallery'
+			Description = 'Uses a Config file to install and maintain a list of PowerShell Modules'
+			Version     = 'Latest'
+			Projecturi  = "https://github.com/smitpi/PWSHModule"
+		}
+ } | ConvertTo-Json
 
 	$ConfigFile = Join-Path $Path -ChildPath 'PWSHModules.json'
 	if (Test-Path $ConfigFile) {
