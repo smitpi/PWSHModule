@@ -22,10 +22,3 @@ Get-Command -Module PWSHModule
 Get-Help about_PWSHModule
 ```
 Documentation can be found at: [Github_Pages](https://smitpi.github.io/PWSHModule)
- 
-## Functions
-- [`Add-PWSHModule`](https://smitpi.github.io/PWSHModule/Add-PWSHModule) -- Add a module to the config file
-- [`Install-PWSHModule`](https://smitpi.github.io/PWSHModule/Install-PWSHModule) -- Install modules from a config file
-- [`New-PWSHModuleConfigFile`](https://smitpi.github.io/PWSHModule/New-PWSHModuleConfigFile) -- Create a new config file.
-- [`Remove-PWSHModule`](https://smitpi.github.io/PWSHModule/Remove-PWSHModule) -- Remove a module to the config file
-- [`Show-PWSHModule`](https://smitpi.github.io/PWSHModule/Show-PWSHModule) -- List the content of a config file

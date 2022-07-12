@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://smitpi.github.io/PWSHModule/</loc>
+         <lastmod>2022-07-12</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://smitpi.github.io/PWSHModule/Add-PWSHModule/</loc>
+         <lastmod>2022-07-12</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://smitpi.github.io/PWSHModule/Install-PWSHModule/</loc>
+         <lastmod>2022-07-12</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://smitpi.github.io/PWSHModule/New-PWSHModuleConfigFile/</loc>
+         <lastmod>2022-07-12</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://smitpi.github.io/PWSHModule/Remove-PWSHModule/</loc>
+         <lastmod>2022-07-12</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://smitpi.github.io/PWSHModule/Show-PWSHModule/</loc>
+         <lastmod>2022-07-12</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+</urlset>

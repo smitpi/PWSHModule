@@ -32,9 +32,6 @@ Created [09/07/2022_15:58] Initial Script Creating
 
 #>
 
-#Requires -Module ImportExcel
-#Requires -Module PSWriteHTML
-#Requires -Module PSWriteColor
 
 <# 
 
@@ -62,51 +59,27 @@ Remove-PWSHModule -Export HTML -ReportPath C:\temp
 
 #>
 Function Remove-PWSHModule {
-		[Cmdletbinding(DefaultParameterSetName='Set1', HelpURI = "https://smitpi.github.io/PWSHModule/Remove-PWSHModule")]
-	    [OutputType([System.Object[]])]
-                PARAM(
-					[Parameter(Mandatory = $true)]
-					[Parameter(ParameterSetName = 'Set1')]
-					[ValidateScript( { (Test-Path $_) -and ((Get-Item $_).Extension -eq ".csv") })]
-					[System.IO.FileInfo]$InputObject,
+	[Cmdletbinding(DefaultParameterSetName = 'Set1', HelpURI = 'https://smitpi.github.io/PWSHModule/Remove-PWSHModule')]
+	PARAM(
+		[Parameter(Mandatory = $true)]
+		[ValidateScript( { (Test-Path $_) -and ((Get-Item $_).Extension -eq '.json') })]
+		[System.IO.FileInfo]$Path,
+		[String]$ModuleName
+	)
 
-					[ValidateNotNullOrEmpty()]
-					[string]$Username,
+	try {
+		$Content = (Get-Content $Path -ErrorAction Stop) | ConvertFrom-Json -ErrorAction Stop
+	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+	if ([string]::IsNullOrEmpty($Content.Date) -or [string]::IsNullOrEmpty($Content.Modules)) {Throw 'Invalid Config File'}
 
-					[ValidateSet('Excel', 'HTML', 'Host')]
-					[string]$Export = 'Host',
-
-                	[ValidateScript( { if (Test-Path $_) { $true }
-                                else { New-Item -Path $_ -ItemType Directory -Force | Out-Null; $true }
-                    })]
-                	[System.IO.DirectoryInfo]$ReportPath = 'C:\Temp',
-
-					[ValidateScript({$IsAdmin = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
-            						if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {$True}
-            						else {Throw "Must be running an elevated prompt to use this function"}})]
-        			[switch]$ClearARPCache,
-					
-        			[ValidateScript({if (Test-Connection -ComputerName $_ -Count 2 -Quiet) {$true}
-                            		else {throw "Unable to connect to $($_)"} })]
-        			[string[]]$ComputerName
-					)
-
-
-
-	if ($Export -eq 'Excel') { 
-		$ExcelOptions = @{
-            Path             = $(Join-Path -Path $ReportPath -ChildPath "\PWSHModule-$(Get-Date -Format yyyy.MM.dd-HH.mm).xlsx")
-            AutoSize         = $True
-            AutoFilter       = $True
-            TitleBold        = $True
-            TitleSize        = '28'
-            TitleFillPattern = 'LightTrellis'
-            TableStyle       = 'Light20'
-            FreezeTopRow     = $True
-            FreezePane       = '3'
-        }
-         $data | Export-Excel -Title PWSHModule -WorksheetName PWSHModule @ExcelOptions}
-
-	if ($Export -eq 'HTML') { $data | Out-GridHtml -DisablePaging -Title "PWSHModule" -HideFooter -SearchHighlight -FixedHeader -FilePath $(Join-Path -Path $ReportPath -ChildPath "\PWSHModule-$(Get-Date -Format yyyy.MM.dd-HH.mm).html") }
-	if ($Export -eq 'Host') { $data }
+	$Modremove = $Content.Modules | Where-Object {$_.Name -like $ModuleName}
+	if ($Modremove.count -ne 1) {
+		throw 'Module not found'
+	} else {
+		[System.Collections.ArrayList]$ModuleObject = @()		
+		$Content.Modules | ForEach-Object {[void]$ModuleObject.Add($_)}
+		$ModuleObject.Remove($Modremove)
+		$Content.Modules = $ModuleObject
+		$Content | ConvertTo-Json | Set-Content -Path $Path	
+	}
 } #end Function

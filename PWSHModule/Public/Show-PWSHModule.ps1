@@ -61,7 +61,6 @@ Show-PWSHModule -Export HTML -ReportPath C:\temp
 #>
 Function Show-PWSHModule {
 	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModule')]
-	[OutputType([System.Object[]])]
 	PARAM(
 		[Parameter(Mandatory = $true)]
 		[ValidateScript( { (Test-Path $_) -and ((Get-Item $_).Extension -eq '.json') })]

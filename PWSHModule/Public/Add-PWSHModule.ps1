@@ -59,7 +59,6 @@ Add-PWSHModule -Export HTML -ReportPath C:\temp
 #>
 Function Add-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Set1', HelpURI = 'https://smitpi.github.io/PWSHModule/Add-PWSHModule')]
-	[OutputType([System.Object[]])]
 	PARAM(
 		[Parameter(Mandatory = $true)]
 		[ValidateScript( { (Test-Path $_) -and ((Get-Item $_).Extension -eq '.json') })]
@@ -69,7 +68,6 @@ Function Add-PWSHModule {
 		[Parameter(Mandatory = $true)]
 		[String]$Repository,
 		[switch]$RequiredVersion
-		
 	)
 
 	try {
