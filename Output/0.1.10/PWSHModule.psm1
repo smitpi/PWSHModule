@@ -1,9 +1,9 @@
-#region Public Functions
+﻿#region Public Functions
 #region Add-PWSHModule.ps1
 ######## Function 1 of 7 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.8
+# ModuleVersion:    0.1.10
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
@@ -191,7 +191,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 7 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.8
+# ModuleVersion:    0.1.10
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
@@ -312,7 +312,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 3 of 7 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.8
+# ModuleVersion:    0.1.10
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -436,7 +436,7 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 4 of 7 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.8
+# ModuleVersion:    0.1.10
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
@@ -534,7 +534,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 5 of 7 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.8
+# ModuleVersion:    0.1.10
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -655,7 +655,7 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 6 of 7 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.8
+# ModuleVersion:    0.1.10
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -759,7 +759,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 7 of 7 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.8
+# ModuleVersion:    0.1.10
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
