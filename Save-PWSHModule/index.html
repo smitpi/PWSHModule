@@ -12,14 +12,14 @@
         <meta name="author" content="Pierre Smit">
       
       
-        <link rel="canonical" href="https://smitpi.github.io/PWSHModule/New-PWSHModuleConfigFile/">
+        <link rel="canonical" href="https://smitpi.github.io/PWSHModule/Save-PWSHModule/">
       
       <link rel="icon" href="..">
       <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.3.8">
     
     
       
-        <title>New-PWSHModuleConfigFile - PWSHModule</title>
+        <title>Save-PWSHModule - PWSHModule</title>
       
     
     
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#new-pwshmoduleconfigfile" class="md-skip">
+        <a href="#save-pwshmodule" class="md-skip">
           Skip to content
         </a>
       
@@ -103,7 +103,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              New-PWSHModuleConfigFile
+              Save-PWSHModule
             
           </span>
         </div>
@@ -278,6 +278,36 @@
 
   
   
+  
+    <li class="md-nav__item">
+      <a href="../New-PWSHModuleList/" class="md-nav__link">
+        New-PWSHModuleList
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Remove-PWSHModule/" class="md-nav__link">
+        Remove-PWSHModule
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
     
   
   
@@ -290,12 +320,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          New-PWSHModuleConfigFile
+          Save-PWSHModule
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        New-PWSHModuleConfigFile
+        Save-PWSHModule
       </a>
       
         
@@ -370,15 +400,36 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#-path" class="md-nav__link">
-    -Path
+  <a href="#-githubuserid" class="md-nav__link">
+    -GitHubUserID
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#-description" class="md-nav__link">
-    -Description
+  <a href="#-githubtoken" class="md-nav__link">
+    -GitHubToken
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-listname" class="md-nav__link">
+    -ListName
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-asnuget" class="md-nav__link">
+    -AsNuGet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-path" class="md-nav__link">
+    -Path
   </a>
   
 </li>
@@ -452,8 +503,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../Remove-PWSHModule/" class="md-nav__link">
-        Remove-PWSHModule
+      <a href="../Show-PWSHModule/" class="md-nav__link">
+        Show-PWSHModule
       </a>
     </li>
   
@@ -467,8 +518,8 @@
   
   
     <li class="md-nav__item">
-      <a href="../Show-PWSHModule/" class="md-nav__link">
-        Show-PWSHModule
+      <a href="../Show-PWSHModuleList/" class="md-nav__link">
+        Show-PWSHModuleList
       </a>
     </li>
   
@@ -557,15 +608,36 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#-path" class="md-nav__link">
-    -Path
+  <a href="#-githubuserid" class="md-nav__link">
+    -GitHubUserID
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#-description" class="md-nav__link">
-    -Description
+  <a href="#-githubtoken" class="md-nav__link">
+    -GitHubToken
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-listname" class="md-nav__link">
+    -ListName
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-asnuget" class="md-nav__link">
+    -AsNuGet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-path" class="md-nav__link">
+    -Path
   </a>
   
 </li>
@@ -635,32 +707,32 @@
             <article class="md-content__inner md-typeset">
               
                 
-  <a href="https://github.com/smitpi/PWSHModule/edit/master/docs/New-PWSHModuleConfigFile.md" title="Edit this page" class="md-content__button md-icon">
+  <a href="https://github.com/smitpi/PWSHModule/edit/master/docs/Save-PWSHModule.md" title="Edit this page" class="md-content__button md-icon">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
   </a>
 
 
 
-<h1 id="new-pwshmoduleconfigfile">New-PWSHModuleConfigFile</h1>
+<h1 id="save-pwshmodule">Save-PWSHModule</h1>
 <h2 id="synopsis">SYNOPSIS</h2>
-<p>Create a new config file.</p>
+<p>Saves the modules from the specified list to a folder.</p>
 <h2 id="syntax">SYNTAX</h2>
-<div class="highlight"><pre><span></span><code>New-PWSHModuleConfigFile [-Path] &lt;DirectoryInfo&gt; [[-Description] &lt;String&gt;] [&lt;CommonParameters&gt;]
+<div class="highlight"><pre><span></span><code>Save-PWSHModule [-GitHubUserID] &lt;String&gt; [-GitHubToken] &lt;String&gt; [-ListName] &lt;String&gt; [-AsNuGet]
+ [[-Path] &lt;DirectoryInfo&gt;] [&lt;CommonParameters&gt;]
 </code></pre></div>
 <h2 id="description">DESCRIPTION</h2>
-<p>Create a new json config file in the path specified.</p>
+<p>Saves the modules from the specified list to a folder.</p>
 <h2 id="examples">EXAMPLES</h2>
 <h3 id="example-1">EXAMPLE 1</h3>
-<div class="highlight"><pre><span></span><code>New-PWSHModuleConfigFile -Export HTML -ReportPath C:\temp
+<div class="highlight"><pre><span></span><code>Save-PWSHModule -Export HTML -ReportPath C:\temp
 </code></pre></div>
 <h3 id="example-2">EXAMPLE 2</h3>
-<div class="highlight"><pre><span></span><code>New-PWSHModuleConfigFile -Path C:\temp
+<div class="highlight"><pre><span></span><code>Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GithubToken -ListName extended -AsNuGet -Path c:\temp\
 </code></pre></div>
 <h2 id="parameters">PARAMETERS</h2>
-<h3 id="-path">-Path</h3>
-<p>Path where the config file will be created.
-If the path doesn't exist, it will be created.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DirectoryInfo</span><span class="w"></span>
+<h3 id="-githubuserid">-GitHubUserID</h3>
+<p>The GitHub User ID.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String</span><span class="w"></span>
 <span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
 <span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
 
@@ -670,15 +742,51 @@ If the path doesn't exist, it will be created.</p>
 <span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 <span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 </code></pre></div>
-<h3 id="-description">-Description</h3>
-<p>{{ Fill Description Description }}</p>
+<h3 id="-githubtoken">-GitHubToken</h3>
+<p>GitHub Token with access to the Users' Gist.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String</span><span class="w"></span>
 <span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
 <span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
 
-<span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
 <span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
-<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Created by PWSHModule PowerShell Module.</span><span class="w"></span>
+<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">None</span><span class="w"></span>
+<span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+</code></pre></div>
+<h3 id="-listname">-ListName</h3>
+<p>The File Name on GitHub Gist.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String</span><span class="w"></span>
+<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
+<span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
+
+<span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"></span>
+<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">None</span><span class="w"></span>
+<span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+</code></pre></div>
+<h3 id="-asnuget">-AsNuGet</h3>
+<p>Save in the nuget format</p>
+<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SwitchParameter</span><span class="w"></span>
+<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
+<span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
+
+<span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Named</span><span class="w"></span>
+<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+</code></pre></div>
+<h3 id="-path">-Path</h3>
+<p>Where to save</p>
+<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DirectoryInfo</span><span class="w"></span>
+<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
+<span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
+
+<span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w"></span>
+<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">C:\Temp</span><span class="w"></span>
 <span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 <span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 </code></pre></div>
@@ -704,7 +812,7 @@ If the path doesn't exist, it will be created.</p>
     <nav class="md-footer__inner md-grid" aria-label="Footer" >
       
         
-        <a href="../Install-PWSHModule/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Install-PWSHModule" rel="prev">
+        <a href="../Remove-PWSHModule/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Remove-PWSHModule" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
           </div>
@@ -713,20 +821,20 @@ If the path doesn't exist, it will be created.</p>
               <span class="md-footer__direction">
                 Previous
               </span>
-              Install-PWSHModule
+              Remove-PWSHModule
             </div>
           </div>
         </a>
       
       
         
-        <a href="../Remove-PWSHModule/" class="md-footer__link md-footer__link--next" aria-label="Next: Remove-PWSHModule" rel="next">
+        <a href="../Show-PWSHModule/" class="md-footer__link md-footer__link--next" aria-label="Next: Show-PWSHModule" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Remove-PWSHModule
+              Show-PWSHModule
             </div>
           </div>
           <div class="md-footer__button md-icon">
