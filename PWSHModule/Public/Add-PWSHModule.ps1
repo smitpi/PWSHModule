@@ -42,38 +42,56 @@ Created [09/07/2022_15:58] Initial Script Creating
 
 <#
 .SYNOPSIS
-Add a module to the config file
+Add a Module name to the config File.
 
 .DESCRIPTION
-Add a module to the config file
+Add a Module name to the config File.
 
-.PARAMETER Export
-Export the result to a report file. (Excel or html). Or select Host to display the object on screen.
+.PARAMETER Path
+Path to the json config file.
 
-.PARAMETER ReportPath
-Where to save the report.
+.PARAMETER ModuleName
+Name of the Module to add.
+
+.PARAMETER Repository
+Repository to find the module.
+
+.PARAMETER RequiredVersion
+Select if you want to specify a specific version.
 
 .EXAMPLE
-Add-PWSHModule -Export HTML -ReportPath C:\temp
+Add-PWSHModule -Path C:\Utils\PWSLModule.json -ModuleName Json -Repository PSGallery
 
 #>
 Function Add-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Set1', HelpURI = 'https://smitpi.github.io/PWSHModule/Add-PWSHModule')]
 	PARAM(
-		[Parameter(Mandatory = $true)]
-		[ValidateScript( { (Test-Path $_) -and ((Get-Item $_).Extension -eq '.json') })]
-		[System.IO.FileInfo]$Path,
+		[string]$GitHubUserID, 
+		[string]$GitHubToken,
+		[string]$ListName,
 		[Parameter(Mandatory = $true)]
 		[string]$ModuleName,
-		[Parameter(Mandatory = $true)]
-		[String]$Repository,
+		[String]$Repository = 'PSGallery',
 		[switch]$RequiredVersion
 	)
 
 	try {
-		$Content = (Get-Content $Path -ErrorAction Stop) | ConvertFrom-Json -ErrorAction Stop
+		$headers = @{}
+		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+		$base64 = [System.Convert]::ToBase64String($bytes)
+		$headers.Authorization = 'Basic {0}' -f $base64
+
+		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+
+	try {
+		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($ListName)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
 	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-	if ([string]::IsNullOrEmpty($Content.Date) -or [string]::IsNullOrEmpty($Content.Modules)) {Throw 'Invalid Config File'}
+	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Throw 'Invalid Config File'}
+
 
 	[System.Collections.ArrayList]$ModuleObject = @()		
 	$Content.Modules | ForEach-Object {[void]$ModuleObject.Add($_)}
@@ -89,11 +107,11 @@ Function Add-PWSHModule {
 		$index++
 	}
 
-	if ($filtermod.count -gt 1) {
+	if ($filtermod.name.count -gt 1) {
 		$FilterMod | Select-Object Index, Name, Description | Format-Table -AutoSize -Wrap
 		$num = Read-Host 'Index Number '
 		$ModuleToAdd = $filtermod[$num]
-	} elseif ($filtermod.Count -eq 1) {
+	} elseif ($filtermod.name.Count -eq 1) {
 		$ModuleToAdd = $filtermod
 	} else {throw 'Module not found'}
 
@@ -112,12 +130,25 @@ Function Add-PWSHModule {
 
 	[void]$ModuleObject.Add([PSCustomObject]@{
 			Name        = $ModuleToAdd.Name
-			Repository  = $Repository457
-			Description = $ModuleToAdd.Description
 			Version     = $VersionToAdd
+			Description = $ModuleToAdd.Description
+			Repository  = $Repository
 			Projecturi  = $ModuleToAdd.ProjectUri
 		})
-
+	Write-Host '[Added]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ModuleToAdd.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to $($ListName)" -ForegroundColor Green
 	$Content.Modules = $ModuleObject | Sort-Object -Property name
-	$Content | ConvertTo-Json | Set-Content -Path $Path
+	$Content.Modified = "[$(Get-Date -Format u)] -- $($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
+
+	try {
+		$Body = @{}
+		$files = @{}
+		$Files["$($PRGist.files.$($ListName).Filename)"] = @{content = ( $Content | ConvertTo-Json | Out-String ) }
+		$Body.files = $Files
+		$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
+		$json = ConvertTo-Json -InputObject $Body
+		$json = [System.Text.Encoding]::UTF8.GetBytes($json)
+		$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
+		Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
+	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+
 } #end Function

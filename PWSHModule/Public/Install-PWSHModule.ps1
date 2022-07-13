@@ -62,9 +62,9 @@ Function Install-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Set1', HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
 	[OutputType([System.Object[]])]
 	PARAM(
-		[Parameter(Mandatory = $true)]
-		[ValidateScript( { (Test-Path $_) -and ((Get-Item $_).Extension -eq '.json') })]
-		[System.IO.FileInfo]$Path,
+		[string]$GitHubUserID, 
+		[string]$GitHubToken,
+		[string]$ListName,
 		[ValidateSet('AllUsers', 'CurrentUser')]
 		[string]$Scope
 	)
@@ -75,9 +75,21 @@ Function Install-PWSHModule {
 	}
 
 	try {
-		$Content = (Get-Content $Path -ErrorAction Stop) | ConvertFrom-Json -ErrorAction Stop
+		$headers = @{}
+		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+		$base64 = [System.Convert]::ToBase64String($bytes)
+		$headers.Authorization = 'Basic {0}' -f $base64
+
+		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+
+	try {
+		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($ListName)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
 	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-	if ([string]::IsNullOrEmpty($Content.Date) -or [string]::IsNullOrEmpty($Content.Modules)) {Throw 'Invalid Config File'}
+	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Throw 'Invalid Config File'}
 
 	foreach ($module in $Content.Modules) {
 		if ($module.Version -like 'Latest') {
@@ -88,10 +100,11 @@ Function Install-PWSHModule {
 				Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope -Force -AllowClobber
 			} else {
 				Write-Host '[Installed]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
-				[version]$Onlineversion = (Find-Module -Name $module.name -Repository $module.Repository).version
+				$OnlineMod = Find-Module -Name $module.name -Repository $module.Repository
+				[version]$Onlineversion = $OnlineMod.version 
 				[version]$Localversion = ($mod | Sort-Object -Property Version -Descending)[0].Version
 				if ($Localversion -lt $Onlineversion) {
-					Write-Host "`t[Upgrading]" -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green
+					Write-Host "`t[Upgrading]" -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green ; Write-Host " v$($OnlineMod.version)" -ForegroundColor DarkRed
 					try {
 						Update-Module -Name $module.Name -Force -ErrorAction Stop
 					} catch {

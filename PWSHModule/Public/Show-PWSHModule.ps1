@@ -62,20 +62,46 @@ Show-PWSHModule -Export HTML -ReportPath C:\temp
 Function Show-PWSHModule {
 	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModule')]
 	PARAM(
-		[Parameter(Mandatory = $true)]
-		[ValidateScript( { (Test-Path $_) -and ((Get-Item $_).Extension -eq '.json') })]
-		[System.IO.FileInfo]$Path,
+		[string]$GitHubUserID, 
+		[string]$GitHubToken,
+		[string]$Listname,
 		[switch]$AsTable,
 		[switch]$ShowProjectURI
 	)
 
 	try {
-		$Content = (Get-Content $Path -ErrorAction Stop) | ConvertFrom-Json -ErrorAction Stop
-	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-	if ([string]::IsNullOrEmpty($Content.Date) -or [string]::IsNullOrEmpty($Content.Modules)) {Throw 'Invalid Config File'}
+		$headers = @{}
+		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+		$base64 = [System.Convert]::ToBase64String($bytes)
+		$headers.Authorization = 'Basic {0}' -f $base64
 
-	if ($AsTable) {$Content.Modules | Format-Table -AutoSize}
-	else {$Content.Modules}
+		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+
+	try {
+		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($Listname)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
+	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Throw 'Invalid Config File'}
+
+	$index = 0
+	[System.Collections.ArrayList]$ModuleObject = @()		
+	$Content.Modules | ForEach-Object {				
+		[void]$ModuleObject.Add([PSCustomObject]@{
+				Index       = $index
+				Name        = $_.Name
+				Version     = $_.version
+				Description = $_.Description
+				Repository  = $_.$Repository
+				Projecturi  = $_.projecturi
+			})
+		$index++
+	}
+
+	if ($AsTable) {$ModuleObject | Format-Table -AutoSize}
+	else {$ModuleObject}
 
 	if ($ShowProjectURI) {
 		Write-Output ' '
