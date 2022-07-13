@@ -1,7 +1,7 @@
 # PWSHModule
  
 ## Description
-Uses a Config file to install and maintain a list of PowerShell Modules
+Uses a GitHub Gist file to install and maintain a list of PowerShell Modules, you can create more than one lists and use that custom install modules from different repositories and different versions
  
 ## Getting Started
 - Install from PowerShell Gallery [PS Gallery](https://www.powershellgallery.com/packages/PWSHModule)
