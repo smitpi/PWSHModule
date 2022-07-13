@@ -39,9 +39,6 @@ Created [09/07/2022_15:58] Initial Script Creating
  Remove a module to the config file 
 
 #> 
-
-
-
 <#
 .SYNOPSIS
 Remove module from the specified list.
@@ -63,7 +60,6 @@ Module to remove
 
 .EXAMPLE
 Remove-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName base -ModuleName pslauncher
-
 #>
 Function Remove-PWSHModule {
 	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Remove-PWSHModule')]
