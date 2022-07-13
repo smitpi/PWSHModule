@@ -16,7 +16,7 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://smitpi.github.io/PWSHModule/New-PWSHModuleConfigFile/</loc>
+         <loc>https://smitpi.github.io/PWSHModule/New-PWSHModuleList/</loc>
          <lastmod>2022-07-13</lastmod>
          <changefreq>daily</changefreq>
     </url>
@@ -27,6 +27,11 @@
     </url>
     <url>
          <loc>https://smitpi.github.io/PWSHModule/Show-PWSHModule/</loc>
+         <lastmod>2022-07-13</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://smitpi.github.io/PWSHModule/Show-PWSHModuleList/</loc>
          <lastmod>2022-07-13</lastmod>
          <changefreq>daily</changefreq>
     </url>

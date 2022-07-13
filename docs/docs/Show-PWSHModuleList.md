@@ -5,40 +5,39 @@ online version:
 schema: 2.0.0
 ---
 
-# New-PWSHModuleConfigFile
+# Show-PWSHModuleList
 
 ## SYNOPSIS
-Create a new config file.
+List all the GitHub Gist Lists.
 
 ## SYNTAX
 
 ```
-New-PWSHModuleConfigFile [-Path] <DirectoryInfo> [[-Description] <String>] [<CommonParameters>]
+Show-PWSHModuleList [-GitHubUserID] <String> [-GitHubToken] <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Create a new json config file in the path specified.
+List all the GitHub Gist Lists.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-New-PWSHModuleConfigFile -Export HTML -ReportPath C:\temp
+Show-PWSHModuleList -Export HTML -ReportPath C:\temp
 ```
 
 ### EXAMPLE 2
 ```
-New-PWSHModuleConfigFile -Path C:\temp
+Show-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken
 ```
 
 ## PARAMETERS
 
-### -Path
-Path where the config file will be created.
-If the path doesn't exist, it will be created.
+### -GitHubUserID
+The GitHub User ID.
 
 ```yaml
-Type: DirectoryInfo
+Type: String
 Parameter Sets: (All)
 Aliases:
 
@@ -49,17 +48,17 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Description
-{{ Fill Description Description }}
+### -GitHubToken
+GitHub Token with access to the Users' Gist.
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 2
-Default value: Created by PWSHModule PowerShell Module.
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -71,7 +70,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### System.Object[]
 ## NOTES
 
 ## RELATED LINKS

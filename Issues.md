@@ -2,24 +2,22 @@
 
 ---
 
-| Catagory      | File                        | details                                                                             |
-| ------------- | --------------------------- | ----------------------------------------------------------------------------------- |
-| External Help | New-PWSHModuleList          | Did not create the .md file                                                         |
-| External Help | Show-PWSHModuleList         | Did not create the .md file                                                         |
-| External Help | Add-PWSHModule.md           | Add-PWSHModule.md - ### -Path - {{ Fill Path Description }}                         |
-| External Help | Install-PWSHModule.md       | Install-PWSHModule.md - ### -Path - {{ Fill Path Description }}                     |
-| External Help | Remove-PWSHModule.md        | Remove-PWSHModule.md - ### -Path - {{ Fill Path Description }}                      |
-| External Help | Show-PWSHModule.md          | Show-PWSHModule.md - ### -Path - {{ Fill Path Description }}                        |
-| External Help | Add-PWSHModule.md           | Add-PWSHModule.md - ### -ModuleName - {{ Fill ModuleName Description }}             |
-| External Help | Remove-PWSHModule.md        | Remove-PWSHModule.md - ### -ModuleName - {{ Fill ModuleName Description }}          |
-| External Help | Add-PWSHModule.md           | Add-PWSHModule.md - ### -Repository - {{ Fill Repository Description }}             |
-| External Help | Add-PWSHModule.md           | Add-PWSHModule.md - ### -RequiredVersion - {{ Fill RequiredVersion Description }}   |
-| External Help | Install-PWSHModule.md       | Install-PWSHModule.md - ### -Scope - {{ Fill Scope Description }}                   |
-| External Help | New-PWSHModuleConfigFile.md | New-PWSHModuleConfigFile.md - ### -Description - {{ Fill Description Description }} |
-| External Help | Show-PWSHModule.md          | Show-PWSHModule.md - ### -AsTable - {{ Fill AsTable Description }}                  |
-| External Help | Show-PWSHModule.md          | Show-PWSHModule.md - ### -ShowProjectURI - {{ Fill ShowProjectURI Description }}    |
-| Not Copied    | New-PWSHModuleConfigFile    | <=                                                                                  |
+| Catagory      | File                  | details                                                                          |
+| ------------- | --------------------- | -------------------------------------------------------------------------------- |
+| External Help | Install-PWSHModule.md | Install-PWSHModule.md - ### -GitHubUserID - {{ Fill GitHubUserID Description }}  |
+| External Help | Remove-PWSHModule.md  | Remove-PWSHModule.md - ### -GitHubUserID - {{ Fill GitHubUserID Description }}   |
+| External Help | Show-PWSHModule.md    | Show-PWSHModule.md - ### -GitHubUserID - {{ Fill GitHubUserID Description }}     |
+| External Help | Install-PWSHModule.md | Install-PWSHModule.md - ### -GitHubToken - {{ Fill GitHubToken Description }}    |
+| External Help | Remove-PWSHModule.md  | Remove-PWSHModule.md - ### -GitHubToken - {{ Fill GitHubToken Description }}     |
+| External Help | Show-PWSHModule.md    | Show-PWSHModule.md - ### -GitHubToken - {{ Fill GitHubToken Description }}       |
+| External Help | Install-PWSHModule.md | Install-PWSHModule.md - ### -ListName - {{ Fill ListName Description }}          |
+| External Help | Remove-PWSHModule.md  | Remove-PWSHModule.md - ### -ListName - {{ Fill ListName Description }}           |
+| External Help | Show-PWSHModule.md    | Show-PWSHModule.md - ### -Listname - {{ Fill Listname Description }}             |
+| External Help | Install-PWSHModule.md | Install-PWSHModule.md - ### -Scope - {{ Fill Scope Description }}                |
+| External Help | Remove-PWSHModule.md  | Remove-PWSHModule.md - ### -ModuleName - {{ Fill ModuleName Description }}       |
+| External Help | Show-PWSHModule.md    | Show-PWSHModule.md - ### -AsTable - {{ Fill AsTable Description }}               |
+| External Help | Show-PWSHModule.md    | Show-PWSHModule.md - ### -ShowProjectURI - {{ Fill ShowProjectURI Description }} |
 
 ---
 
-*Updated: Wednesday, 13 July 2022 03:52:52 UTC*
+*Updated: Wednesday, 13 July 2022 08:06:23 UTC*

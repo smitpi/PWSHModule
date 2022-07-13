@@ -8,32 +8,32 @@ schema: 2.0.0
 # Add-PWSHModule
 
 ## SYNOPSIS
-Add a module to the config file
+Adds a new module to the GitHub Gist List.
 
 ## SYNTAX
 
 ```
-Add-PWSHModule [-Path] <FileInfo> [-ModuleName] <String> [-Repository] <String> [-RequiredVersion]
- [<CommonParameters>]
+Add-PWSHModule [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String> [-ModuleName] <String[]>
+ [[-Repository] <String>] [[-RequiredVersion] <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Add a module to the config file
+Adds a new module to the GitHub Gist List.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Add-PWSHModule -Export HTML -ReportPath C:\temp
+Add-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName base -ModuleName pslauncher -Repository PSgallery -RequiredVersion 0.1.19
 ```
 
 ## PARAMETERS
 
-### -Path
-{{ Fill Path Description }}
+### -GitHubUserID
+The GitHub User ID.
 
 ```yaml
-Type: FileInfo
+Type: String
 Parameter Sets: (All)
 Aliases:
 
@@ -44,8 +44,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ModuleName
-{{ Fill ModuleName Description }}
+### -GitHubToken
+GitHub Token with access to the Users' Gist.
 
 ```yaml
 Type: String
@@ -59,8 +59,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Repository
-{{ Fill Repository Description }}
+### -ListName
+The File Name on GitHub Gist.
 
 ```yaml
 Type: String
@@ -74,17 +74,49 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -RequiredVersion
-{{ Fill RequiredVersion Description }}
+### -ModuleName
+Name of the module to add.
+You can also use a keyword to search for.
 
 ```yaml
-Type: SwitchParameter
+Type: String[]
+Parameter Sets: (All)
+Aliases: Name
+
+Required: True
+Position: 4
+Default value: None
+Accept pipeline input: True (ByPropertyName)
+Accept wildcard characters: False
+```
+
+### -Repository
+Name of the Repository to hosting the module.
+
+```yaml
+Type: String
 Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: Named
-Default value: False
+Position: 5
+Default value: PSGallery
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -RequiredVersion
+This will force a version to be used.
+Leave blank to use the latest version.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 6
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

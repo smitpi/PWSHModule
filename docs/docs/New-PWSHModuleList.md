@@ -5,32 +5,32 @@ online version:
 schema: 2.0.0
 ---
 
-# Show-PWSHModule
+# New-PWSHModuleList
 
 ## SYNOPSIS
-List the content of a config file
+Add a new list to GitHub Gist.
 
 ## SYNTAX
 
 ```
-Show-PWSHModule [-GitHubUserID] <String> [[-GitHubToken] <String>] [[-Listname] <String>] [-AsTable]
- [-ShowProjectURI] [<CommonParameters>]
+New-PWSHModuleList [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String>
+ [-Description] <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-List the content of a config file
+Add a new list to GitHub Gist.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Show-PWSHModule -Export HTML -ReportPath C:\temp
+New-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -Description "These modules needs to be installed on all servers"
 ```
 
 ## PARAMETERS
 
 ### -GitHubUserID
-{{ Fill GitHubUserID Description }}
+The GitHub User ID.
 
 ```yaml
 Type: String
@@ -45,61 +45,46 @@ Accept wildcard characters: False
 ```
 
 ### -GitHubToken
-{{ Fill GitHubToken Description }}
+GitHub Token with access to the Users' Gist.
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 2
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Listname
-{{ Fill Listname Description }}
+### -ListName
+The File Name on GitHub Gist.
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 3
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -AsTable
-{{ Fill AsTable Description }}
+### -Description
+Summary of the function for the list.
 
 ```yaml
-Type: SwitchParameter
+Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ShowProjectURI
-{{ Fill ShowProjectURI Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
+Required: True
+Position: 4
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

@@ -9,11 +9,10 @@ SHORT DESCRIPTION
 NOTES
 Functions in this module:
 	 Add-PWSHModule -- Adds a new module to the GitHub Gist List.
-	 Install-PWSHModule -- Install modules from a config file
-	 New-PWSHModuleConfigFile -- Create a new config file.
+	 Install-PWSHModule -- Install modules from the specified list.
 	 New-PWSHModuleList -- Add a new list to GitHub Gist.
 	 Remove-PWSHModule -- Remove a module to the config file
-	 Show-PWSHModule -- List the content of a config file
+	 Show-PWSHModule -- Show the details of the modules in a list.
 	 Show-PWSHModuleList -- List all the GitHub Gist Lists.
  
 SEE ALSO
