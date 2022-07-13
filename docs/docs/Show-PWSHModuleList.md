@@ -1,6 +1,6 @@
 ---
 external help file: PWSHModule-help.xml
-Module Name: PWSHModule
+Module Name: pwshmodule
 online version:
 schema: 2.0.0
 ---

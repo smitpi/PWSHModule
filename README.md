@@ -28,5 +28,6 @@ Documentation can be found at: [Github_Pages](https://smitpi.github.io/PWSHModul
 - [`Install-PWSHModule`](https://smitpi.github.io/PWSHModule/Install-PWSHModule) -- Install modules from the specified list.
 - [`New-PWSHModuleList`](https://smitpi.github.io/PWSHModule/New-PWSHModuleList) -- Add a new list to GitHub Gist.
 - [`Remove-PWSHModule`](https://smitpi.github.io/PWSHModule/Remove-PWSHModule) -- Remove a module to the config file
+- [`Save-PWSHModule`](https://smitpi.github.io/PWSHModule/Save-PWSHModule) -- Saves the modules from the specified list to a folder.
 - [`Show-PWSHModule`](https://smitpi.github.io/PWSHModule/Show-PWSHModule) -- Show the details of the modules in a list.
 - [`Show-PWSHModuleList`](https://smitpi.github.io/PWSHModule/Show-PWSHModuleList) -- List all the GitHub Gist Lists.

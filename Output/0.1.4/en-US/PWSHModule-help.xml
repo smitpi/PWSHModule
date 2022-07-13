@@ -187,19 +187,19 @@
       <command:verb>Install</command:verb>
       <command:noun>PWSHModule</command:noun>
       <maml:description>
-        <maml:para>Install modules from a config file</maml:para>
+        <maml:para>Install modules from the specified list.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Install modules from a config file</maml:para>
+      <maml:para>Install modules from the specified list.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Install-PWSHModule</maml:name>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
           <maml:name>GitHubUserID</maml:name>
           <maml:description>
-            <maml:para>{{ Fill GitHubUserID Description }}</maml:para>
+            <maml:para>The GitHub User ID.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -208,10 +208,10 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
           <maml:name>GitHubToken</maml:name>
           <maml:description>
-            <maml:para>{{ Fill GitHubToken Description }}</maml:para>
+            <maml:para>GitHub Token with access to the Users' Gist.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -220,10 +220,10 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
           <maml:name>ListName</maml:name>
           <maml:description>
-            <maml:para>{{ Fill ListName Description }}</maml:para>
+            <maml:para>The File Name on GitHub Gist.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -232,10 +232,10 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
           <maml:name>Scope</maml:name>
           <maml:description>
-            <maml:para>{{ Fill Scope Description }}</maml:para>
+            <maml:para>Where the module will be installed. AllUsers require admin access.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -247,10 +247,10 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
         <maml:name>GitHubUserID</maml:name>
         <maml:description>
-          <maml:para>{{ Fill GitHubUserID Description }}</maml:para>
+          <maml:para>The GitHub User ID.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -259,10 +259,10 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
         <maml:name>GitHubToken</maml:name>
         <maml:description>
-          <maml:para>{{ Fill GitHubToken Description }}</maml:para>
+          <maml:para>GitHub Token with access to the Users' Gist.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -271,10 +271,10 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
         <maml:name>ListName</maml:name>
         <maml:description>
-          <maml:para>{{ Fill ListName Description }}</maml:para>
+          <maml:para>The File Name on GitHub Gist.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -283,10 +283,10 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
         <maml:name>Scope</maml:name>
         <maml:description>
-          <maml:para>{{ Fill Scope Description }}</maml:para>
+          <maml:para>Where the module will be installed. AllUsers require admin access.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -315,7 +315,7 @@
     <command:examples>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Install-PWSHModule -Export HTML -ReportPath C:\temp</dev:code>
+        <dev:code>Install-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -Filename extended -Scope CurrentUser</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>
@@ -471,7 +471,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Remove-PWSHModule</maml:name>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
           <maml:name>GitHubUserID</maml:name>
           <maml:description>
             <maml:para>{{ Fill GitHubUserID Description }}</maml:para>
@@ -483,7 +483,7 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
           <maml:name>GitHubToken</maml:name>
           <maml:description>
             <maml:para>{{ Fill GitHubToken Description }}</maml:para>
@@ -495,7 +495,7 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
           <maml:name>ListName</maml:name>
           <maml:description>
             <maml:para>{{ Fill ListName Description }}</maml:para>
@@ -507,7 +507,7 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
           <maml:name>ModuleName</maml:name>
           <maml:description>
             <maml:para>{{ Fill ModuleName Description }}</maml:para>
@@ -522,7 +522,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
         <maml:name>GitHubUserID</maml:name>
         <maml:description>
           <maml:para>{{ Fill GitHubUserID Description }}</maml:para>
@@ -534,7 +534,7 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
         <maml:name>GitHubToken</maml:name>
         <maml:description>
           <maml:para>{{ Fill GitHubToken Description }}</maml:para>
@@ -546,7 +546,7 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
         <maml:name>ListName</maml:name>
         <maml:description>
           <maml:para>{{ Fill ListName Description }}</maml:para>
@@ -558,7 +558,7 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
         <maml:name>ModuleName</maml:name>
         <maml:description>
           <maml:para>{{ Fill ModuleName Description }}</maml:para>
@@ -595,11 +595,11 @@
       <command:verb>Show</command:verb>
       <command:noun>PWSHModule</command:noun>
       <maml:description>
-        <maml:para>List the content of a config file</maml:para>
+        <maml:para>Show the details of the modules in a list.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>List the content of a config file</maml:para>
+      <maml:para>Show the details of the modules in a list.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -607,7 +607,7 @@
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
           <maml:name>GitHubUserID</maml:name>
           <maml:description>
-            <maml:para>{{ Fill GitHubUserID Description }}</maml:para>
+            <maml:para>The GitHub User ID.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -616,10 +616,10 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
           <maml:name>GitHubToken</maml:name>
           <maml:description>
-            <maml:para>{{ Fill GitHubToken Description }}</maml:para>
+            <maml:para>GitHub Token with access to the Users' Gist.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -628,10 +628,10 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
-        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
-          <maml:name>Listname</maml:name>
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+          <maml:name>ListName</maml:name>
           <maml:description>
-            <maml:para>{{ Fill Listname Description }}</maml:para>
+            <maml:para>The File Name on GitHub Gist.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -643,7 +643,7 @@
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>AsTable</maml:name>
           <maml:description>
-            <maml:para>{{ Fill AsTable Description }}</maml:para>
+            <maml:para>Display output as a table.</maml:para>
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
@@ -654,7 +654,7 @@
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>ShowProjectURI</maml:name>
           <maml:description>
-            <maml:para>{{ Fill ShowProjectURI Description }}</maml:para>
+            <maml:para>Will open the browser to the the project URL.</maml:para>
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
@@ -668,7 +668,7 @@
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
         <maml:name>GitHubUserID</maml:name>
         <maml:description>
-          <maml:para>{{ Fill GitHubUserID Description }}</maml:para>
+          <maml:para>The GitHub User ID.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -677,10 +677,10 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
         <maml:name>GitHubToken</maml:name>
         <maml:description>
-          <maml:para>{{ Fill GitHubToken Description }}</maml:para>
+          <maml:para>GitHub Token with access to the Users' Gist.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -689,10 +689,10 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
-        <maml:name>Listname</maml:name>
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="3" aliases="none">
+        <maml:name>ListName</maml:name>
         <maml:description>
-          <maml:para>{{ Fill Listname Description }}</maml:para>
+          <maml:para>The File Name on GitHub Gist.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -704,7 +704,7 @@
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>AsTable</maml:name>
         <maml:description>
-          <maml:para>{{ Fill AsTable Description }}</maml:para>
+          <maml:para>Display output as a table.</maml:para>
         </maml:description>
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
@@ -716,7 +716,7 @@
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
         <maml:name>ShowProjectURI</maml:name>
         <maml:description>
-          <maml:para>{{ Fill ShowProjectURI Description }}</maml:para>
+          <maml:para>Will open the browser to the the project URL.</maml:para>
         </maml:description>
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
@@ -736,7 +736,7 @@
     <command:examples>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Show-PWSHModule -Export HTML -ReportPath C:\temp</dev:code>
+        <dev:code>Show-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -AsTable</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>

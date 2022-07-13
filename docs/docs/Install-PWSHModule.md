@@ -1,6 +1,6 @@
 ---
 external help file: PWSHModule-help.xml
-Module Name: PWSHModule
+Module Name: pwshmodule
 online version:
 schema: 2.0.0
 ---
@@ -8,36 +8,36 @@ schema: 2.0.0
 # Install-PWSHModule
 
 ## SYNOPSIS
-Install modules from a config file
+Install modules from the specified list.
 
 ## SYNTAX
 
 ```
-Install-PWSHModule [[-GitHubUserID] <String>] [[-GitHubToken] <String>] [[-ListName] <String>]
- [[-Scope] <String>] [<CommonParameters>]
+Install-PWSHModule [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String> [-Scope] <String>
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Install modules from a config file
+Install modules from the specified list.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Install-PWSHModule -Export HTML -ReportPath C:\temp
+Install-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -Filename extended -Scope CurrentUser
 ```
 
 ## PARAMETERS
 
 ### -GitHubUserID
-{{ Fill GitHubUserID Description }}
+The GitHub User ID.
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 1
 Default value: None
 Accept pipeline input: False
@@ -45,14 +45,14 @@ Accept wildcard characters: False
 ```
 
 ### -GitHubToken
-{{ Fill GitHubToken Description }}
+GitHub Token with access to the Users' Gist.
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 2
 Default value: None
 Accept pipeline input: False
@@ -60,14 +60,14 @@ Accept wildcard characters: False
 ```
 
 ### -ListName
-{{ Fill ListName Description }}
+The File Name on GitHub Gist.
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 3
 Default value: None
 Accept pipeline input: False
@@ -75,14 +75,15 @@ Accept wildcard characters: False
 ```
 
 ### -Scope
-{{ Fill Scope Description }}
+Where the module will be installed.
+AllUsers require admin access.
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 4
 Default value: None
 Accept pipeline input: False

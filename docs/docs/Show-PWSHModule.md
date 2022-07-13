@@ -1,6 +1,6 @@
 ---
 external help file: PWSHModule-help.xml
-Module Name: PWSHModule
+Module Name: pwshmodule
 online version:
 schema: 2.0.0
 ---
@@ -8,29 +8,29 @@ schema: 2.0.0
 # Show-PWSHModule
 
 ## SYNOPSIS
-List the content of a config file
+Show the details of the modules in a list.
 
 ## SYNTAX
 
 ```
-Show-PWSHModule [-GitHubUserID] <String> [[-GitHubToken] <String>] [[-Listname] <String>] [-AsTable]
+Show-PWSHModule [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String> [-AsTable]
  [-ShowProjectURI] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-List the content of a config file
+Show the details of the modules in a list.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Show-PWSHModule -Export HTML -ReportPath C:\temp
+Show-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -AsTable
 ```
 
 ## PARAMETERS
 
 ### -GitHubUserID
-{{ Fill GitHubUserID Description }}
+The GitHub User ID.
 
 ```yaml
 Type: String
@@ -45,29 +45,29 @@ Accept wildcard characters: False
 ```
 
 ### -GitHubToken
-{{ Fill GitHubToken Description }}
+GitHub Token with access to the Users' Gist.
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 2
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Listname
-{{ Fill Listname Description }}
+### -ListName
+The File Name on GitHub Gist.
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 3
 Default value: None
 Accept pipeline input: False
@@ -75,7 +75,7 @@ Accept wildcard characters: False
 ```
 
 ### -AsTable
-{{ Fill AsTable Description }}
+Display output as a table.
 
 ```yaml
 Type: SwitchParameter
@@ -90,7 +90,7 @@ Accept wildcard characters: False
 ```
 
 ### -ShowProjectURI
-{{ Fill ShowProjectURI Description }}
+Will open the browser to the the project URL.
 
 ```yaml
 Type: SwitchParameter

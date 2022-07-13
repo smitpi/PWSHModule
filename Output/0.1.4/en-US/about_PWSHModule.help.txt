@@ -12,6 +12,7 @@ Functions in this module:
 	 Install-PWSHModule -- Install modules from the specified list.
 	 New-PWSHModuleList -- Add a new list to GitHub Gist.
 	 Remove-PWSHModule -- Remove a module to the config file
+	 Save-PWSHModule -- Saves the modules from the specified list to a folder.
 	 Show-PWSHModule -- Show the details of the modules in a list.
 	 Show-PWSHModuleList -- List all the GitHub Gist Lists.
  

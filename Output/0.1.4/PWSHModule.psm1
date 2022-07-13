@@ -1,9 +1,9 @@
 ﻿#region Public Functions
 #region Add-PWSHModule.ps1
-######## Function 1 of 6 ##################
+######## Function 1 of 7 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.3
+# ModuleVersion:    0.1.4
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
@@ -188,10 +188,10 @@ Export-ModuleMember -Function Add-PWSHModule
 #endregion
  
 #region Install-PWSHModule.ps1
-######## Function 2 of 6 ##################
+######## Function 2 of 7 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.3
+# ModuleVersion:    0.1.4
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
@@ -309,10 +309,10 @@ Export-ModuleMember -Function Install-PWSHModule
 #endregion
  
 #region New-PWSHModuleList.ps1
-######## Function 3 of 6 ##################
+######## Function 3 of 7 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.3
+# ModuleVersion:    0.1.4
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -433,10 +433,10 @@ Export-ModuleMember -Function New-PWSHModuleList
 #endregion
  
 #region Remove-PWSHModule.ps1
-######## Function 4 of 6 ##################
+######## Function 4 of 7 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.3
+# ModuleVersion:    0.1.4
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:58:24
@@ -525,11 +525,132 @@ Function Remove-PWSHModule {
 Export-ModuleMember -Function Remove-PWSHModule
 #endregion
  
+#region Save-PWSHModule.ps1
+######## Function 5 of 7 ##################
+# Function:         Save-PWSHModule
+# Module:           PWSHModule
+# ModuleVersion:    0.1.4
+# Author:           Pierre Smit
+# Company:          HTPCZA Tech
+# CreatedOn:        2022/07/13 10:26:41
+# ModifiedOn:       2022/07/13 10:45:07
+# Synopsis:         Saves the modules from the specified list to a folder.
+#############################################
+ 
+<#
+.SYNOPSIS
+Saves the module to a folder
+
+.DESCRIPTION
+Saves the module to a folder
+
+.PARAMETER Export
+Export the result to a report file. (Excel or html). Or select Host to display the object on screen.
+
+.PARAMETER ReportPath
+Where to save the report.
+
+.EXAMPLE
+Save-PWSHModule -Export HTML -ReportPath C:\temp
+
+#>
+<#
+.SYNOPSIS
+Saves the modules from the specified list to a folder.
+
+.DESCRIPTION
+Saves the modules from the specified list to a folder.
+
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
+.PARAMETER ListName
+The File Name on GitHub Gist.
+
+.PARAMETER AsNuGet
+Save in the nuget format
+
+.PARAMETER Path
+Where to save
+
+.EXAMPLE
+Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GithubToken -ListName extended -AsNuGet -Path c:\temp\
+
+#>
+Function Save-PWSHModule {
+	[Cmdletbinding(DefaultParameterSetName = 'Set1', HelpURI = 'https://smitpi.github.io/PWSHModule/Save-PWSHModule')]
+	[OutputType([System.Object[]])]
+	PARAM(
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubUserID, 
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubToken,
+		[Parameter(Mandatory = $true)]
+		[string]$ListName,
+		[switch]$AsNuGet,
+		[ValidateScript( { if (Test-Path $_) { $true }
+				else { New-Item -Path $_ -ItemType Directory -Force | Out-Null; $true }
+			})]
+		[System.IO.DirectoryInfo]$Path = 'C:\Temp'
+	)        
+		
+	try {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
+		$headers = @{}
+		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+		$base64 = [System.Convert]::ToBase64String($bytes)
+		$headers.Authorization = 'Basic {0}' -f $base64
+
+		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+	} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+
+	try {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking Config File"
+		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($ListName)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
+	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
+
+	foreach ($module in $Content.Modules) {
+		if ($module.Version -like 'Latest') {
+			if ($AsNuGet) {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+				Write-Host '[Downloading]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Nuget: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name):" -ForegroundColor Green -NoNewline ; Write-Host "$($Path)" -ForegroundColor DarkRed
+				Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -Path $Path | Out-Null
+			} else {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+				Write-Host '[Downloading]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name):" -ForegroundColor Green -NoNewline ; Write-Host "$($Path)" -ForegroundColor DarkRed
+				Save-Module -Name $module.name -Repository $module.Repository -Path $Path
+			}
+		} else {
+			if ($AsNuGet) {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+				Write-Host '[Downloading]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Nuget: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name):" -ForegroundColor Green -NoNewline ; Write-Host "$($Path)" -ForegroundColor DarkRed
+				Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -RequiredVersion $module.Version -Path $Path | Out-Null
+			} else {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+				Write-Host '[Downloading]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name):" -ForegroundColor Green -NoNewline ; Write-Host "$($Path)" -ForegroundColor DarkRed
+				Save-Module -Name $module.name -Repository $module.Repository -RequiredVersion $module.Version -Path $Path
+			}
+
+		}
+	}
+	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
+} #end Function
+ 
+Export-ModuleMember -Function Save-PWSHModule
+#endregion
+ 
 #region Show-PWSHModule.ps1
-######## Function 5 of 6 ##################
+######## Function 6 of 7 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.3
+# ModuleVersion:    0.1.4
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -630,10 +751,10 @@ Export-ModuleMember -Function Show-PWSHModule
 #endregion
  
 #region Show-PWSHModuleList.ps1
-######## Function 6 of 6 ##################
+######## Function 7 of 7 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.3
+# ModuleVersion:    0.1.4
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39

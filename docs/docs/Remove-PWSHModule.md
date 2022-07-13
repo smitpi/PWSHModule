@@ -1,6 +1,6 @@
 ---
 external help file: PWSHModule-help.xml
-Module Name: PWSHModule
+Module Name: pwshmodule
 online version:
 schema: 2.0.0
 ---
@@ -13,8 +13,8 @@ Remove a module to the config file
 ## SYNTAX
 
 ```
-Remove-PWSHModule [[-GitHubUserID] <String>] [[-GitHubToken] <String>] [[-ListName] <String>]
- [[-ModuleName] <String>] [<CommonParameters>]
+Remove-PWSHModule [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String> [-ModuleName] <String>
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -37,7 +37,7 @@ Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 1
 Default value: None
 Accept pipeline input: False
@@ -52,7 +52,7 @@ Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 2
 Default value: None
 Accept pipeline input: False
@@ -67,7 +67,7 @@ Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 3
 Default value: None
 Accept pipeline input: False
@@ -82,7 +82,7 @@ Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: 4
 Default value: None
 Accept pipeline input: False
