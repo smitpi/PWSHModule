@@ -41,21 +41,28 @@ Created [09/07/2022_15:58] Initial Script Creating
 #> 
 
 
+
 <#
 .SYNOPSIS
-Remove a module to the config file
+Remove module from the specified list.
 
 .DESCRIPTION
-Remove a module to the config file
+Remove module from the specified list.
 
-.PARAMETER Export
-Export the result to a report file. (Excel or html). Or select Host to display the object on screen.
+.PARAMETER GitHubUserID
+The GitHub User ID.
 
-.PARAMETER ReportPath
-Where to save the report.
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
+.PARAMETER ListName
+The File Name on GitHub Gist.
+
+.PARAMETER ModuleName
+Module to remove
 
 .EXAMPLE
-Remove-PWSHModule -Export HTML -ReportPath C:\temp
+Remove-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName base -ModuleName pslauncher
 
 #>
 Function Remove-PWSHModule {

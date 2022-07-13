@@ -1,9 +1,9 @@
-﻿#region Public Functions
+#region Public Functions
 #region Add-PWSHModule.ps1
 ######## Function 1 of 7 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.4
+# ModuleVersion:    0.1.5
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
@@ -191,7 +191,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 7 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.4
+# ModuleVersion:    0.1.5
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
@@ -312,7 +312,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 3 of 7 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.4
+# ModuleVersion:    0.1.5
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -436,29 +436,35 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 4 of 7 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.4
+# ModuleVersion:    0.1.5
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:58:24
-# ModifiedOn:       2022/07/13 09:58:41
-# Synopsis:         Remove a module to the config file
+# ModifiedOn:       2022/07/13 10:52:01
+# Synopsis:         Remove module from the specified list.
 #############################################
  
 <#
 .SYNOPSIS
-Remove a module to the config file
+Remove module from the specified list.
 
 .DESCRIPTION
-Remove a module to the config file
+Remove module from the specified list.
 
-.PARAMETER Export
-Export the result to a report file. (Excel or html). Or select Host to display the object on screen.
+.PARAMETER GitHubUserID
+The GitHub User ID.
 
-.PARAMETER ReportPath
-Where to save the report.
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
+.PARAMETER ListName
+The File Name on GitHub Gist.
+
+.PARAMETER ModuleName
+Module to remove
 
 .EXAMPLE
-Remove-PWSHModule -Export HTML -ReportPath C:\temp
+Remove-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName base -ModuleName pslauncher
 
 #>
 Function Remove-PWSHModule {
@@ -529,7 +535,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 5 of 7 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.4
+# ModuleVersion:    0.1.5
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -650,7 +656,7 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 6 of 7 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.4
+# ModuleVersion:    0.1.5
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -754,7 +760,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 7 of 7 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.4
+# ModuleVersion:    0.1.5
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39

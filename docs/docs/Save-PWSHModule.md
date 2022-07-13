@@ -5,26 +5,31 @@ online version:
 schema: 2.0.0
 ---
 
-# New-PWSHModuleList
+# Save-PWSHModule
 
 ## SYNOPSIS
-Add a new list to GitHub Gist.
+Saves the modules from the specified list to a folder.
 
 ## SYNTAX
 
 ```
-New-PWSHModuleList [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String>
- [-Description] <String> [<CommonParameters>]
+Save-PWSHModule [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String> [-AsNuGet]
+ [[-Path] <DirectoryInfo>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Add a new list to GitHub Gist.
+Saves the modules from the specified list to a folder.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-New-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -Description "These modules needs to be installed on all servers"
+Save-PWSHModule -Export HTML -ReportPath C:\temp
+```
+
+### EXAMPLE 2
+```
+Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GithubToken -ListName extended -AsNuGet -Path c:\temp\
 ```
 
 ## PARAMETERS
@@ -74,17 +79,32 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Description
-Summary of the function for the list.
+### -AsNuGet
+Save in the nuget format
 
 ```yaml
-Type: String
+Type: SwitchParameter
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Path
+Where to save
+
+```yaml
+Type: DirectoryInfo
+Parameter Sets: (All)
+Aliases:
+
+Required: False
 Position: 4
-Default value: None
+Default value: C:\Temp
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -96,6 +116,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
+### System.Object[]
 ## NOTES
 
 ## RELATED LINKS

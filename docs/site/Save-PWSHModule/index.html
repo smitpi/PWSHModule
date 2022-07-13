@@ -12,14 +12,14 @@
         <meta name="author" content="Pierre Smit">
       
       
-        <link rel="canonical" href="https://smitpi.github.io/PWSHModule/Show-PWSHModule/">
+        <link rel="canonical" href="https://smitpi.github.io/PWSHModule/Save-PWSHModule/">
       
       <link rel="icon" href="..">
       <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.3.8">
     
     
       
-        <title>Show-PWSHModule - PWSHModule</title>
+        <title>Save-PWSHModule - PWSHModule</title>
       
     
     
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#show-pwshmodule" class="md-skip">
+        <a href="#save-pwshmodule" class="md-skip">
           Skip to content
         </a>
       
@@ -103,7 +103,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Show-PWSHModule
+              Save-PWSHModule
             
           </span>
         </div>
@@ -308,21 +308,6 @@
 
   
   
-  
-    <li class="md-nav__item">
-      <a href="../Save-PWSHModule/" class="md-nav__link">
-        Save-PWSHModule
-      </a>
-    </li>
-  
-
-    
-      
-      
-      
-
-  
-  
     
   
   
@@ -335,12 +320,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Show-PWSHModule
+          Save-PWSHModule
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Show-PWSHModule
+        Save-PWSHModule
       </a>
       
         
@@ -394,6 +379,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#example-2" class="md-nav__link">
+    EXAMPLE 2
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -429,15 +421,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#-astable" class="md-nav__link">
-    -AsTable
+  <a href="#-asnuget" class="md-nav__link">
+    -AsNuGet
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#-showprojecturi" class="md-nav__link">
-    -ShowProjectURI
+  <a href="#-path" class="md-nav__link">
+    -Path
   </a>
   
 </li>
@@ -466,6 +458,19 @@
     OUTPUTS
   </a>
   
+    <nav class="md-nav" aria-label="OUTPUTS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#systemobject" class="md-nav__link">
+    System.Object[]
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -486,6 +491,21 @@
   
 </nav>
       
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Show-PWSHModule/" class="md-nav__link">
+        Show-PWSHModule
+      </a>
     </li>
   
 
@@ -567,6 +587,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#example-2" class="md-nav__link">
+    EXAMPLE 2
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -602,15 +629,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#-astable" class="md-nav__link">
-    -AsTable
+  <a href="#-asnuget" class="md-nav__link">
+    -AsNuGet
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#-showprojecturi" class="md-nav__link">
-    -ShowProjectURI
+  <a href="#-path" class="md-nav__link">
+    -Path
   </a>
   
 </li>
@@ -638,6 +665,19 @@
   <a href="#outputs" class="md-nav__link">
     OUTPUTS
   </a>
+  
+    <nav class="md-nav" aria-label="OUTPUTS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#systemobject" class="md-nav__link">
+    System.Object[]
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -667,24 +707,27 @@
             <article class="md-content__inner md-typeset">
               
                 
-  <a href="https://github.com/smitpi/PWSHModule/edit/master/docs/Show-PWSHModule.md" title="Edit this page" class="md-content__button md-icon">
+  <a href="https://github.com/smitpi/PWSHModule/edit/master/docs/Save-PWSHModule.md" title="Edit this page" class="md-content__button md-icon">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
   </a>
 
 
 
-<h1 id="show-pwshmodule">Show-PWSHModule</h1>
+<h1 id="save-pwshmodule">Save-PWSHModule</h1>
 <h2 id="synopsis">SYNOPSIS</h2>
-<p>Show the details of the modules in a list.</p>
+<p>Saves the modules from the specified list to a folder.</p>
 <h2 id="syntax">SYNTAX</h2>
-<div class="highlight"><pre><span></span><code>Show-PWSHModule [-GitHubUserID] &lt;String&gt; [-GitHubToken] &lt;String&gt; [-ListName] &lt;String&gt; [-AsTable]
- [-ShowProjectURI] [&lt;CommonParameters&gt;]
+<div class="highlight"><pre><span></span><code>Save-PWSHModule [-GitHubUserID] &lt;String&gt; [-GitHubToken] &lt;String&gt; [-ListName] &lt;String&gt; [-AsNuGet]
+ [[-Path] &lt;DirectoryInfo&gt;] [&lt;CommonParameters&gt;]
 </code></pre></div>
 <h2 id="description">DESCRIPTION</h2>
-<p>Show the details of the modules in a list.</p>
+<p>Saves the modules from the specified list to a folder.</p>
 <h2 id="examples">EXAMPLES</h2>
 <h3 id="example-1">EXAMPLE 1</h3>
-<div class="highlight"><pre><span></span><code>Show-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -AsTable
+<div class="highlight"><pre><span></span><code>Save-PWSHModule -Export HTML -ReportPath C:\temp
+</code></pre></div>
+<h3 id="example-2">EXAMPLE 2</h3>
+<div class="highlight"><pre><span></span><code>Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GithubToken -ListName extended -AsNuGet -Path c:\temp\
 </code></pre></div>
 <h2 id="parameters">PARAMETERS</h2>
 <h3 id="-githubuserid">-GitHubUserID</h3>
@@ -723,8 +766,8 @@
 <span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 <span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 </code></pre></div>
-<h3 id="-astable">-AsTable</h3>
-<p>Display output as a table.</p>
+<h3 id="-asnuget">-AsNuGet</h3>
+<p>Save in the nuget format</p>
 <div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SwitchParameter</span><span class="w"></span>
 <span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
 <span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
@@ -735,15 +778,15 @@
 <span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 <span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 </code></pre></div>
-<h3 id="-showprojecturi">-ShowProjectURI</h3>
-<p>Will open the browser to the the project URL.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SwitchParameter</span><span class="w"></span>
+<h3 id="-path">-Path</h3>
+<p>Where to save</p>
+<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DirectoryInfo</span><span class="w"></span>
 <span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
 <span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
 
 <span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Named</span><span class="w"></span>
-<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w"></span>
+<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">C:\Temp</span><span class="w"></span>
 <span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 <span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 </code></pre></div>
@@ -751,6 +794,7 @@
 <p>This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see <a href="http://go.microsoft.com/fwlink/?LinkID=113216">about_CommonParameters</a>.</p>
 <h2 id="inputs">INPUTS</h2>
 <h2 id="outputs">OUTPUTS</h2>
+<h3 id="systemobject">System.Object[]</h3>
 <h2 id="notes">NOTES</h2>
 <h2 id="related-links">RELATED LINKS</h2>
 
@@ -768,7 +812,7 @@
     <nav class="md-footer__inner md-grid" aria-label="Footer" >
       
         
-        <a href="../Save-PWSHModule/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Save-PWSHModule" rel="prev">
+        <a href="../Remove-PWSHModule/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Remove-PWSHModule" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
           </div>
@@ -777,20 +821,20 @@
               <span class="md-footer__direction">
                 Previous
               </span>
-              Save-PWSHModule
+              Remove-PWSHModule
             </div>
           </div>
         </a>
       
       
         
-        <a href="../Show-PWSHModuleList/" class="md-footer__link md-footer__link--next" aria-label="Next: Show-PWSHModuleList" rel="next">
+        <a href="../Show-PWSHModule/" class="md-footer__link md-footer__link--next" aria-label="Next: Show-PWSHModule" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Show-PWSHModuleList
+              Show-PWSHModule
             </div>
           </div>
           <div class="md-footer__button md-icon">
