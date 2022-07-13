@@ -32,7 +32,6 @@ Created [09/07/2022_15:57] Initial Script Creating
 
 #>
 
-#Requires -Module PSWriteColor
 
 <# 
 
@@ -44,19 +43,29 @@ Created [09/07/2022_15:57] Initial Script Creating
 
 <#
 .SYNOPSIS
-List the content of a config file
+Show the details of the modules in a list.
 
 .DESCRIPTION
-List the content of a config file
+Show the details of the modules in a list.
 
-.PARAMETER Export
-Export the result to a report file. (Excel or html). Or select Host to display the object on screen.
+.PARAMETER GitHubUserID
+The GitHub User ID.
 
-.PARAMETER ReportPath
-Where to save the report.
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
+.PARAMETER ListName
+The File Name on GitHub Gist.
+
+.PARAMETER AsTable
+Display output as a table.
+
+.PARAMETER ShowProjectURI
+Will open the browser to the the project URL.
 
 .EXAMPLE
-Show-PWSHModule -Export HTML -ReportPath C:\temp
+Show-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -AsTable
+
 
 #>
 Function Show-PWSHModule {
@@ -64,13 +73,16 @@ Function Show-PWSHModule {
 	PARAM(
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
+		[Parameter(Mandatory = $true)]
 		[string]$GitHubToken,
-		[string]$Listname,
+		[Parameter(Mandatory = $true)]
+		[string]$ListName,
 		[switch]$AsTable,
 		[switch]$ShowProjectURI
 	)
 
 	try {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connecting to Gist"
 		$headers = @{}
 		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
 		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
@@ -83,11 +95,13 @@ Function Show-PWSHModule {
 	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
 
 	try {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking config file"
 		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($Listname)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
 	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Throw 'Invalid Config File'}
 
 	$index = 0
+	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating object"
 	[System.Collections.ArrayList]$ModuleObject = @()		
 	$Content.Modules | ForEach-Object {				
 		[void]$ModuleObject.Add([PSCustomObject]@{
@@ -107,8 +121,11 @@ Function Show-PWSHModule {
 	if ($ShowProjectURI) {
 		Write-Output ' '
 		[int]$IndexURI = Read-Host 'Module Index Number'
-		if ($Content.Modules[$IndexURI].projecturi -notlike 'Unknown') {
+
+		if (-not([string]::IsNullOrEmpty($Content.Modules[$IndexURI].projecturi))) {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] open url"
 			Start-Process "$($Content.Modules[$IndexURI].projecturi)"
 		} else { Write-Warning 'Unknown ProjectURI'}
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
 } #end Function

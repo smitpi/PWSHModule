@@ -40,41 +40,52 @@ Created [12/07/2022_07:38] Initial Script Creating
 
 #> 
 
-
 <#
 .SYNOPSIS
-Install modules from a config file
+Install modules from the specified list.
 
 .DESCRIPTION
-Install modules from a config file
+Install modules from the specified list.
 
-.PARAMETER Export
-Export the result to a report file. (Excel or html). Or select Host to display the object on screen.
+.PARAMETER GitHubUserID
+The GitHub User ID.
 
-.PARAMETER ReportPath
-Where to save the report.
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
+.PARAMETER ListName
+The File Name on GitHub Gist.
+
+.PARAMETER Scope
+Where the module will be installed. AllUsers require admin access.
 
 .EXAMPLE
-Install-PWSHModule -Export HTML -ReportPath C:\temp
+Install-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -Filename extended -Scope CurrentUser
 
 #>
 Function Install-PWSHModule {
-	[Cmdletbinding(DefaultParameterSetName = 'Set1', HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
+	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
 	[OutputType([System.Object[]])]
 	PARAM(
+		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
+		[Parameter(Mandatory = $true)]
 		[string]$GitHubToken,
+		[Parameter(Mandatory = $true)]
 		[string]$ListName,
+		[Parameter(Mandatory = $true)]
 		[ValidateSet('AllUsers', 'CurrentUser')]
 		[string]$Scope
 	)
 
 	if ($scope -like 'AllUsers') {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) BEGIN] Check for admin"
 	 $IsAdmin = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
-		if (-not($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) { Throw 'Must be running an elevated prompt.' }
+		if (-not($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) { Write-Error 'Must be running an elevated prompt.' }
 	}
 
 	try {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
 		$headers = @{}
 		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
 		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
@@ -84,21 +95,25 @@ Function Install-PWSHModule {
 		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
 		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
 		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
-	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+	} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 
 	try {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking Config File"
 		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($ListName)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
 	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Throw 'Invalid Config File'}
+	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
 
 	foreach ($module in $Content.Modules) {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module"
 		if ($module.Version -like 'Latest') {
 			$mod = Get-Module -Name $module.Name
 			if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
 			if (-not($mod)) { 
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
 				Write-Host '[Installing]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green
 				Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope -Force -AllowClobber
 			} else {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking versions"
 				Write-Host '[Installed]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
 				$OnlineMod = Find-Module -Name $module.name -Repository $module.Repository
 				[version]$Onlineversion = $OnlineMod.version 
@@ -106,6 +121,7 @@ Function Install-PWSHModule {
 				if ($Localversion -lt $Onlineversion) {
 					Write-Host "`t[Upgrading]" -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green ; Write-Host " v$($OnlineMod.version)" -ForegroundColor DarkRed
 					try {
+						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Updating module"
 						Update-Module -Name $module.Name -Force -ErrorAction Stop
 					} catch {
 						try {
@@ -115,14 +131,17 @@ Function Install-PWSHModule {
 				}
 			}
 		} else {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking installed module"
 			$mod = Get-Module -Name $module.Name
 			if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
 			if ((-not($mod)) -or $mod.Version -lt $module.Version) {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
 				Write-Host '[Installing]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green
 				Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope -Force -AllowClobber
 			} else {
 				Write-Host '[Installed]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
 			}
 		}
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
 } #end Function

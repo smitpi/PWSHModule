@@ -111,18 +111,21 @@ Function Add-PWSHModule {
 
 	begin {
 		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) BEGIN] Starting $($myinvocation.mycommand)"
 			$headers = @{}
 			$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
 			$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
 			$base64 = [System.Convert]::ToBase64String($bytes)
 			$headers.Authorization = 'Basic {0}' -f $base64
 
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Starting connect to github"
 			$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
 			$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
 			$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 
 		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Checking Config File"
 			$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($ListName)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 		if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
@@ -133,6 +136,7 @@ Function Add-PWSHModule {
 	process {
 		foreach ($ModName in $ModuleName) {
 			$index = 0
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Finding modules"
 			$FilterMod = Find-Module -Filter $ModName -Repository $Repository | ForEach-Object {
 				[PSCustomObject]@{
 					Index       = $index
@@ -145,6 +149,7 @@ Function Add-PWSHModule {
 			}
 
 			if ($filtermod.name.count -gt 1) {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] More than one module found"
 				$FilterMod | Select-Object Index, Name, Description | Format-Table -AutoSize -Wrap
 				$num = Read-Host 'Index Number '
 				$ModuleToAdd = $filtermod[$num]
@@ -154,6 +159,7 @@ Function Add-PWSHModule {
 
 			if ($RequiredVersion) {
 				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Looking for versions"
 					$tmp = Find-Module -Name $ModuleToAdd.name -RequiredVersion $RequiredVersion -Repository $Repository -ErrorAction Stop
 					$VersionToAdd = $RequiredVersion
 				} catch {	
@@ -170,6 +176,7 @@ Function Add-PWSHModule {
 				}
 			} else {$VersionToAdd = 'Latest'}
 
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create new Object"
 			[void]$ModuleObject.Add([PSCustomObject]@{
 					Name        = $ModuleToAdd.Name
 					Version     = $VersionToAdd
@@ -184,6 +191,7 @@ Function Add-PWSHModule {
 		$Content.Modules = $ModuleObject | Sort-Object -Property name
 		$Content.Modified = "[$(Get-Date -Format u)] -- $($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
 		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to gist"
 			$Body = @{}
 			$files = @{}
 			$Files["$($PRGist.files.$($ListName).Filename)"] = @{content = ( $Content | ConvertTo-Json | Out-String ) }
@@ -194,6 +202,7 @@ Function Add-PWSHModule {
 			$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
 			Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " List: $($ListName)" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
 } #end Function
 

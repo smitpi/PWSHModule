@@ -76,6 +76,7 @@ Function New-PWSHModuleList {
 		[string]$Description
 	)
 
+	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating config"
 	$NewConfig = [PSCustomObject]@{
 		CreateDate  = (Get-Date -Format u)
 		Description = $Description
@@ -91,6 +92,7 @@ Function New-PWSHModuleList {
  } | ConvertTo-Json
 
 	$ConfigFile = Join-Path $env:TEMP -ChildPath "$($ListName).json"
+	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create temp file"
 	if (Test-Path $ConfigFile) {
 		Write-Warning "Config File exists, Renaming file to $($ListName)-$(Get-Date -Format yyyyMMdd_HHmm).json"	
 		try {
@@ -103,6 +105,7 @@ Function New-PWSHModuleList {
 
 
 	try {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connecting to Gist"
 		$headers = @{}
 		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
 		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
@@ -117,6 +120,7 @@ Function New-PWSHModuleList {
 		
 	if ([string]::IsNullOrEmpty($PRGist)) {
 		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to gist"
 			$Body = @{}
 			$files = @{}
 			$Files["$($ListName)"] = @{content = ( Get-Content (Get-Item $ConfigFile).FullName -Encoding UTF8 | Out-String ) }
@@ -130,6 +134,7 @@ Function New-PWSHModuleList {
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 	} else {
 		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to Gist"
 			$Body = @{}
 			$files = @{}
 			$Files["$($ListName)"] = @{content = ( Get-Content (Get-Item $ConfigFile).FullName -Encoding UTF8 | Out-String ) }
@@ -141,4 +146,5 @@ Function New-PWSHModuleList {
 			Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 	}
+	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 } #end Function

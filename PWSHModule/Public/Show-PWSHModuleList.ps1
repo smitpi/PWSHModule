@@ -86,6 +86,7 @@ Function Show-PWSHModuleList {
 
 	
 	try {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to gist"
 		$headers = @{}
 		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
 		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
@@ -99,6 +100,7 @@ Function Show-PWSHModuleList {
 
 
 	[System.Collections.ArrayList]$GistObject = @()
+	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create object"
 	$PRGist.files | Get-Member -MemberType NoteProperty | ForEach-Object {
 		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($_.name)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
 		if ($Content.modified -notlike 'Unknown') {
@@ -119,5 +121,6 @@ Function Show-PWSHModuleList {
 	}
 
 	$GistObject
+	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 
 } #end Function

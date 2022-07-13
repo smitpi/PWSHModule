@@ -59,15 +59,20 @@ Remove-PWSHModule -Export HTML -ReportPath C:\temp
 
 #>
 Function Remove-PWSHModule {
-	[Cmdletbinding(DefaultParameterSetName = 'Set1', HelpURI = 'https://smitpi.github.io/PWSHModule/Remove-PWSHModule')]
+	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Remove-PWSHModule')]
 	PARAM(
+		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
+		[Parameter(Mandatory = $true)]
 		[string]$GitHubToken,
+		[Parameter(Mandatory = $true)]
 		[string]$ListName,
+		[Parameter(Mandatory = $true)]
 		[String]$ModuleName
 	)
 
 	try {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connecting to Gist"
 		$headers = @{}
 		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
 		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
@@ -77,25 +82,29 @@ Function Remove-PWSHModule {
 		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
 		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
 		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
-	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+	} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 
 	try {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking config file."
 		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($ListName)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
 	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Throw 'Invalid Config File'}
+	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
 
-	$Modremove = $Content.Modules | Where-Object {$_.Name -like $ModuleName}
+	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Find module to remove"
+	$Modremove = ($Content.Modules | Where-Object {$_.Name -like $ModuleName})[0]
 	if ([string]::IsNullOrEmpty($Modremove) -or ($Modremove.name.count -gt 1)) {
-		throw 'Module not found'
+		Write-Error 'Module not found'
 	} else {
 		[System.Collections.ArrayList]$ModuleObject = @()		
 		$Content.Modules | ForEach-Object {[void]$ModuleObject.Add($_)}
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Removing module"
 		$ModuleObject.Remove($Modremove)
 		Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to $($ListName)" -ForegroundColor Green
 		$Content.Modules = $ModuleObject | Sort-Object -Property name
 		$Content.Modified = "[$(Get-Date -Format u)] -- $($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
 
 		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to gist"
 			$Body = @{}
 			$files = @{}
 			$Files["$($PRGist.files.$($ListName).Filename)"] = @{content = ( $Content | ConvertTo-Json | Out-String ) }
@@ -105,7 +114,7 @@ Function Remove-PWSHModule {
 			$json = [System.Text.Encoding]::UTF8.GetBytes($json)
 			$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
 			Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
-		} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 	}
 
 } #end Function
