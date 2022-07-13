@@ -55,13 +55,32 @@ Export the result to a report file. (Excel or html). Or select Host to display t
 Where to save the report.
 
 .EXAMPLE
-Show-PWSHModuleGistConfig -Export HTML -ReportPath C:\temp
+Show-PWSHModuleList -Export HTML -ReportPath C:\temp
 
 #>
-Function Show-PWSHModuleGistConfig {
-	[Cmdletbinding(DefaultParameterSetName = 'Set1', HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModuleGistConfig')]
+<#
+.SYNOPSIS
+List all the GitHub Gist Lists.
+
+.DESCRIPTION
+List all the GitHub Gist Lists.
+
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
+.EXAMPLE
+Show-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken 
+
+#>
+Function Show-PWSHModuleList {
+	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModuleList')]
 	PARAM(
+		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
+		[Parameter(Mandatory = $true)]
 		[string]$GitHubToken
 	)
 
@@ -82,8 +101,8 @@ Function Show-PWSHModuleGistConfig {
 	[System.Collections.ArrayList]$GistObject = @()
 	$PRGist.files | Get-Member -MemberType NoteProperty | ForEach-Object {
 		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($_.name)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
-		if ($Content.modified.split(' -- ')[0]) {
-			$modifiedDate = $Content.modified.split(' -- ')[0]
+		if ($Content.modified -notlike 'Unknown') {
+			$modifiedDate = [datetime](($Content.modified.split(' -- ')[0]).replace('[', '')).replace(']', '')
 			$modifiedUser = $Content.modified.split(' -- ')[1]
 		} else { 
 			$modifiedDate = 'Unknown'

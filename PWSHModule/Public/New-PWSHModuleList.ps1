@@ -32,8 +32,6 @@ Created [09/07/2022_15:22] Initial Script Creating
 
 #>
 
-#Requires -Module PSWriteColor
-
 <# 
 
 .DESCRIPTION 
@@ -44,37 +42,29 @@ Created [09/07/2022_15:22] Initial Script Creating
 
 <#
 .SYNOPSIS
-Create a new config file.
+Add a new list to GitHub Gist.
 
 .DESCRIPTION
-Create a new config file.
+Add a new list to GitHub Gist.
 
-.PARAMETER Export
-Export the result to a report file. (Excel or html). Or select Host to display the object on screen.
+.PARAMETER GitHubUserID
+The GitHub User ID.
 
-.PARAMETER ReportPath
-Where to save the report.
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
 
-.EXAMPLE
-New-PWSHModuleConfigFile -Export HTML -ReportPath C:\temp
+.PARAMETER ListName
+The File Name on GitHub Gist.
 
-#>
-<#
-.SYNOPSIS
-Create a new config file.
-
-.DESCRIPTION
-Create a new json config file in the path specified.
-
-.PARAMETER Path
-Path where the config file will be created. If the path doesn't exist, it will be created.
+.PARAMETER Description
+Summary of the function for the list.
 
 .EXAMPLE
-New-PWSHModuleConfigFile -Path C:\temp
+New-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -Description "These modules needs to be installed on all servers"
 
 #>
-Function New-PWSHModuleConfigFile {
-	[Cmdletbinding( HelpURI = 'https://smitpi.github.io/PWSHModule/New-PWSHModuleConfigFile')]
+Function New-PWSHModuleList {
+	[Cmdletbinding( HelpURI = 'https://smitpi.github.io/PWSHModule/New-PWSHModuleList')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
@@ -87,11 +77,11 @@ Function New-PWSHModuleConfigFile {
 	)
 
 	$NewConfig = [PSCustomObject]@{
-		CreateDate   = (Get-Date -Format u)
-		Description  = $Description
-		Author       = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
-		Modified     = 'Unknown'
-		Modules      = [PSCustomObject]@{
+		CreateDate  = (Get-Date -Format u)
+		Description = $Description
+		Author      = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
+		Modified    = 'Unknown'
+		Modules     = [PSCustomObject]@{
 			Name        = 'PWSHModule'
 			Version     = 'Latest'
 			Description = 'Uses a GitHub Gist File to install and maintain a list of PowerShell Modules'
@@ -122,7 +112,7 @@ Function New-PWSHModuleConfigFile {
 		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
 		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
 		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
-	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+	} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 
 		
 	if ([string]::IsNullOrEmpty($PRGist)) {
@@ -137,7 +127,7 @@ Function New-PWSHModuleConfigFile {
 			$null = Invoke-WebRequest -Headers $headers -Uri https://api.github.com/gists -Method Post -Body $json -ErrorAction Stop
 			Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
 
-		} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 	} else {
 		try {
 			$Body = @{}
@@ -149,6 +139,6 @@ Function New-PWSHModuleConfigFile {
 			$json = [System.Text.Encoding]::UTF8.GetBytes($json)
 			$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
 			Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
-		} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 	}
 } #end Function
