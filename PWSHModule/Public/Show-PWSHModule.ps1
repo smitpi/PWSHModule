@@ -62,6 +62,7 @@ Show-PWSHModule -Export HTML -ReportPath C:\temp
 Function Show-PWSHModule {
 	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModule')]
 	PARAM(
+		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
 		[string]$GitHubToken,
 		[string]$Listname,

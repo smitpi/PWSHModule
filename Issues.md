@@ -4,6 +4,8 @@
 
 | Catagory      | File                        | details                                                                             |
 | ------------- | --------------------------- | ----------------------------------------------------------------------------------- |
+| External Help | New-PWSHModuleList          | Did not create the .md file                                                         |
+| External Help | Show-PWSHModuleList         | Did not create the .md file                                                         |
 | External Help | Add-PWSHModule.md           | Add-PWSHModule.md - ### -Path - {{ Fill Path Description }}                         |
 | External Help | Install-PWSHModule.md       | Install-PWSHModule.md - ### -Path - {{ Fill Path Description }}                     |
 | External Help | Remove-PWSHModule.md        | Remove-PWSHModule.md - ### -Path - {{ Fill Path Description }}                      |
@@ -16,7 +18,8 @@
 | External Help | New-PWSHModuleConfigFile.md | New-PWSHModuleConfigFile.md - ### -Description - {{ Fill Description Description }} |
 | External Help | Show-PWSHModule.md          | Show-PWSHModule.md - ### -AsTable - {{ Fill AsTable Description }}                  |
 | External Help | Show-PWSHModule.md          | Show-PWSHModule.md - ### -ShowProjectURI - {{ Fill ShowProjectURI Description }}    |
+| Not Copied    | New-PWSHModuleConfigFile    | <=                                                                                  |
 
 ---
 
-*Updated: Tuesday, 12 July 2022 10:44:31 UTC*
+*Updated: Wednesday, 13 July 2022 03:52:52 UTC*
