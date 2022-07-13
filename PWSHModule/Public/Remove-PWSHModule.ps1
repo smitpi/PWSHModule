@@ -39,6 +39,8 @@ Created [09/07/2022_15:58] Initial Script Creating
  Remove a module to the config file 
 
 #> 
+
+
 <#
 .SYNOPSIS
 Remove module from the specified list.
@@ -119,5 +121,16 @@ Function Remove-PWSHModule {
 			Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 	}
+
+	$files = @{}
+	$Files["$($PRGist.files.$($ListName).Filename)"] = @{content = ( $Content | ConvertTo-Json | Out-String ) }
+	$Body.files = $Files
+	$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
+	$json = ConvertTo-Json -InputObject $Body
+	$json = [System.Text.Encoding]::UTF8.GetBytes($json)
+	$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
+	Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
+} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+}
 
 } #end Function
