@@ -75,11 +75,14 @@ New-PWSHModuleConfigFile -Path C:\temp
 #>
 Function New-PWSHModuleConfigFile {
 	[Cmdletbinding( HelpURI = 'https://smitpi.github.io/PWSHModule/New-PWSHModuleConfigFile')]
-	[OutputType([System.Object[]])]
 	PARAM(
+		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
+		[Parameter(Mandatory = $true)]
 		[string]$GitHubToken,
+		[Parameter(Mandatory = $true)]
 		[string]$ListName,
+		[Parameter(Mandatory = $true)]
 		[string]$Description
 	)
 
@@ -91,7 +94,7 @@ Function New-PWSHModuleConfigFile {
 		Modules      = [PSCustomObject]@{
 			Name        = 'PWSHModule'
 			Version     = 'Latest'
-			Description = 'Uses a Config file to install and maintain a list of PowerShell Modules'
+			Description = 'Uses a GitHub Gist File to install and maintain a list of PowerShell Modules'
 			Repository  = 'PSGallery'
 			Projecturi  = 'https://github.com/smitpi/PWSHModule'
 		}
