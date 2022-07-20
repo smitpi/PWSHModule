@@ -1,7 +1,7 @@
 # PWSHModule
  
 ## Description
-Uses a GitHub Gist file to install and maintain a list of PowerShell Modules, you can create more than one lists and use that custom install modules from different repositories and different versions
+Creates a GitHub Gist (Private or Public) list to install and maintain the installed PowerShell Modules on your systems, you can create more than one list and use it to custom install modules from different repositories or different versions.
  
 ## Getting Started
 - Install from PowerShell Gallery [PS Gallery](https://www.powershellgallery.com/packages/PWSHModule)
