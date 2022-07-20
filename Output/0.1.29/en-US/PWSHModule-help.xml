@@ -854,16 +854,7 @@
       </command:parameter>
     </command:parameters>
     <command:inputTypes />
-    <command:returnValues>
-      <command:returnValue>
-        <dev:type>
-          <maml:name>System.Object[]</maml:name>
-        </dev:type>
-        <maml:description>
-          <maml:para></maml:para>
-        </maml:description>
-      </command:returnValue>
-    </command:returnValues>
+    <command:returnValues />
     <maml:alertSet>
       <maml:alert>
         <maml:para></maml:para>
@@ -872,13 +863,6 @@
     <command:examples>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Save-PWSHModule -Export HTML -ReportPath C:\temp</dev:code>
-        <dev:remarks>
-          <maml:para></maml:para>
-        </dev:remarks>
-      </command:example>
-      <command:example>
-        <maml:title>-------------------------- EXAMPLE 2 --------------------------</maml:title>
         <dev:code>Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GithubToken -ListName extended -AsNuGet -Path c:\temp\</dev:code>
         <dev:remarks>
           <maml:para></maml:para>

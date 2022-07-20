@@ -31,11 +31,6 @@ Saves the modules from the specified list to a folder.
 
 ### EXAMPLE 1
 ```
-Save-PWSHModule -Export HTML -ReportPath C:\temp
-```
-
-### EXAMPLE 2
-```
 Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GithubToken -ListName extended -AsNuGet -Path c:\temp\
 ```
 
@@ -138,7 +133,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### System.Object[]
 ## NOTES
 
 ## RELATED LINKS
