@@ -43,23 +43,6 @@ Created [13/07/2022_01:15] Initial Script Creating
 
 <#
 .SYNOPSIS
-Shows a list of all the Config files in GitHub
-
-.DESCRIPTION
-Shows a list of all the Config files in GitHub
-
-.PARAMETER Export
-Export the result to a report file. (Excel or html). Or select Host to display the object on screen.
-
-.PARAMETER ReportPath
-Where to save the report.
-
-.EXAMPLE
-Show-PWSHModuleList -Export HTML -ReportPath C:\temp
-
-#>
-<#
-.SYNOPSIS
 List all the GitHub Gist Lists.
 
 .DESCRIPTION
@@ -67,6 +50,9 @@ List all the GitHub Gist Lists.
 
 .PARAMETER GitHubUserID
 The GitHub User ID.
+
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
 
 .PARAMETER GitHubToken
 GitHub Token with access to the Users' Gist.
@@ -76,11 +62,13 @@ Show-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function Show-PWSHModuleList {
-	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModuleList')]
+	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModuleList')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
-		[Parameter(Mandatory = $true)]
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
 		[string]$GitHubToken
 	)
 

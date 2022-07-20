@@ -3,38 +3,14 @@
 ######## Function 1 of 7 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.11
+# ModuleVersion:    0.1.12
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
-# ModifiedOn:       2022/07/13 09:51:53
+# ModifiedOn:       2022/07/20 17:42:31
 # Synopsis:         Adds a new module to the GitHub Gist List.
 #############################################
  
-<#
-.SYNOPSIS
-Add a Module name to the config File.
-
-.DESCRIPTION
-Add a Module name to the config File.
-
-.PARAMETER Path
-Path to the json config file.
-
-.PARAMETER ModuleName
-Name of the Module to add.
-
-.PARAMETER Repository
-Repository to find the module.
-
-.PARAMETER RequiredVersion
-Select if you want to specify a specific version.
-
-.EXAMPLE
-Add-PWSHModule -Path C:\Utils\PWSLModule.json -ModuleName Json -Repository PSGallery
-
-#>
-
 <#
 .SYNOPSIS
 Adds a new module to the GitHub Gist List.
@@ -191,11 +167,11 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 7 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.11
+# ModuleVersion:    0.1.12
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
-# ModifiedOn:       2022/07/13 09:55:18
+# ModifiedOn:       2022/07/20 17:39:08
 # Synopsis:         Install modules from the specified list.
 #############################################
  
@@ -208,6 +184,9 @@ Install modules from the specified list.
 
 .PARAMETER GitHubUserID
 The GitHub User ID.
+
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
 
 .PARAMETER GitHubToken
 GitHub Token with access to the Users' Gist.
@@ -223,12 +202,13 @@ Install-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -Filename exte
 
 #>
 Function Install-PWSHModule {
-	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
-	[OutputType([System.Object[]])]
+	[Cmdletbinding(DefaultParameterSetName = 'Private',HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
-		[Parameter(Mandatory = $true)]
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
 		[string]$GitHubToken,
 		[Parameter(Mandatory = $true)]
 		[string]$ListName,
@@ -312,7 +292,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 3 of 7 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.11
+# ModuleVersion:    0.1.12
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -436,7 +416,7 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 4 of 7 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.11
+# ModuleVersion:    0.1.12
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
@@ -534,11 +514,11 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 5 of 7 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.11
+# ModuleVersion:    0.1.12
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
-# ModifiedOn:       2022/07/13 10:45:07
+# ModifiedOn:       2022/07/20 17:38:55
 # Synopsis:         Saves the modules from the specified list to a folder.
 #############################################
  
@@ -569,6 +549,9 @@ Saves the modules from the specified list to a folder.
 .PARAMETER GitHubUserID
 The GitHub User ID.
 
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
+
 .PARAMETER GitHubToken
 GitHub Token with access to the Users' Gist.
 
@@ -576,7 +559,7 @@ GitHub Token with access to the Users' Gist.
 The File Name on GitHub Gist.
 
 .PARAMETER AsNuGet
-Save in the nuget format
+Save in the NuGet format
 
 .PARAMETER Path
 Where to save
@@ -586,12 +569,14 @@ Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GithubToken -ListName extende
 
 #>
 Function Save-PWSHModule {
-	[Cmdletbinding(DefaultParameterSetName = 'Set1', HelpURI = 'https://smitpi.github.io/PWSHModule/Save-PWSHModule')]
+	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Save-PWSHModule')]
 	[OutputType([System.Object[]])]
 	PARAM(
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
-		[Parameter(Mandatory = $true)]
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
 		[string]$GitHubToken,
 		[Parameter(Mandatory = $true)]
 		[string]$ListName,
@@ -655,11 +640,11 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 6 of 7 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.11
+# ModuleVersion:    0.1.12
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
-# ModifiedOn:       2022/07/13 10:00:13
+# ModifiedOn:       2022/07/20 17:41:18
 # Synopsis:         Show the details of the modules in a list.
 #############################################
  
@@ -672,6 +657,9 @@ Show the details of the modules in a list.
 
 .PARAMETER GitHubUserID
 The GitHub User ID.
+
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
 
 .PARAMETER GitHubToken
 GitHub Token with access to the Users' Gist.
@@ -691,11 +679,13 @@ Show-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -A
 
 #>
 Function Show-PWSHModule {
-	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModule')]
+	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModule')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
-		[Parameter(Mandatory = $true)]
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
 		[string]$GitHubToken,
 		[Parameter(Mandatory = $true)]
 		[string]$ListName,
@@ -731,7 +721,7 @@ Function Show-PWSHModule {
 				Name        = $_.Name
 				Version     = $_.version
 				Description = $_.Description
-				Repository  = $_.$Repository
+				Repository  = $_.Repository
 				Projecturi  = $_.projecturi
 			})
 		$index++
@@ -759,31 +749,14 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 7 of 7 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.11
+# ModuleVersion:    0.1.12
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
-# ModifiedOn:       2022/07/13 10:01:42
+# ModifiedOn:       2022/07/20 17:39:50
 # Synopsis:         List all the GitHub Gist Lists.
 #############################################
  
-<#
-.SYNOPSIS
-Shows a list of all the Config files in GitHub
-
-.DESCRIPTION
-Shows a list of all the Config files in GitHub
-
-.PARAMETER Export
-Export the result to a report file. (Excel or html). Or select Host to display the object on screen.
-
-.PARAMETER ReportPath
-Where to save the report.
-
-.EXAMPLE
-Show-PWSHModuleList -Export HTML -ReportPath C:\temp
-
-#>
 <#
 .SYNOPSIS
 List all the GitHub Gist Lists.
@@ -794,6 +767,9 @@ List all the GitHub Gist Lists.
 .PARAMETER GitHubUserID
 The GitHub User ID.
 
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
+
 .PARAMETER GitHubToken
 GitHub Token with access to the Users' Gist.
 
@@ -802,11 +778,13 @@ Show-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function Show-PWSHModuleList {
-	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModuleList')]
+	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModuleList')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
-		[Parameter(Mandatory = $true)]
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
 		[string]$GitHubToken
 	)
 

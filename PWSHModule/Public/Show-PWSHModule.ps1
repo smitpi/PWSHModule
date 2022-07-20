@@ -51,6 +51,9 @@ Show the details of the modules in a list.
 .PARAMETER GitHubUserID
 The GitHub User ID.
 
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
+
 .PARAMETER GitHubToken
 GitHub Token with access to the Users' Gist.
 
@@ -69,11 +72,13 @@ Show-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -A
 
 #>
 Function Show-PWSHModule {
-	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModule')]
+	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModule')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
-		[Parameter(Mandatory = $true)]
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
 		[string]$GitHubToken,
 		[Parameter(Mandatory = $true)]
 		[string]$ListName,
@@ -109,7 +114,7 @@ Function Show-PWSHModule {
 				Name        = $_.Name
 				Version     = $_.version
 				Description = $_.Description
-				Repository  = $_.$Repository
+				Repository  = $_.Repository
 				Projecturi  = $_.projecturi
 			})
 		$index++

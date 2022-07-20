@@ -50,6 +50,9 @@ Install modules from the specified list.
 .PARAMETER GitHubUserID
 The GitHub User ID.
 
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
+
 .PARAMETER GitHubToken
 GitHub Token with access to the Users' Gist.
 
@@ -64,12 +67,13 @@ Install-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -Filename exte
 
 #>
 Function Install-PWSHModule {
-	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
-	[OutputType([System.Object[]])]
+	[Cmdletbinding(DefaultParameterSetName = 'Private',HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
-		[Parameter(Mandatory = $true)]
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
 		[string]$GitHubToken,
 		[Parameter(Mandatory = $true)]
 		[string]$ListName,

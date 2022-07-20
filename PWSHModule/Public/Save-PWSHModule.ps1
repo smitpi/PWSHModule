@@ -32,9 +32,6 @@ Created [13/07/2022_10:26] Initial Script Creating
 
 #>
 
-#Requires -Module ImportExcel
-#Requires -Module PSWriteHTML
-#Requires -Module PSWriteColor
 
 <# 
 
@@ -71,6 +68,9 @@ Saves the modules from the specified list to a folder.
 .PARAMETER GitHubUserID
 The GitHub User ID.
 
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
+
 .PARAMETER GitHubToken
 GitHub Token with access to the Users' Gist.
 
@@ -78,7 +78,7 @@ GitHub Token with access to the Users' Gist.
 The File Name on GitHub Gist.
 
 .PARAMETER AsNuGet
-Save in the nuget format
+Save in the NuGet format
 
 .PARAMETER Path
 Where to save
@@ -88,12 +88,14 @@ Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GithubToken -ListName extende
 
 #>
 Function Save-PWSHModule {
-	[Cmdletbinding(DefaultParameterSetName = 'Set1', HelpURI = 'https://smitpi.github.io/PWSHModule/Save-PWSHModule')]
+	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Save-PWSHModule')]
 	[OutputType([System.Object[]])]
 	PARAM(
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
-		[Parameter(Mandatory = $true)]
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
 		[string]$GitHubToken,
 		[Parameter(Mandatory = $true)]
 		[string]$ListName,

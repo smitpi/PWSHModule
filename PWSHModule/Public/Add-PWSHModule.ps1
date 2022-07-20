@@ -31,38 +31,12 @@ Created [09/07/2022_15:58] Initial Script Creating
 .PRIVATEDATA
 
 #>
-#Requires -Module PSWriteColor
 <# 
 
 .DESCRIPTION 
  Add a module to the config file 
 
 #> 
-
-
-<#
-.SYNOPSIS
-Add a Module name to the config File.
-
-.DESCRIPTION
-Add a Module name to the config File.
-
-.PARAMETER Path
-Path to the json config file.
-
-.PARAMETER ModuleName
-Name of the Module to add.
-
-.PARAMETER Repository
-Repository to find the module.
-
-.PARAMETER RequiredVersion
-Select if you want to specify a specific version.
-
-.EXAMPLE
-Add-PWSHModule -Path C:\Utils\PWSLModule.json -ModuleName Json -Repository PSGallery
-
-#>
 
 <#
 .SYNOPSIS
