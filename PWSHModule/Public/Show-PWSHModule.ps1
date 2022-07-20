@@ -60,15 +60,14 @@ GitHub Token with access to the Users' Gist.
 .PARAMETER ListName
 The File Name on GitHub Gist.
 
-.PARAMETER AsTable
-Display output as a table.
+.PARAMETER CompareInstalled
+Compare the list to what is installed.
 
 .PARAMETER ShowProjectURI
 Will open the browser to the the project URL.
 
 .EXAMPLE
-Show-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -AsTable
-
+Show-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base
 
 #>
 Function Show-PWSHModule {
@@ -82,7 +81,7 @@ Function Show-PWSHModule {
 		[string]$GitHubToken,
 		[Parameter(Mandatory = $true)]
 		[string]$ListName,
-		[switch]$AsTable,
+		[switch]$CompareInstalled,
 		[switch]$ShowProjectURI
 	)
 
@@ -120,13 +119,39 @@ Function Show-PWSHModule {
 		$index++
 	}
 
-	if ($AsTable) {$ModuleObject | Format-Table -AutoSize}
-	else {$ModuleObject}
-
+	if ($CompareInstalled) {
+		[System.Collections.ArrayList]$CompareObject = @()		
+		$index = 0
+		foreach ($CompareModule in $ModuleObject) {
+			try {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Online: $($CompareModule.name)"
+				if ($CompareModule.Version -like 'Latest') {
+					$online = Find-Module -Name $CompareModule.name -Repository $CompareModule.Repository 
+				} else {
+					$online = Find-Module -Name $CompareModule.name -Repository $CompareModule.Repository -RequiredVersion $CompareModule.Version
+				}
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Local: $($CompareModule.name)"
+				$local = (Get-Module -Name $CompareModule.Name -ListAvailable | Sort-Object -Property Version -Descending)[0]
+				if ($local.Version -lt $online.Version) {$update = $true}
+				else {$update = $false}
+				[void]$CompareObject.Add([PSCustomObject]@{
+						Index           = $index
+						Name            = $CompareModule.Name
+						InstalledVer    = $local.Version
+						OnlineVer       = $online.Version
+						UpdateAvailable = $update
+						Folder          = (Get-Item $local.Path).DirectoryName
+						Description     = $CompareModule.Description
+						Repository      = $CompareModule.Repository
+					})
+			} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			$index++
+		}
+		$CompareObject
+	} else {$ModuleObject}
 	if ($ShowProjectURI) {
 		Write-Output ' '
 		[int]$IndexURI = Read-Host 'Module Index Number'
-
 		if (-not([string]::IsNullOrEmpty($Content.Modules[$IndexURI].projecturi))) {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] open url"
 			Start-Process "$($Content.Modules[$IndexURI].projecturi)"
