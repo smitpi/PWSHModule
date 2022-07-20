@@ -145,7 +145,7 @@ Function Install-PWSHModule {
 			if ((-not($mod)) -or $mod.Version -lt $module.Version) {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
-					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green
+					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($module.Version))" -ForegroundColor Green  -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
 					Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope -Force -AllowClobber
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {

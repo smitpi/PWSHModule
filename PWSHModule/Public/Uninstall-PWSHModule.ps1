@@ -59,6 +59,9 @@ GitHub Token with access to the Users' Gist.
 .PARAMETER ListName
 The File Name on GitHub Gist.
 
+.PARAMETER ModuleName
+Name of the module to uninstall. Use * to select all modules in the list.
+
 .PARAMETER OldVersions
 Will only uninstall old versions of the module.
 
@@ -146,13 +149,17 @@ Function Uninstall-PWSHModule {
 					Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green
 					Uninstall-Module -Name $module.Name -AllVersions -Force -ErrorAction Stop
 				} catch {
-                Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"
-                if ($ForceDeleteFolder) {
-                try {
-                        Get-Module -Name $Module.name -ListAvailable | ForEach-Object {Get-ChildItem -Path (Get-Item $_.Path).Directory -Recurse | Remove-Item -Force -Recurse}
-                } catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-                    }
-                }
+					Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"
+					if ($ForceDeleteFolder) {
+						Get-Module -Name $Module.name -ListAvailable | ForEach-Object {
+							try {
+								Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
+								Get-ChildItem -Path (Get-Item $_.Path).Directory -Recurse | Remove-Item -Force -Recurse
+							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+						}
+						
+					}
+				}
 			}
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 		}

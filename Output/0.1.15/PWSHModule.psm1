@@ -1,9 +1,9 @@
-﻿#region Public Functions
+#region Public Functions
 #region Add-PWSHModule.ps1
 ######## Function 1 of 8 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.13
+# ModuleVersion:    0.1.15
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
@@ -173,11 +173,11 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 8 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.13
+# ModuleVersion:    0.1.15
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
-# ModifiedOn:       2022/07/20 22:10:31
+# ModifiedOn:       2022/07/20 23:55:06
 # Synopsis:         Install modules from the specified list.
 #############################################
  
@@ -286,7 +286,7 @@ Function Install-PWSHModule {
 			if ((-not($mod)) -or $mod.Version -lt $module.Version) {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
-					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green
+					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($module.Version))" -ForegroundColor Green  -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
 					Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope -Force -AllowClobber
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
@@ -304,7 +304,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 3 of 8 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.13
+# ModuleVersion:    0.1.15
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -429,11 +429,11 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 4 of 8 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.13
+# ModuleVersion:    0.1.15
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
-# ModifiedOn:       2022/07/20 20:08:51
+# ModifiedOn:       2022/07/21 00:17:16
 # Synopsis:         Remove module from the specified list.
 #############################################
  
@@ -523,7 +523,7 @@ Function Remove-PWSHModule {
 			$json = ConvertTo-Json -InputObject $Body
 			$json = [System.Text.Encoding]::UTF8.GetBytes($json)
 			$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
-			Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
+			Write-Host '[Uploaded] ' -NoNewline -ForegroundColor Yellow; Write-Host " List: $($ListName)" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 	}
 } #end Function
@@ -535,7 +535,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 5 of 8 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.13
+# ModuleVersion:    0.1.15
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -651,7 +651,7 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 6 of 8 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.13
+# ModuleVersion:    0.1.15
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -785,7 +785,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 7 of 8 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.13
+# ModuleVersion:    0.1.15
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -872,11 +872,11 @@ Export-ModuleMember -Function Show-PWSHModuleList
 ######## Function 8 of 8 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.13
+# ModuleVersion:    0.1.15
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
-# ModifiedOn:       2022/07/20 23:40:27
+# ModifiedOn:       2022/07/20 23:59:22
 # Synopsis:         Will uninstall the module from the system.
 #############################################
  
@@ -898,6 +898,9 @@ GitHub Token with access to the Users' Gist.
 
 .PARAMETER ListName
 The File Name on GitHub Gist.
+
+.PARAMETER ModuleName
+Name of the module to uninstall. Use * to select all modules in the list.
 
 .PARAMETER OldVersions
 Will only uninstall old versions of the module.
@@ -986,13 +989,17 @@ Function Uninstall-PWSHModule {
 					Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green
 					Uninstall-Module -Name $module.Name -AllVersions -Force -ErrorAction Stop
 				} catch {
-                Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"
-                if ($ForceDeleteFolder) {
-                try {
-                        Get-Module -Name $Module.name -ListAvailable | ForEach-Object {Get-ChildItem -Path (Get-Item $_.Path).Directory -Recurse | Remove-Item -Force -Recurse}
-                } catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-                    }
-                }
+					Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"
+					if ($ForceDeleteFolder) {
+						Get-Module -Name $Module.name -ListAvailable | ForEach-Object {
+							try {
+								Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
+								Get-ChildItem -Path (Get-Item $_.Path).Directory -Recurse | Remove-Item -Force -Recurse
+							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+						}
+						
+					}
+				}
 			}
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 		}

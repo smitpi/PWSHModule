@@ -98,7 +98,7 @@ Accept wildcard characters: False
 ```
 
 ### -ModuleName
-{{ Fill ModuleName Description }}
+Name of the module to uninstall.
 
 ```yaml
 Type: String[]

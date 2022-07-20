@@ -127,7 +127,7 @@ Function Remove-PWSHModule {
 			$json = ConvertTo-Json -InputObject $Body
 			$json = [System.Text.Encoding]::UTF8.GetBytes($json)
 			$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
-			Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
+			Write-Host '[Uploaded] ' -NoNewline -ForegroundColor Yellow; Write-Host " List: $($ListName)" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 	}
 } #end Function
