@@ -3,7 +3,7 @@
 ######## Function 1 of 7 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.13
+# ModuleVersion:    0.1.14
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
@@ -168,7 +168,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 7 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.13
+# ModuleVersion:    0.1.14
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
@@ -293,7 +293,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 3 of 7 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.13
+# ModuleVersion:    0.1.14
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -418,7 +418,7 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 4 of 7 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.13
+# ModuleVersion:    0.1.14
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
@@ -517,7 +517,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 5 of 7 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.13
+# ModuleVersion:    0.1.14
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -643,7 +643,7 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 6 of 7 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.13
+# ModuleVersion:    0.1.14
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -752,11 +752,11 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 7 of 7 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.13
+# ModuleVersion:    0.1.14
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
-# ModifiedOn:       2022/07/20 17:39:50
+# ModifiedOn:       2022/07/20 17:59:55
 # Synopsis:         List all the GitHub Gist Lists.
 #############################################
  
@@ -810,9 +810,9 @@ Function Show-PWSHModuleList {
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create object"
 	$PRGist.files | Get-Member -MemberType NoteProperty | ForEach-Object {
 		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($_.name)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
-		if ($Content.modified -notlike 'Unknown') {
-			$modifiedDate = [datetime](($Content.modified.split(' -- ')[0]).replace('[', '')).replace(']', '')
-			$modifiedUser = $Content.modified.split(' -- ')[1]
+		if ($Content.modifiedDate -notlike 'Unknown') {
+			$modifiedDate = [datetime]$Content.ModifiedDate
+			$modifiedUser = $Content.ModifiedUser
 		} else { 
 			$modifiedDate = 'Unknown'
 			$modifiedUser = 'Unknown'

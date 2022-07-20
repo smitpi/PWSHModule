@@ -91,9 +91,9 @@ Function Show-PWSHModuleList {
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create object"
 	$PRGist.files | Get-Member -MemberType NoteProperty | ForEach-Object {
 		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($_.name)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
-		if ($Content.modified -notlike 'Unknown') {
-			$modifiedDate = [datetime](($Content.modified.split(' -- ')[0]).replace('[', '')).replace(']', '')
-			$modifiedUser = $Content.modified.split(' -- ')[1]
+		if ($Content.modifiedDate -notlike 'Unknown') {
+			$modifiedDate = [datetime]$Content.ModifiedDate
+			$modifiedUser = $Content.ModifiedUser
 		} else { 
 			$modifiedDate = 'Unknown'
 			$modifiedUser = 'Unknown'
