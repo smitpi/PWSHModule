@@ -43,23 +43,6 @@ Created [13/07/2022_10:26] Initial Script Creating
 
 <#
 .SYNOPSIS
-Saves the module to a folder
-
-.DESCRIPTION
-Saves the module to a folder
-
-.PARAMETER Export
-Export the result to a report file. (Excel or html). Or select Host to display the object on screen.
-
-.PARAMETER ReportPath
-Where to save the report.
-
-.EXAMPLE
-Save-PWSHModule -Export HTML -ReportPath C:\temp
-
-#>
-<#
-.SYNOPSIS
 Saves the modules from the specified list to a folder.
 
 .DESCRIPTION
@@ -89,7 +72,6 @@ Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GithubToken -ListName extende
 #>
 Function Save-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Save-PWSHModule')]
-	[OutputType([System.Object[]])]
 	PARAM(
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
@@ -128,23 +110,31 @@ Function Save-PWSHModule {
 	foreach ($module in $Content.Modules) {
 		if ($module.Version -like 'Latest') {
 			if ($AsNuGet) {
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
-				Write-Host '[Downloading]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Nuget: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name):" -ForegroundColor Green -NoNewline ; Write-Host "$($Path)" -ForegroundColor DarkRed
-				Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -Path $Path | Out-Null
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'NuGet: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
+					Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -Path $Path | Out-Null
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
-				Write-Host '[Downloading]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name):" -ForegroundColor Green -NoNewline ; Write-Host "$($Path)" -ForegroundColor DarkRed
-				Save-Module -Name $module.name -Repository $module.Repository -Path $Path
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
+					Save-Module -Name $module.name -Repository $module.Repository -Path $Path
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			}
 		} else {
 			if ($AsNuGet) {
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
-				Write-Host '[Downloading]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Nuget: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name):" -ForegroundColor Green -NoNewline ; Write-Host "$($Path)" -ForegroundColor DarkRed
-				Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -RequiredVersion $module.Version -Path $Path | Out-Null
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'NuGet: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)(ver $($module.version)) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
+					Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -RequiredVersion $module.Version -Path $Path | Out-Null
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
-				Write-Host '[Downloading]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name):" -ForegroundColor Green -NoNewline ; Write-Host "$($Path)" -ForegroundColor DarkRed
-				Save-Module -Name $module.name -Repository $module.Repository -RequiredVersion $module.Version -Path $Path
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)(ver $($module.version)) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
+					Save-Module -Name $module.name -Repository $module.Repository -RequiredVersion $module.Version -Path $Path
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			}
 
 		}
