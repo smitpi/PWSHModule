@@ -13,8 +13,8 @@ Remove module from the specified list.
 ## SYNTAX
 
 ```
-Remove-PWSHModule [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String> [-ModuleName] <String>
- [<CommonParameters>]
+Remove-PWSHModule [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String>
+ [-ModuleName] <String[]> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -78,14 +78,14 @@ Accept wildcard characters: False
 Module to remove
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
-Aliases:
+Aliases: Name
 
 Required: True
 Position: 4
 Default value: None
-Accept pipeline input: False
+Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 

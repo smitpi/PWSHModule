@@ -12,8 +12,14 @@ List all the GitHub Gist Lists.
 
 ## SYNTAX
 
+### Private (Default)
 ```
-Show-PWSHModuleList [-GitHubUserID] <String> [-GitHubToken] <String> [<CommonParameters>]
+Show-PWSHModuleList -GitHubUserID <String> [-GitHubToken <String>] [<CommonParameters>]
+```
+
+### Public
+```
+Show-PWSHModuleList -GitHubUserID <String> [-PublicGist] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -22,11 +28,6 @@ List all the GitHub Gist Lists.
 ## EXAMPLES
 
 ### EXAMPLE 1
-```
-Show-PWSHModuleList -Export HTML -ReportPath C:\temp
-```
-
-### EXAMPLE 2
 ```
 Show-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken
 ```
@@ -42,8 +43,23 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 1
+Position: Named
 Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -PublicGist
+Select if the list is hosted publicly.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: Public
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -53,11 +69,11 @@ GitHub Token with access to the Users' Gist.
 
 ```yaml
 Type: String
-Parameter Sets: (All)
+Parameter Sets: Private
 Aliases:
 
-Required: True
-Position: 2
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

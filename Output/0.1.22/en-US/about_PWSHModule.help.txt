@@ -15,6 +15,7 @@ Functions in this module:
 	 Save-PWSHModule -- Saves the modules from the specified list to a folder.
 	 Show-PWSHModule -- Show the details of the modules in a list.
 	 Show-PWSHModuleList -- List all the GitHub Gist Lists.
+	 Uninstall-PWSHModule -- Will uninstall the module from the system.
  
 SEE ALSO
 	 https://github.com/smitpi/PWSHModule

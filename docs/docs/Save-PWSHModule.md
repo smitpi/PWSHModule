@@ -12,9 +12,16 @@ Saves the modules from the specified list to a folder.
 
 ## SYNTAX
 
+### Private (Default)
 ```
-Save-PWSHModule [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String> [-AsNuGet]
- [[-Path] <DirectoryInfo>] [<CommonParameters>]
+Save-PWSHModule -GitHubUserID <String> [-GitHubToken <String>] -ListName <String> [-AsNuGet]
+ [-Path <DirectoryInfo>] [<CommonParameters>]
+```
+
+### Public
+```
+Save-PWSHModule -GitHubUserID <String> [-PublicGist] -ListName <String> [-AsNuGet] [-Path <DirectoryInfo>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -43,8 +50,23 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 1
+Position: Named
 Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -PublicGist
+Select if the list is hosted publicly.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: Public
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -54,11 +76,11 @@ GitHub Token with access to the Users' Gist.
 
 ```yaml
 Type: String
-Parameter Sets: (All)
+Parameter Sets: Private
 Aliases:
 
-Required: True
-Position: 2
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -73,14 +95,14 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 3
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
 ### -AsNuGet
-Save in the nuget format
+Save in the NuGet format
 
 ```yaml
 Type: SwitchParameter
@@ -103,7 +125,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 4
+Position: Named
 Default value: C:\Temp
 Accept pipeline input: False
 Accept wildcard characters: False

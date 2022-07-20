@@ -183,7 +183,6 @@ Function Add-PWSHModule {
 
 
 $scriptblock = {
-	param($commandName, $parameterName, $stringMatch)
 	(Get-PSRepository).Name
 }
 Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName Repository -ScriptBlock $scriptBlock

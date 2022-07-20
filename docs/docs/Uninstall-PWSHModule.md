@@ -5,33 +5,34 @@ online version:
 schema: 2.0.0
 ---
 
-# Show-PWSHModule
+# Uninstall-PWSHModule
 
 ## SYNOPSIS
-Show the details of the modules in a list.
+Will uninstall the module from the system.
 
 ## SYNTAX
 
 ### Private (Default)
 ```
-Show-PWSHModule -GitHubUserID <String> [-GitHubToken <String>] -ListName <String> [-AsTable] [-ShowProjectURI]
- [<CommonParameters>]
+Uninstall-PWSHModule -GitHubUserID <String> [-GitHubToken <String>] -ListName <String> [-OldVersions]
+ [-ForceDeleteFolder] [<CommonParameters>]
 ```
 
 ### Public
 ```
-Show-PWSHModule -GitHubUserID <String> [-PublicGist] -ListName <String> [-AsTable] [-ShowProjectURI]
- [<CommonParameters>]
+Uninstall-PWSHModule -GitHubUserID <String> [-PublicGist] -ListName <String> [-OldVersions]
+ [-ForceDeleteFolder] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Show the details of the modules in a list.
+Will uninstall the module from the system.
+Select OldVersions to remove duplicates only.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Show-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -AsTable
+Uninstall-PWSHModule -GitHubUserID smitpi -PublicGist -ListName base -OldVersions
 ```
 
 ## PARAMETERS
@@ -96,8 +97,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -AsTable
-Display output as a table.
+### -OldVersions
+Will only uninstall old versions of the module.
 
 ```yaml
 Type: SwitchParameter
@@ -111,8 +112,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ShowProjectURI
-Will open the browser to the the project URL.
+### -ForceDeleteFolder
+Will force delete the base folder.
 
 ```yaml
 Type: SwitchParameter

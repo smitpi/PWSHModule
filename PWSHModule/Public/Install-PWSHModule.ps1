@@ -67,7 +67,7 @@ Install-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -Filename exte
 
 #>
 Function Install-PWSHModule {
-	[Cmdletbinding(DefaultParameterSetName = 'Private',HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
+	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
@@ -113,17 +113,21 @@ Function Install-PWSHModule {
 			$mod = Get-Module -Name $module.Name
 			if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
 			if (-not($mod)) { 
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
-				Write-Host '[Installing]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green
-				Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope -Force -AllowClobber
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
+					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline ; Write-Host 'to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
+					Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope -Force -AllowClobber
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking versions"
-				Write-Host '[Installed]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
-				$OnlineMod = Find-Module -Name $module.name -Repository $module.Repository
-				[version]$Onlineversion = $OnlineMod.version 
-				[version]$Localversion = ($mod | Sort-Object -Property Version -Descending)[0].Version
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking versions"
+					Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
+					$OnlineMod = Find-Module -Name $module.name -Repository $module.Repository
+					[version]$Onlineversion = $OnlineMod.version 
+					[version]$Localversion = ($mod | Sort-Object -Property Version -Descending)[0].Version
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 				if ($Localversion -lt $Onlineversion) {
-					Write-Host "`t[Upgrading]" -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green ; Write-Host " v$($OnlineMod.version)" -ForegroundColor DarkRed
+					Write-Host "`t[Upgrading] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline; Write-Host " v$($OnlineMod.version)" -ForegroundColor DarkRed
 					try {
 						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Updating module"
 						Update-Module -Name $module.Name -Force -ErrorAction Stop
@@ -139,11 +143,13 @@ Function Install-PWSHModule {
 			$mod = Get-Module -Name $module.Name
 			if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
 			if ((-not($mod)) -or $mod.Version -lt $module.Version) {
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
-				Write-Host '[Installing]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green
-				Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope -Force -AllowClobber
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
+					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green
+					Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope -Force -AllowClobber
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
-				Write-Host '[Installed]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
+				Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
 			}
 		}
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"

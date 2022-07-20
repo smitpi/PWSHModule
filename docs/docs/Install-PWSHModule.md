@@ -12,9 +12,15 @@ Install modules from the specified list.
 
 ## SYNTAX
 
+### Private (Default)
 ```
-Install-PWSHModule [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String> [-Scope] <String>
+Install-PWSHModule -GitHubUserID <String> [-GitHubToken <String>] -ListName <String> -Scope <String>
  [<CommonParameters>]
+```
+
+### Public
+```
+Install-PWSHModule -GitHubUserID <String> [-PublicGist] -ListName <String> -Scope <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -38,8 +44,23 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 1
+Position: Named
 Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -PublicGist
+Select if the list is hosted publicly.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: Public
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -49,11 +70,11 @@ GitHub Token with access to the Users' Gist.
 
 ```yaml
 Type: String
-Parameter Sets: (All)
+Parameter Sets: Private
 Aliases:
 
-Required: True
-Position: 2
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -68,7 +89,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 3
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -84,7 +105,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 4
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -97,7 +118,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### System.Object[]
 ## NOTES
 
 ## RELATED LINKS

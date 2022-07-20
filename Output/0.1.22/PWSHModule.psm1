@@ -1,13 +1,13 @@
 ﻿#region Public Functions
 #region Add-PWSHModule.ps1
-######## Function 1 of 7 ##################
+######## Function 1 of 8 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.14
+# ModuleVersion:    0.1.22
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
-# ModifiedOn:       2022/07/20 17:54:45
+# ModifiedOn:       2022/07/20 18:51:23
 # Synopsis:         Adds a new module to the GitHub Gist List.
 #############################################
  
@@ -156,7 +156,6 @@ Function Add-PWSHModule {
 
 
 $scriptblock = {
-	param($commandName, $parameterName, $stringMatch)
 	(Get-PSRepository).Name
 }
 Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName Repository -ScriptBlock $scriptBlock
@@ -165,14 +164,14 @@ Export-ModuleMember -Function Add-PWSHModule
 #endregion
  
 #region Install-PWSHModule.ps1
-######## Function 2 of 7 ##################
+######## Function 2 of 8 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.14
+# ModuleVersion:    0.1.22
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
-# ModifiedOn:       2022/07/20 17:39:08
+# ModifiedOn:       2022/07/20 21:02:27
 # Synopsis:         Install modules from the specified list.
 #############################################
  
@@ -203,7 +202,7 @@ Install-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -Filename exte
 
 #>
 Function Install-PWSHModule {
-	[Cmdletbinding(DefaultParameterSetName = 'Private',HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
+	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
@@ -249,17 +248,21 @@ Function Install-PWSHModule {
 			$mod = Get-Module -Name $module.Name
 			if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
 			if (-not($mod)) { 
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
-				Write-Host '[Installing]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green
-				Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope -Force -AllowClobber
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
+					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline ; Write-Host 'to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
+					Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope -Force -AllowClobber
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking versions"
-				Write-Host '[Installed]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
-				$OnlineMod = Find-Module -Name $module.name -Repository $module.Repository
-				[version]$Onlineversion = $OnlineMod.version 
-				[version]$Localversion = ($mod | Sort-Object -Property Version -Descending)[0].Version
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking versions"
+					Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
+					$OnlineMod = Find-Module -Name $module.name -Repository $module.Repository
+					[version]$Onlineversion = $OnlineMod.version 
+					[version]$Localversion = ($mod | Sort-Object -Property Version -Descending)[0].Version
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 				if ($Localversion -lt $Onlineversion) {
-					Write-Host "`t[Upgrading]" -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green ; Write-Host " v$($OnlineMod.version)" -ForegroundColor DarkRed
+					Write-Host "`t[Upgrading] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline; Write-Host " v$($OnlineMod.version)" -ForegroundColor DarkRed
 					try {
 						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Updating module"
 						Update-Module -Name $module.Name -Force -ErrorAction Stop
@@ -275,11 +278,13 @@ Function Install-PWSHModule {
 			$mod = Get-Module -Name $module.Name
 			if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
 			if ((-not($mod)) -or $mod.Version -lt $module.Version) {
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
-				Write-Host '[Installing]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green
-				Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope -Force -AllowClobber
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
+					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green
+					Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope -Force -AllowClobber
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
-				Write-Host '[Installed]' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
+				Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
 			}
 		}
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
@@ -290,10 +295,10 @@ Export-ModuleMember -Function Install-PWSHModule
 #endregion
  
 #region New-PWSHModuleList.ps1
-######## Function 3 of 7 ##################
+######## Function 3 of 8 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.14
+# ModuleVersion:    0.1.22
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -415,14 +420,14 @@ Export-ModuleMember -Function New-PWSHModuleList
 #endregion
  
 #region Remove-PWSHModule.ps1
-######## Function 4 of 7 ##################
+######## Function 4 of 8 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.14
+# ModuleVersion:    0.1.22
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
-# ModifiedOn:       2022/07/20 17:55:09
+# ModifiedOn:       2022/07/20 20:08:51
 # Synopsis:         Remove module from the specified list.
 #############################################
  
@@ -457,44 +462,52 @@ Function Remove-PWSHModule {
 		[string]$GitHubToken,
 		[Parameter(Mandatory = $true)]
 		[string]$ListName,
-		[Parameter(Mandatory = $true)]
-		[String]$ModuleName
+		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[Alias('Name')]
+		[string[]]$ModuleName
 	)
+	begin {
+		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connecting to Gist"
+			$headers = @{}
+			$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+			$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+			$base64 = [System.Convert]::ToBase64String($bytes)
+			$headers.Authorization = 'Basic {0}' -f $base64
 
-	try {
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connecting to Gist"
-		$headers = @{}
-		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
-		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
-		$base64 = [System.Convert]::ToBase64String($bytes)
-		$headers.Authorization = 'Basic {0}' -f $base64
-
-		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
-		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
-		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
-	} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
-
-	try {
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking config file."
-		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($ListName)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
-	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
-
-	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Find module to remove"
-	$Modremove = ($Content.Modules | Where-Object {$_.Name -like $ModuleName})[0]
-	if ([string]::IsNullOrEmpty($Modremove) -or ($Modremove.name.count -gt 1)) {
-		Write-Error 'Module not found'
-	} else {
-		[System.Collections.ArrayList]$ModuleObject = @()		
-		$Content.Modules | ForEach-Object {[void]$ModuleObject.Add($_)}
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Removing module"
-		$ModuleObject.Remove($Modremove)
-		Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to $($ListName)" -ForegroundColor Green
-		$Content.Modules = $ModuleObject | Sort-Object -Property name
-		$Content.ModifiedDate = "$(Get-Date -Format u)"
-		$content.ModifiedUser = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
+			$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+			$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+			$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 
 		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking config file."
+			$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($ListName)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
+		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+		if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
+		
+		[System.Collections.ArrayList]$ModuleObject = @()		
+		$Content.Modules | ForEach-Object {[void]$ModuleObject.Add($_)
+		}
+	}
+	process {
+		foreach ($mod in $ModuleName) {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Find module to remove"
+			$Modremove = ($Content.Modules | Where-Object {$_.Name -like $Mod})
+			if ([string]::IsNullOrEmpty($Modremove) -or ($Modremove.name.count -gt 1)) {
+				Write-Error 'Module not found'
+			} else {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Removing module"
+				$ModuleObject.Remove($Modremove)
+				Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " from $($ListName)" -ForegroundColor Green
+			}
+		}
+	}
+	end {
+		try {
+			$Content.Modules = $ModuleObject | Sort-Object -Property name
+			$Content.ModifiedDate = "$(Get-Date -Format u)"
+			$content.ModifiedUser = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to gist"
 			$Body = @{}
 			$files = @{}
@@ -507,17 +520,16 @@ Function Remove-PWSHModule {
 			Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 	}
-
 } #end Function
  
 Export-ModuleMember -Function Remove-PWSHModule
 #endregion
  
 #region Save-PWSHModule.ps1
-######## Function 5 of 7 ##################
+######## Function 5 of 8 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.14
+# ModuleVersion:    0.1.22
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -640,10 +652,10 @@ Export-ModuleMember -Function Save-PWSHModule
 #endregion
  
 #region Show-PWSHModule.ps1
-######## Function 6 of 7 ##################
+######## Function 6 of 8 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.14
+# ModuleVersion:    0.1.22
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -749,10 +761,10 @@ Export-ModuleMember -Function Show-PWSHModule
 #endregion
  
 #region Show-PWSHModuleList.ps1
-######## Function 7 of 7 ##################
+######## Function 7 of 8 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.14
+# ModuleVersion:    0.1.22
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -833,6 +845,119 @@ Function Show-PWSHModuleList {
 } #end Function
  
 Export-ModuleMember -Function Show-PWSHModuleList
+#endregion
+ 
+#region Uninstall-PWSHModule.ps1
+######## Function 8 of 8 ##################
+# Function:         Uninstall-PWSHModule
+# Module:           PWSHModule
+# ModuleVersion:    0.1.22
+# Author:           Pierre Smit
+# Company:          HTPCZA Tech
+# CreatedOn:        2022/07/20 19:06:13
+# ModifiedOn:       2022/07/20 21:15:47
+# Synopsis:         Will uninstall the module from the system.
+#############################################
+ 
+<#
+.SYNOPSIS
+Will uninstall the module from the system.
+
+.DESCRIPTION
+Will uninstall the module from the system. Select OldVersions to remove duplicates only.
+
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
+.PARAMETER ListName
+The File Name on GitHub Gist.
+
+.PARAMETER OldVersions
+Will only uninstall old versions of the module.
+
+.PARAMETER ForceDeleteFolder
+Will force delete the base folder.
+
+.EXAMPLE
+Uninstall-PWSHModule -GitHubUserID smitpi -PublicGist -ListName base -OldVersions
+
+#>
+Function Uninstall-PWSHModule {
+	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
+	PARAM(
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubUserID, 
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
+		[string]$GitHubToken,
+		[Parameter(Mandatory = $true)]
+		[ValidateScript( { $IsAdmin = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
+				else { Throw 'Must be running an elevated prompt.' } })]
+		[string]$ListName,
+		[switch]$OldVersions,
+		[switch]$ForceDeleteFolder
+	)
+	try {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
+		$headers = @{}
+		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+		$base64 = [System.Convert]::ToBase64String($bytes)
+		$headers.Authorization = 'Basic {0}' -f $base64
+
+		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+	} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+
+	try {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking Config File"
+		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($ListName)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
+	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
+
+	foreach ($module in $Content.Modules) {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module"
+		if ($OldVersions) {
+			Get-Module $module.name -ListAvailable | Remove-Module -Force -ErrorAction SilentlyContinue
+			$mods = (Get-Module $module.name -ListAvailable | Sort-Object -Property version -Descending) | Select-Object -Skip 1
+			foreach ($mod in $mods) {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] UnInstalling module"
+				Write-Host '[Uninstalling] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($mod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
+				try {
+					Uninstall-Module -Name $mod.name -RequiredVersion $mod.Version -Force
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			}
+		} elseif ($OldVersions -and $ForceDeleteFolder) {
+			Get-Module $module.name -ListAvailable | Remove-Module -Force -ErrorAction SilentlyContinue
+			$mods = (Get-Module $module.name -ListAvailable | Sort-Object -Property version -Descending) | Select-Object -Skip 1
+			foreach ($mod in $mods) {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Deleting Folder"
+				Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($mod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
+				try {
+					$folder = Get-Module -Name $mod.name -ListAvailable | Where-Object {$_.version -like $mod.version}
+					Get-ChildItem -Path (Get-Item $folder.Path).Directory -Recurse | Remove-Item -Force -Recurse
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			}
+		} else {
+			try {
+				Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green
+				Uninstall-Module -Name $module.Name -AllVersions -Force
+			} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+		}
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
+	}
+} #end Function
+ 
+Export-ModuleMember -Function Uninstall-PWSHModule
 #endregion
  
 #endregion
