@@ -151,14 +151,20 @@ Function Add-PWSHModule {
 			} else {$VersionToAdd = 'Latest'}
 
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create new Object"
-			[void]$ModuleObject.Add([PSCustomObject]@{
-					Name        = $ModuleToAdd.Name
-					Version     = $VersionToAdd
-					Description = $ModuleToAdd.Description
-					Repository  = $Repository
-					Projecturi  = $ModuleToAdd.ProjectUri
-				})
-			Write-Host '[Added]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ModuleToAdd.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to $($ListName)" -ForegroundColor Green
+			
+			if (-not($ModuleObject.Name.Contains($ModuleToAdd.Name))) {
+				[void]$ModuleObject.Add([PSCustomObject]@{
+						Name        = $ModuleToAdd.Name
+						Version     = $VersionToAdd
+						Description = $ModuleToAdd.Description
+						Repository  = $Repository
+						Projecturi  = $ModuleToAdd.ProjectUri
+					})
+				Write-Host '[Added]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ModuleToAdd.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to $($ListName)" -ForegroundColor Green
+			} else {
+				Write-Host '[Duplicate]' -NoNewline -ForegroundColor DarkRed; Write-Host " $($ModuleToAdd.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to $($ListName)" -ForegroundColor Green
+			}
+
 		}
 	}
 	end {
