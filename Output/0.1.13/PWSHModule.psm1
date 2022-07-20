@@ -3,11 +3,11 @@
 ######## Function 1 of 7 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.12
+# ModuleVersion:    0.1.13
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
-# ModifiedOn:       2022/07/20 17:42:31
+# ModifiedOn:       2022/07/20 17:54:45
 # Synopsis:         Adds a new module to the GitHub Gist List.
 #############################################
  
@@ -136,7 +136,8 @@ Function Add-PWSHModule {
 	}
 	end {
 		$Content.Modules = $ModuleObject | Sort-Object -Property name
-		$Content.Modified = "[$(Get-Date -Format u)] -- $($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
+		$Content.ModifiedDate = "$(Get-Date -Format u)"
+		$content.ModifiedUser = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
 		try {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to gist"
 			$Body = @{}
@@ -167,7 +168,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 7 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.12
+# ModuleVersion:    0.1.13
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
@@ -292,11 +293,11 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 3 of 7 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.12
+# ModuleVersion:    0.1.13
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
-# ModifiedOn:       2022/07/13 09:57:11
+# ModifiedOn:       2022/07/20 17:53:50
 # Synopsis:         Add a new list to GitHub Gist.
 #############################################
  
@@ -338,11 +339,12 @@ Function New-PWSHModuleList {
 
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating config"
 	$NewConfig = [PSCustomObject]@{
-		CreateDate  = (Get-Date -Format u)
-		Description = $Description
-		Author      = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
-		Modified    = 'Unknown'
-		Modules     = [PSCustomObject]@{
+		CreateDate   = (Get-Date -Format u)
+		Description  = $Description
+		Author       = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
+		ModifiedDate = 'Unknown'
+		ModifiedUser = 'Unknown'
+		Modules      = [PSCustomObject]@{
 			Name        = 'PWSHModule'
 			Version     = 'Latest'
 			Description = 'Uses a GitHub Gist File to install and maintain a list of PowerShell Modules'
@@ -416,11 +418,11 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 4 of 7 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.12
+# ModuleVersion:    0.1.13
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
-# ModifiedOn:       2022/07/13 11:22:47
+# ModifiedOn:       2022/07/20 17:55:09
 # Synopsis:         Remove module from the specified list.
 #############################################
  
@@ -489,7 +491,8 @@ Function Remove-PWSHModule {
 		$ModuleObject.Remove($Modremove)
 		Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to $($ListName)" -ForegroundColor Green
 		$Content.Modules = $ModuleObject | Sort-Object -Property name
-		$Content.Modified = "[$(Get-Date -Format u)] -- $($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
+		$Content.ModifiedDate = "$(Get-Date -Format u)"
+		$content.ModifiedUser = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
 
 		try {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to gist"
@@ -514,7 +517,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 5 of 7 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.12
+# ModuleVersion:    0.1.13
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -640,7 +643,7 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 6 of 7 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.12
+# ModuleVersion:    0.1.13
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -749,7 +752,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 7 of 7 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.12
+# ModuleVersion:    0.1.13
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39

@@ -78,11 +78,12 @@ Function New-PWSHModuleList {
 
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating config"
 	$NewConfig = [PSCustomObject]@{
-		CreateDate  = (Get-Date -Format u)
-		Description = $Description
-		Author      = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
-		Modified    = 'Unknown'
-		Modules     = [PSCustomObject]@{
+		CreateDate   = (Get-Date -Format u)
+		Description  = $Description
+		Author       = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
+		ModifiedDate = 'Unknown'
+		ModifiedUser = 'Unknown'
+		Modules      = [PSCustomObject]@{
 			Name        = 'PWSHModule'
 			Version     = 'Latest'
 			Description = 'Uses a GitHub Gist File to install and maintain a list of PowerShell Modules'

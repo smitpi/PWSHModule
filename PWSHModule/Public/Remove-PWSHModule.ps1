@@ -106,7 +106,8 @@ Function Remove-PWSHModule {
 		$ModuleObject.Remove($Modremove)
 		Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to $($ListName)" -ForegroundColor Green
 		$Content.Modules = $ModuleObject | Sort-Object -Property name
-		$Content.Modified = "[$(Get-Date -Format u)] -- $($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
+		$Content.ModifiedDate = "$(Get-Date -Format u)"
+		$content.ModifiedUser = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
 
 		try {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to gist"
