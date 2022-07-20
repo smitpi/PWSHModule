@@ -14,13 +14,13 @@ Show the details of the modules in a list.
 
 ### Private (Default)
 ```
-Show-PWSHModule -GitHubUserID <String> [-GitHubToken <String>] -ListName <String> [-AsTable] [-ShowProjectURI]
- [<CommonParameters>]
+Show-PWSHModule -GitHubUserID <String> [-GitHubToken <String>] -ListName <String> [-CompareInstalled]
+ [-ShowProjectURI] [<CommonParameters>]
 ```
 
 ### Public
 ```
-Show-PWSHModule -GitHubUserID <String> [-PublicGist] -ListName <String> [-AsTable] [-ShowProjectURI]
+Show-PWSHModule -GitHubUserID <String> [-PublicGist] -ListName <String> [-CompareInstalled] [-ShowProjectURI]
  [<CommonParameters>]
 ```
 
@@ -31,7 +31,7 @@ Show the details of the modules in a list.
 
 ### EXAMPLE 1
 ```
-Show-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -AsTable
+Show-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base
 ```
 
 ## PARAMETERS
@@ -96,8 +96,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -AsTable
-Display output as a table.
+### -CompareInstalled
+Compare the list to what is installed.
 
 ```yaml
 Type: SwitchParameter

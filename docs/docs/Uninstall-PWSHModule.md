@@ -14,14 +14,14 @@ Will uninstall the module from the system.
 
 ### Private (Default)
 ```
-Uninstall-PWSHModule -GitHubUserID <String> [-GitHubToken <String>] -ListName <String> [-OldVersions]
- [-ForceDeleteFolder] [<CommonParameters>]
+Uninstall-PWSHModule -GitHubUserID <String> [-GitHubToken <String>] -ListName <String> -ModuleName <String[]>
+ [-OldVersions] [-ForceDeleteFolder] [<CommonParameters>]
 ```
 
 ### Public
 ```
-Uninstall-PWSHModule -GitHubUserID <String> [-PublicGist] -ListName <String> [-OldVersions]
- [-ForceDeleteFolder] [<CommonParameters>]
+Uninstall-PWSHModule -GitHubUserID <String> [-PublicGist] -ListName <String> -ModuleName <String[]>
+ [-OldVersions] [-ForceDeleteFolder] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -94,6 +94,21 @@ Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ModuleName
+{{ Fill ModuleName Description }}
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases: Name
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
