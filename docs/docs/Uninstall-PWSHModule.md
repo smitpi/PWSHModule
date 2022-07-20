@@ -99,6 +99,7 @@ Accept wildcard characters: False
 
 ### -ModuleName
 Name of the module to uninstall.
+Use * to select all modules in the list.
 
 ```yaml
 Type: String[]

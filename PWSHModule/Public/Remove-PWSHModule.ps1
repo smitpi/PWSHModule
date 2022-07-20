@@ -58,7 +58,10 @@ GitHub Token with access to the Users' Gist.
 The File Name on GitHub Gist.
 
 .PARAMETER ModuleName
-Module to remove
+Module to remove.
+
+.PARAMETER UninstallModules
+Will uninstall the modules as well.
 
 .EXAMPLE
 Remove-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName base -ModuleName pslauncher
@@ -74,7 +77,11 @@ Function Remove-PWSHModule {
 		[string]$ListName,
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
 		[Alias('Name')]
-		[string[]]$ModuleName
+		[string[]]$ModuleName,
+		[ValidateScript( { $IsAdmin = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
+				else { Throw 'Must be running an elevated prompt.' } })]
+		[switch]$UninstallModules
 	)
 	begin {
 		try {
@@ -110,6 +117,7 @@ Function Remove-PWSHModule {
 				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Removing module"
 				$ModuleObject.Remove($Modremove)
 				Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " from $($ListName)" -ForegroundColor Green
+				if ($UninstallModules) {Uninstall-PWSHModule -GitHubUserID $GitHubUserID -GitHubToken $GitHubToken -ListName $ListName -ModuleName $Modremove.Name -ForceDeleteFolder}
 			}
 		}
 	}

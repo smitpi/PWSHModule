@@ -1,9 +1,9 @@
-#region Public Functions
+﻿#region Public Functions
 #region Add-PWSHModule.ps1
 ######## Function 1 of 8 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.15
+# ModuleVersion:    0.1.17
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
@@ -173,7 +173,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 8 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.15
+# ModuleVersion:    0.1.17
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
@@ -304,7 +304,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 3 of 8 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.15
+# ModuleVersion:    0.1.17
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -429,11 +429,11 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 4 of 8 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.15
+# ModuleVersion:    0.1.17
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
-# ModifiedOn:       2022/07/21 00:17:16
+# ModifiedOn:       2022/07/21 00:45:08
 # Synopsis:         Remove module from the specified list.
 #############################################
  
@@ -454,7 +454,10 @@ GitHub Token with access to the Users' Gist.
 The File Name on GitHub Gist.
 
 .PARAMETER ModuleName
-Module to remove
+Module to remove.
+
+.PARAMETER UninstallModules
+Will uninstall the modules as well.
 
 .EXAMPLE
 Remove-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName base -ModuleName pslauncher
@@ -470,7 +473,11 @@ Function Remove-PWSHModule {
 		[string]$ListName,
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
 		[Alias('Name')]
-		[string[]]$ModuleName
+		[string[]]$ModuleName,
+		[ValidateScript( { $IsAdmin = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
+				else { Throw 'Must be running an elevated prompt.' } })]
+		[switch]$UninstallModules
 	)
 	begin {
 		try {
@@ -506,6 +513,7 @@ Function Remove-PWSHModule {
 				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Removing module"
 				$ModuleObject.Remove($Modremove)
 				Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " from $($ListName)" -ForegroundColor Green
+				if ($UninstallModules) {Uninstall-PWSHModule -GitHubUserID $GitHubUserID -GitHubToken $GitHubToken -ListName $ListName -ModuleName $Modremove.Name -ForceDeleteFolder}
 			}
 		}
 	}
@@ -535,7 +543,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 5 of 8 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.15
+# ModuleVersion:    0.1.17
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -651,11 +659,11 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 6 of 8 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.15
+# ModuleVersion:    0.1.17
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
-# ModifiedOn:       2022/07/20 23:02:40
+# ModifiedOn:       2022/07/21 00:28:49
 # Synopsis:         Show the details of the modules in a list.
 #############################################
  
@@ -758,6 +766,7 @@ Function Show-PWSHModule {
 						InstalledVer    = $local.Version
 						OnlineVer       = $online.Version
 						UpdateAvailable = $update
+						InstallCount    = (Get-Module -Name $CompareModule.Name -ListAvailable).count
 						Folder          = (Get-Item $local.Path).DirectoryName
 						Description     = $CompareModule.Description
 						Repository      = $CompareModule.Repository
@@ -785,7 +794,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 7 of 8 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.15
+# ModuleVersion:    0.1.17
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -872,7 +881,7 @@ Export-ModuleMember -Function Show-PWSHModuleList
 ######## Function 8 of 8 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.15
+# ModuleVersion:    0.1.17
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13

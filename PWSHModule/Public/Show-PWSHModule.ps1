@@ -140,6 +140,7 @@ Function Show-PWSHModule {
 						InstalledVer    = $local.Version
 						OnlineVer       = $online.Version
 						UpdateAvailable = $update
+						InstallCount    = (Get-Module -Name $CompareModule.Name -ListAvailable).count
 						Folder          = (Get-Item $local.Path).DirectoryName
 						Description     = $CompareModule.Description
 						Repository      = $CompareModule.Repository

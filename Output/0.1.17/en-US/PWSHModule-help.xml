@@ -563,7 +563,7 @@
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName)" position="4" aliases="Name">
           <maml:name>ModuleName</maml:name>
           <maml:description>
-            <maml:para>Module to remove</maml:para>
+            <maml:para>Module to remove.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -571,6 +571,17 @@
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+          <maml:name>UninstallModules</maml:name>
+          <maml:description>
+            <maml:para>Will uninstall the modules as well.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
       </command:syntaxItem>
     </command:syntax>
@@ -614,7 +625,7 @@
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName)" position="4" aliases="Name">
         <maml:name>ModuleName</maml:name>
         <maml:description>
-          <maml:para>Module to remove</maml:para>
+          <maml:para>Module to remove.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
         <dev:type>
@@ -622,6 +633,18 @@
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>UninstallModules</maml:name>
+        <maml:description>
+          <maml:para>Will uninstall the modules as well.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
     </command:parameters>
     <command:inputTypes />
@@ -1274,7 +1297,7 @@
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName)" position="named" aliases="Name">
           <maml:name>ModuleName</maml:name>
           <maml:description>
-            <maml:para>Name of the module to uninstall.</maml:para>
+            <maml:para>Name of the module to uninstall. Use * to select all modules in the list.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -1347,7 +1370,7 @@
         <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName)" position="named" aliases="Name">
           <maml:name>ModuleName</maml:name>
           <maml:description>
-            <maml:para>Name of the module to uninstall.</maml:para>
+            <maml:para>Name of the module to uninstall. Use * to select all modules in the list.</maml:para>
           </maml:description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -1432,7 +1455,7 @@
       <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName)" position="named" aliases="Name">
         <maml:name>ModuleName</maml:name>
         <maml:description>
-          <maml:para>Name of the module to uninstall.</maml:para>
+          <maml:para>Name of the module to uninstall. Use * to select all modules in the list.</maml:para>
         </maml:description>
         <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
         <dev:type>

@@ -14,7 +14,7 @@ Remove module from the specified list.
 
 ```
 Remove-PWSHModule [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String>
- [-ModuleName] <String[]> [<CommonParameters>]
+ [-ModuleName] <String[]> [-UninstallModules] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -75,7 +75,7 @@ Accept wildcard characters: False
 ```
 
 ### -ModuleName
-Module to remove
+Module to remove.
 
 ```yaml
 Type: String[]
@@ -86,6 +86,21 @@ Required: True
 Position: 4
 Default value: None
 Accept pipeline input: True (ByPropertyName)
+Accept wildcard characters: False
+```
+
+### -UninstallModules
+Will uninstall the modules as well.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
