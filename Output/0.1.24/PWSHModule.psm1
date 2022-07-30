@@ -3,7 +3,7 @@
 ######## Function 1 of 8 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.24
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
@@ -180,11 +180,11 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 8 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.24
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
-# ModifiedOn:       2022/07/31 00:07:16
+# ModifiedOn:       2022/07/31 00:18:59
 # Synopsis:         Install modules from the specified list.
 #############################################
  
@@ -264,7 +264,7 @@ Function Install-PWSHModule {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
 					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
-					Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope -Force -AllowClobber
+					Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope -Force -AllowClobber -SkipPublisherCheck
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
 				try {
@@ -281,7 +281,7 @@ Function Install-PWSHModule {
 						Update-Module -Name $module.Name -Force -ErrorAction Stop
 					} catch {
 						try {
-							Install-Module -Name $module.name -Scope $Scope -Repository $module.Repository -AllowClobber -Force
+							Install-Module -Name $module.name -Scope $Scope -Repository $module.Repository -AllowClobber -Force -SkipPublisherCheck
 						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 					}
 					Get-Module $module.name -ListAvailable | Remove-Module -Force -ErrorAction SilentlyContinue
@@ -327,7 +327,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 3 of 8 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.24
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -474,7 +474,7 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 4 of 8 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.24
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
@@ -595,7 +595,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 5 of 8 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.24
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -718,7 +718,7 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 6 of 8 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.24
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -860,7 +860,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 7 of 8 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.24
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -947,7 +947,7 @@ Export-ModuleMember -Function Show-PWSHModuleList
 ######## Function 8 of 8 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.24
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13

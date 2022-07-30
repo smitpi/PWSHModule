@@ -116,7 +116,7 @@ Function Install-PWSHModule {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
 					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
-					Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope -Force -AllowClobber
+					Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope -Force -AllowClobber -SkipPublisherCheck
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
 				try {
@@ -133,7 +133,7 @@ Function Install-PWSHModule {
 						Update-Module -Name $module.Name -Force -ErrorAction Stop
 					} catch {
 						try {
-							Install-Module -Name $module.name -Scope $Scope -Repository $module.Repository -AllowClobber -Force
+							Install-Module -Name $module.name -Scope $Scope -Repository $module.Repository -AllowClobber -Force -SkipPublisherCheck
 						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 					}
 					Get-Module $module.name -ListAvailable | Remove-Module -Force -ErrorAction SilentlyContinue
