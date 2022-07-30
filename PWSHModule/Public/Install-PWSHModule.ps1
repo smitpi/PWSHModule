@@ -136,6 +136,15 @@ Function Install-PWSHModule {
 							Install-Module -Name $module.name -Scope $Scope -Repository $module.Repository -AllowClobber -Force
 						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 					}
+					Get-Module $module.name -ListAvailable | Remove-Module -Force -ErrorAction SilentlyContinue
+					$mods = (Get-Module $module.name -ListAvailable | Sort-Object -Property version -Descending) | Select-Object -Skip 1
+					foreach ($mod in $mods) {
+						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] UnInstalling module"
+						Write-Host "`t[Uninstalling] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($mod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
+						try {
+							Uninstall-Module -Name $mod.name -RequiredVersion $mod.Version -Force
+						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+					}
 				}
 			}
 		} else {
