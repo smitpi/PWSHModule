@@ -3,11 +3,11 @@
 ######## Function 1 of 8 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.20
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
-# ModifiedOn:       2022/07/20 23:19:20
+# ModifiedOn:       2022/07/30 18:07:33
 # Synopsis:         Adds a new module to the GitHub Gist List.
 #############################################
  
@@ -165,6 +165,13 @@ $scriptblock = {
 	(Get-PSRepository).Name
 }
 Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName Repository -ScriptBlock $scriptBlock
+
+
+$scriptblock = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if (($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+}
+Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
 Export-ModuleMember -Function Add-PWSHModule
 #endregion
@@ -173,11 +180,11 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 8 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.20
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
-# ModifiedOn:       2022/07/20 23:55:06
+# ModifiedOn:       2022/07/30 18:09:35
 # Synopsis:         Install modules from the specified list.
 #############################################
  
@@ -296,6 +303,13 @@ Function Install-PWSHModule {
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
 } #end Function
+
+
+$scriptblock = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if (($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+}
+Register-ArgumentCompleter -CommandName Install-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
 Export-ModuleMember -Function Install-PWSHModule
 #endregion
@@ -304,11 +318,11 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 3 of 8 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.20
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
-# ModifiedOn:       2022/07/20 17:53:50
+# ModifiedOn:       2022/07/30 17:51:01
 # Synopsis:         Add a new list to GitHub Gist.
 #############################################
  
@@ -420,6 +434,24 @@ Function New-PWSHModuleList {
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 	}
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
+
+	if ($AddDefaultsToProfile) {
+		$PSDefaultParameterValues["*PWSHModule*:GitHubUserID"]   = $($GitHubUserID)
+		$PSDefaultParameterValues["*PWSHModule*:GitHubToken"]    = $($GitHubToken)
+
+		$addstring = @"
+		
+#######
+#region PWSHModule Defaults
+`$PSDefaultParameterValues["*PWSHModule*:GitHubUserID"]   = "$($GitHubUserID)"
+`$PSDefaultParameterValues["*PWSHModule*:GitHubToken"]    = "$($GitHubToken)"
+#endregion
+"@
+try {
+		$addstring | add-Content -Path (get-item $PROFILE).FullName -Encoding utf8
+		Write-Host '[Updated]' -NoNewline -ForegroundColor Yellow; Write-Host " Profile File:" -NoNewline -ForegroundColor Cyan; Write-Host " $((get-item $profile).FullName)" -ForegroundColor Green
+} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+	}
 } #end Function
  
 Export-ModuleMember -Function New-PWSHModuleList
@@ -429,11 +461,11 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 4 of 8 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.20
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
-# ModifiedOn:       2022/07/21 00:45:08
+# ModifiedOn:       2022/07/30 18:10:07
 # Synopsis:         Remove module from the specified list.
 #############################################
  
@@ -535,6 +567,13 @@ Function Remove-PWSHModule {
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 	}
 } #end Function
+
+
+$scriptblock = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if (($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+}
+Register-ArgumentCompleter -CommandName Remove-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
 Export-ModuleMember -Function Remove-PWSHModule
 #endregion
@@ -543,11 +582,11 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 5 of 8 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.20
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
-# ModifiedOn:       2022/07/20 21:40:21
+# ModifiedOn:       2022/07/30 18:10:19
 # Synopsis:         Saves the modules from the specified list to a folder.
 #############################################
  
@@ -651,6 +690,13 @@ Function Save-PWSHModule {
 	}
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 } #end Function
+
+
+$scriptblock = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if (($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+}
+Register-ArgumentCompleter -CommandName Save-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
 Export-ModuleMember -Function Save-PWSHModule
 #endregion
@@ -659,11 +705,11 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 6 of 8 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.20
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
-# ModifiedOn:       2022/07/21 00:28:49
+# ModifiedOn:       2022/07/30 18:10:50
 # Synopsis:         Show the details of the modules in a list.
 #############################################
  
@@ -786,6 +832,13 @@ Function Show-PWSHModule {
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
 } #end Function
+
+
+$scriptblock = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if (($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+}
+Register-ArgumentCompleter -CommandName Show-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
 Export-ModuleMember -Function Show-PWSHModule
 #endregion
@@ -794,7 +847,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 7 of 8 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.20
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -881,11 +934,11 @@ Export-ModuleMember -Function Show-PWSHModuleList
 ######## Function 8 of 8 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.20
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
-# ModifiedOn:       2022/07/20 23:59:22
+# ModifiedOn:       2022/07/30 18:11:17
 # Synopsis:         Will uninstall the module from the system.
 #############################################
  
@@ -1014,6 +1067,13 @@ Function Uninstall-PWSHModule {
 		}
 	}
 } #end Function
+
+
+$scriptblock = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if (($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+}
+Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
 Export-ModuleMember -Function Uninstall-PWSHModule
 #endregion

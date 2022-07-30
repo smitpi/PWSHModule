@@ -139,3 +139,10 @@ Function Remove-PWSHModule {
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 	}
 } #end Function
+
+
+$scriptblock = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if (($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+}
+Register-ArgumentCompleter -CommandName Remove-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock

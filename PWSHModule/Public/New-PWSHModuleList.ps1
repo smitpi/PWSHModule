@@ -148,4 +148,22 @@ Function New-PWSHModuleList {
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 	}
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
+
+	if ($AddDefaultsToProfile) {
+		$PSDefaultParameterValues["*PWSHModule*:GitHubUserID"]   = $($GitHubUserID)
+		$PSDefaultParameterValues["*PWSHModule*:GitHubToken"]    = $($GitHubToken)
+
+		$addstring = @"
+		
+#######
+#region PWSHModule Defaults
+`$PSDefaultParameterValues["*PWSHModule*:GitHubUserID"]   = "$($GitHubUserID)"
+`$PSDefaultParameterValues["*PWSHModule*:GitHubToken"]    = "$($GitHubToken)"
+#endregion
+"@
+try {
+		$addstring | add-Content -Path (get-item $PROFILE).FullName -Encoding utf8
+		Write-Host '[Updated]' -NoNewline -ForegroundColor Yellow; Write-Host " Profile File:" -NoNewline -ForegroundColor Cyan; Write-Host " $((get-item $profile).FullName)" -ForegroundColor Green
+} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+	}
 } #end Function

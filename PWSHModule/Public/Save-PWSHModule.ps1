@@ -141,3 +141,10 @@ Function Save-PWSHModule {
 	}
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 } #end Function
+
+
+$scriptblock = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if (($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+}
+Register-ArgumentCompleter -CommandName Save-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
