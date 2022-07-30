@@ -59,6 +59,9 @@ The File Name on GitHub Gist.
 .PARAMETER Description
 Summary of the function for the list.
 
+.PARAMETER AddDefaultsToProfile
+This will add the userid and token to $PSDefaultParameterValues and save it in your profile file.
+
 .EXAMPLE
 New-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -Description "These modules needs to be installed on all servers"
 
@@ -73,7 +76,8 @@ Function New-PWSHModuleList {
 		[Parameter(Mandatory = $true)]
 		[string]$ListName,
 		[Parameter(Mandatory = $true)]
-		[string]$Description
+		[string]$Description,
+		[switch]$AddDefaultsToProfile
 	)
 
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating config"

@@ -14,7 +14,7 @@ Add a new list to GitHub Gist.
 
 ```
 New-PWSHModuleList [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String>
- [-Description] <String> [<CommonParameters>]
+ [-Description] <String> [-AddDefaultsToProfile] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -85,6 +85,21 @@ Aliases:
 Required: True
 Position: 4
 Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -AddDefaultsToProfile
+This will add the userid and token to $PSDefaultParameterValues and save it in your profile file.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
