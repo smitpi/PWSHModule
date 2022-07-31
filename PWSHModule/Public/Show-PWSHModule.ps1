@@ -131,21 +131,31 @@ Function Show-PWSHModule {
 					$online = Find-Module -Name $CompareModule.name -Repository $CompareModule.Repository -RequiredVersion $CompareModule.Version
 				}
 				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Local: $($CompareModule.name)"
+				$local = $null
 				$local = (Get-Module -Name $CompareModule.Name -ListAvailable | Sort-Object -Property Version -Descending)[0]
+				if ([string]::IsNullOrEmpty($local)) {
+					$InstallVer = 'Unknown'
+					$InstallCount = 'Unkown'
+					$InstallFolder = 'Unknown'
+				} else {
+					$InstallVer = $local.Version
+					$InstallCount = (Get-Module -Name $CompareModule.Name -ListAvailable).count
+					$InstallFolder = (Get-Item $local.Path).DirectoryName
+				}
 				if ($local.Version -lt $online.Version) {$update = $true}
 				else {$update = $false}
 				[void]$CompareObject.Add([PSCustomObject]@{
 						Index           = $index
 						Name            = $CompareModule.Name
-						InstalledVer    = $local.Version
+						InstalledVer    = $InstallVer
 						OnlineVer       = $online.Version
 						UpdateAvailable = $update
-						InstallCount    = (Get-Module -Name $CompareModule.Name -ListAvailable).count
-						Folder          = (Get-Item $local.Path).DirectoryName
+						InstallCount    = $InstallCount
+						Folder          = $InstallFolder
 						Description     = $CompareModule.Description
 						Repository      = $CompareModule.Repository
 					})
-			} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			} catch {Write-Warning "Error $($CompareModule.Name): `n`tMessage:$($_.Exception.Message)"}
 			$index++
 		}
 		$CompareObject
@@ -163,7 +173,7 @@ Function Show-PWSHModule {
 
 
 $scriptblock = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if ([bool]($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Show-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
