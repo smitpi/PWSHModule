@@ -110,14 +110,16 @@ Function Remove-PWSHModule {
 	process {
 		foreach ($mod in $ModuleName) {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Find module to remove"
-			$Modremove = ($Content.Modules | Where-Object {$_.Name -like $Mod})
+			$Modremove = ($Content.Modules | Where-Object {$_.Name -like "*$Mod*"})
 			if ([string]::IsNullOrEmpty($Modremove) -or ($Modremove.name.count -gt 1)) {
-				Write-Error 'Module not found'
+				Write-Error 'Module not found. Redevine your search'
 			} else {
 				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Removing module"
 				$ModuleObject.Remove($Modremove)
 				Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " from $($ListName)" -ForegroundColor Green
-				if ($UninstallModules) {Uninstall-PWSHModule -GitHubUserID $GitHubUserID -GitHubToken $GitHubToken -ListName $ListName -ModuleName $Modremove.Name -ForceDeleteFolder}
+				if ($UninstallModules) {	
+					Uninstall-PWSHModule @PSBoundParameters -ForceDeleteFolder
+				}
 			}
 		}
 	}

@@ -143,28 +143,25 @@ Function Uninstall-PWSHModule {
 					Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($mod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
 					try {
 						$folder = Get-Module -Name $mod.name -ListAvailable | Where-Object {$_.version -like $mod.version}
-						Get-ChildItem -Path (Get-Item $folder.Path).Directory -Recurse | Remove-Item -Force -Recurse
+						Remove-Item (Get-Item $folder.Path).Directory -Recurse -Force -ErrorAction Stop
 					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 				}
 			} else {
 				try {
 					Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green
 					Uninstall-Module -Name $module.Name -AllVersions -Force -ErrorAction Stop
-				} catch {
-					Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"
-					if ($ForceDeleteFolder) {
-						Get-Module -Name $Module.name -ListAvailable | ForEach-Object {
-							try {
-								Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
-								Get-ChildItem -Path (Get-Item $_.Path).Directory -Recurse | Remove-Item -Force -Recurse
-							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-						}
-						
+				} catch { Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+				if ($ForceDeleteFolder) {
+					Get-Module -Name $Module.name -ListAvailable | ForEach-Object {
+						try {
+							Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
+							Remove-Item (Get-Item $_.Path).Directory -Recurse -Force -ErrorAction Stop
+						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 					}
 				}
 			}
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 		}
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
 } #end Function
 
@@ -174,3 +171,11 @@ $scriptblock = {
 	if (($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
+
+$scriptblock2 = {
+	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if (($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {
+	(Show-PWSHModule -ListName * -ErrorAction SilentlyContinue).name | Sort-Object -Unique
+	}
+}
+Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ModuleName -ScriptBlock $scriptBlock2

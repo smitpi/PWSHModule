@@ -81,9 +81,9 @@ Function Add-PWSHModuleDefaultsToProfile {
 	)
 
 	if ($PublicGist) {
-		$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = "$($GitHubUserID)"
-		$PSDefaultParameterValues['*PWSHModule*:PublicGist'] = $true
-		$PSDefaultParameterValues['*PWSHModule*:Scope'] = "$($Scope)"
+		$Script:PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = "$($GitHubUserID)"
+		$Script:PSDefaultParameterValues['*PWSHModule*:PublicGist'] = $true
+		$Script:PSDefaultParameterValues['*PWSHModule*:Scope'] = "$($Scope)"
 
 		$ToAppend = @"
 
@@ -94,9 +94,9 @@ Function Add-PWSHModuleDefaultsToProfile {
 #endregion PWSHModule
 "@
 	} else {
-		$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = "$($GitHubUserID)"
-		$PSDefaultParameterValues['*PWSHModule*:GitHubToken'] = "$($GitHubToken)"
-		$PSDefaultParameterValues['*PWSHModule*:Scope'] = "$($Scope)"
+		$Script:PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = "$($GitHubUserID)"
+		$Script:PSDefaultParameterValues['*PWSHModule*:GitHubToken'] = "$($GitHubToken)"
+		$Script:PSDefaultParameterValues['*PWSHModule*:Scope'] = "$($Scope)"
 		$ToAppend = @"
 		
 #region PWSHModule Defaults

@@ -3,11 +3,11 @@
 ######## Function 1 of 10 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.29
+# ModuleVersion:    0.1.30
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
-# ModifiedOn:       2022/07/31 12:36:20
+# ModifiedOn:       2022/07/31 14:17:15
 # Synopsis:         Adds a new module to the GitHub Gist List.
 #############################################
  
@@ -167,11 +167,11 @@ $scriptblock = {
 Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName Repository -ScriptBlock $scriptBlock
 
 
-$scriptblock = {
+$scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
 	if ([bool]($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
 }
-Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
+Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock2
  
 Export-ModuleMember -Function Add-PWSHModule
 #endregion
@@ -180,11 +180,11 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 10 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.29
+# ModuleVersion:    0.1.30
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
-# ModifiedOn:       2022/07/31 13:00:02
+# ModifiedOn:       2022/07/31 14:18:41
 # Synopsis:         Creates PSDefaultParameterValues in the users profile files.
 #############################################
  
@@ -226,9 +226,9 @@ Function Add-PWSHModuleDefaultsToProfile {
 	)
 
 	if ($PublicGist) {
-		$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = "$($GitHubUserID)"
-		$PSDefaultParameterValues['*PWSHModule*:PublicGist'] = $true
-		$PSDefaultParameterValues['*PWSHModule*:Scope'] = "$($Scope)"
+		$Script:PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = "$($GitHubUserID)"
+		$Script:PSDefaultParameterValues['*PWSHModule*:PublicGist'] = $true
+		$Script:PSDefaultParameterValues['*PWSHModule*:Scope'] = "$($Scope)"
 
 		$ToAppend = @"
 
@@ -239,9 +239,9 @@ Function Add-PWSHModuleDefaultsToProfile {
 #endregion PWSHModule
 "@
 	} else {
-		$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = "$($GitHubUserID)"
-		$PSDefaultParameterValues['*PWSHModule*:GitHubToken'] = "$($GitHubToken)"
-		$PSDefaultParameterValues['*PWSHModule*:Scope'] = "$($Scope)"
+		$Script:PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = "$($GitHubUserID)"
+		$Script:PSDefaultParameterValues['*PWSHModule*:GitHubToken'] = "$($GitHubToken)"
+		$Script:PSDefaultParameterValues['*PWSHModule*:Scope'] = "$($Scope)"
 		$ToAppend = @"
 		
 #region PWSHModule Defaults
@@ -273,7 +273,7 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 ######## Function 3 of 10 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.29
+# ModuleVersion:    0.1.30
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
@@ -420,7 +420,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 4 of 10 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.29
+# ModuleVersion:    0.1.30
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -547,11 +547,11 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 5 of 10 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.29
+# ModuleVersion:    0.1.30
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
-# ModifiedOn:       2022/07/31 12:36:20
+# ModifiedOn:       2022/07/31 14:30:15
 # Synopsis:         Remove module from the specified list.
 #############################################
  
@@ -624,14 +624,16 @@ Function Remove-PWSHModule {
 	process {
 		foreach ($mod in $ModuleName) {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Find module to remove"
-			$Modremove = ($Content.Modules | Where-Object {$_.Name -like $Mod})
+			$Modremove = ($Content.Modules | Where-Object {$_.Name -like "*$Mod*"})
 			if ([string]::IsNullOrEmpty($Modremove) -or ($Modremove.name.count -gt 1)) {
-				Write-Error 'Module not found'
+				Write-Error 'Module not found. Redevine your search'
 			} else {
 				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Removing module"
 				$ModuleObject.Remove($Modremove)
 				Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " from $($ListName)" -ForegroundColor Green
-				if ($UninstallModules) {Uninstall-PWSHModule -GitHubUserID $GitHubUserID -GitHubToken $GitHubToken -ListName $ListName -ModuleName $Modremove.Name -ForceDeleteFolder}
+				if ($UninstallModules) {	
+					Uninstall-PWSHModule @PSBoundParameters -ForceDeleteFolder
+				}
 			}
 		}
 	}
@@ -668,7 +670,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 6 of 10 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.29
+# ModuleVersion:    0.1.30
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
@@ -755,7 +757,7 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 ######## Function 7 of 10 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.29
+# ModuleVersion:    0.1.30
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -878,7 +880,7 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 8 of 10 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.29
+# ModuleVersion:    0.1.30
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -1031,7 +1033,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 9 of 10 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.29
+# ModuleVersion:    0.1.30
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -1118,11 +1120,11 @@ Export-ModuleMember -Function Show-PWSHModuleList
 ######## Function 10 of 10 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.29
+# ModuleVersion:    0.1.30
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
-# ModifiedOn:       2022/07/31 01:29:01
+# ModifiedOn:       2022/07/31 14:16:48
 # Synopsis:         Will uninstall the module from the system.
 #############################################
  
@@ -1229,28 +1231,25 @@ Function Uninstall-PWSHModule {
 					Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($mod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
 					try {
 						$folder = Get-Module -Name $mod.name -ListAvailable | Where-Object {$_.version -like $mod.version}
-						Get-ChildItem -Path (Get-Item $folder.Path).Directory -Recurse | Remove-Item -Force -Recurse
+						Remove-Item (Get-Item $folder.Path).Directory -Recurse -Force -ErrorAction Stop
 					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 				}
 			} else {
 				try {
 					Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green
 					Uninstall-Module -Name $module.Name -AllVersions -Force -ErrorAction Stop
-				} catch {
-					Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"
-					if ($ForceDeleteFolder) {
-						Get-Module -Name $Module.name -ListAvailable | ForEach-Object {
-							try {
-								Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
-								Get-ChildItem -Path (Get-Item $_.Path).Directory -Recurse | Remove-Item -Force -Recurse
-							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-						}
-						
+				} catch { Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+				if ($ForceDeleteFolder) {
+					Get-Module -Name $Module.name -ListAvailable | ForEach-Object {
+						try {
+							Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
+							Remove-Item (Get-Item $_.Path).Directory -Recurse -Force -ErrorAction Stop
+						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 					}
 				}
 			}
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 		}
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
 } #end Function
 
@@ -1260,6 +1259,14 @@ $scriptblock = {
 	if (($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
+
+$scriptblock2 = {
+	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if (($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {
+	(Show-PWSHModule -ListName * -ErrorAction SilentlyContinue).name | Sort-Object -Unique
+	}
+}
+Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ModuleName -ScriptBlock $scriptBlock2
  
 Export-ModuleMember -Function Uninstall-PWSHModule
 #endregion
