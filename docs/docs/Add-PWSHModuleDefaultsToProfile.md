@@ -5,26 +5,32 @@ online version:
 schema: 2.0.0
 ---
 
-# New-PWSHModuleList
+# Add-PWSHModuleDefaultsToProfile
 
 ## SYNOPSIS
-Add a new list to GitHub Gist.
+Creates PSDefaultParameterValues in the users profile files.
 
 ## SYNTAX
 
+### Public (Default)
 ```
-New-PWSHModuleList [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String>
- [-Description] <String> [<CommonParameters>]
+Add-PWSHModuleDefaultsToProfile -GitHubUserID <String> [-PublicGist] [-Scope <String>] [<CommonParameters>]
+```
+
+### Private
+```
+Add-PWSHModuleDefaultsToProfile -GitHubUserID <String> [-GitHubToken <String>] [-Scope <String>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Add a new list to GitHub Gist.
+Creates PSDefaultParameterValues in the users profile files.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-New-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -Description "These modules needs to be installed on all servers"
+Add-PWSHModuleDefaultsToProfile -GitHubUserID smitpi -PublicGist -Scope AllUsers
 ```
 
 ## PARAMETERS
@@ -38,8 +44,23 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 1
+Position: Named
 Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -PublicGist
+Select if the list is hosted publicly.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: Public
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -49,41 +70,27 @@ GitHub Token with access to the Users' Gist.
 
 ```yaml
 Type: String
-Parameter Sets: (All)
+Parameter Sets: Private
 Aliases:
 
-Required: True
-Position: 2
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ListName
-The File Name on GitHub Gist.
+### -Scope
+Where the module will be installed.
+AllUsers require admin access.
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: True
-Position: 3
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Description
-Summary of the function for the list.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 4
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -96,6 +103,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
+### System.Object[]
 ## NOTES
 
 ## RELATED LINKS

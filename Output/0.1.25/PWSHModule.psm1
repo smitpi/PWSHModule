@@ -1,13 +1,13 @@
 ﻿#region Public Functions
 #region Add-PWSHModule.ps1
-######## Function 1 of 8 ##################
+######## Function 1 of 10 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.24
+# ModuleVersion:    0.1.25
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
-# ModifiedOn:       2022/07/30 18:07:33
+# ModifiedOn:       2022/07/31 12:36:20
 # Synopsis:         Adds a new module to the GitHub Gist List.
 #############################################
  
@@ -168,23 +168,116 @@ Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName Repository
 
 
 $scriptblock = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if ([bool]($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
 Export-ModuleMember -Function Add-PWSHModule
 #endregion
  
+#region Add-PWSHModuleDefaultsToProfile.ps1
+######## Function 2 of 10 ##################
+# Function:         Add-PWSHModuleDefaultsToProfile
+# Module:           PWSHModule
+# ModuleVersion:    0.1.25
+# Author:           Pierre Smit
+# Company:          HTPCZA Tech
+# CreatedOn:        2022/07/31 11:51:50
+# ModifiedOn:       2022/07/31 12:38:20
+# Synopsis:         Creates PSDefaultParameterValues in the users profile files.
+#############################################
+ 
+<#
+.SYNOPSIS
+Creates PSDefaultParameterValues in the users profile files.
+
+.DESCRIPTION
+Creates PSDefaultParameterValues in the users profile files.
+
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
+.PARAMETER Scope
+Where the module will be installed. AllUsers require admin access.
+
+.EXAMPLE
+Add-PWSHModuleDefaultsToProfile -GitHubUserID smitpi -PublicGist -Scope AllUsers
+
+#>
+Function Add-PWSHModuleDefaultsToProfile {
+	[Cmdletbinding(DefaultParameterSetName = 'Public', HelpURI = 'https://smitpi.github.io/PWSHModule/Add-PWSHModuleDefaultsToProfile')]
+	[OutputType([System.Object[]])]
+	PARAM(
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubUserID, 
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
+		[string]$GitHubToken,
+		[ValidateSet('AllUsers', 'CurrentUser')]
+		[string]$Scope
+	)
+
+	if ($PublicGist) {
+		$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = $($GitHubUserID)
+		$PSDefaultParameterValues['*PWSHModule*:PublicGist'] = $true
+		$PSDefaultParameterValues['*PWSHModule*:Scope'] = $Scope
+
+		$ToAppend = @"
+
+#region PWSHModule Defaults
+`$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = $($GitHubUserID)
+`$PSDefaultParameterValues['*PWSHModule*:PublicGist'] = `$true
+`$PSDefaultParameterValues['*PWSHModule*:Scope'] = $Scope
+#endregion PWSHModule
+"@
+	} else {
+		$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = $($GitHubUserID)
+		$PSDefaultParameterValues['*PWSHModule*:GitHubToken'] = $($GitHubToken)
+		$PSDefaultParameterValues['*PWSHModule*:Scope'] = $Scope
+		$ToAppend = @"
+		
+#region PWSHModule Defaults
+`$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = $($GitHubUserID)
+`$PSDefaultParameterValues['*PWSHModule*:GitHubToken'] = $($GitHubToken)
+`$PSDefaultParameterValues['*PWSHModule*:Scope'] = $Scope
+#endregion PWSHModule
+"@
+	}
+
+	try {
+		$CheckProfile = Get-Item $PROFILE -ErrorAction Stop
+	} catch { $CheckProfile = New-Item $PROFILE -ItemType File -Force}
+	
+	$Files = Get-ChildItem -Path "$($CheckProfile.Directory)\*profile*"
+	foreach ($file in $files) {	
+		$tmp = Get-Content -Path $file.FullName | Where-Object { $_ -notlike '*PWSHModule*'}
+		$tmp | Set-Content -Path $file.FullName -Force
+		Add-Content -Value $ToAppend -Path $file.FullName -Force -Encoding utf8
+		Write-Host '[Updated]' -NoNewline -ForegroundColor Yellow; Write-Host ' Profile File:' -NoNewline -ForegroundColor Cyan; Write-Host " $($file.FullName)" -ForegroundColor Green
+	}
+
+} #end Function
+ 
+Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
+#endregion
+ 
 #region Install-PWSHModule.ps1
-######## Function 2 of 8 ##################
+######## Function 3 of 10 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.24
+# ModuleVersion:    0.1.25
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
-# ModifiedOn:       2022/07/31 00:18:59
+# ModifiedOn:       2022/07/31 12:36:20
 # Synopsis:         Install modules from the specified list.
 #############################################
  
@@ -302,7 +395,7 @@ Function Install-PWSHModule {
 			if ((-not($mod)) -or $mod.Version -lt $module.Version) {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
-					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($module.Version))" -ForegroundColor Green  -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
+					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($module.Version))" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
 					Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope -Force -AllowClobber
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
@@ -315,8 +408,8 @@ Function Install-PWSHModule {
 
 
 $scriptblock = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if ([bool]($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Install-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
@@ -324,14 +417,14 @@ Export-ModuleMember -Function Install-PWSHModule
 #endregion
  
 #region New-PWSHModuleList.ps1
-######## Function 3 of 8 ##################
+######## Function 4 of 10 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.24
+# ModuleVersion:    0.1.25
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
-# ModifiedOn:       2022/07/30 18:22:56
+# ModifiedOn:       2022/07/31 11:58:00
 # Synopsis:         Add a new list to GitHub Gist.
 #############################################
  
@@ -354,9 +447,6 @@ The File Name on GitHub Gist.
 .PARAMETER Description
 Summary of the function for the list.
 
-.PARAMETER AddDefaultsToProfile
-This will add the userid and token to $PSDefaultParameterValues and save it in your profile file.
-
 .EXAMPLE
 New-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -Description "These modules needs to be installed on all servers"
 
@@ -371,8 +461,7 @@ Function New-PWSHModuleList {
 		[Parameter(Mandatory = $true)]
 		[string]$ListName,
 		[Parameter(Mandatory = $true)]
-		[string]$Description,
-		[switch]$AddDefaultsToProfile
+		[string]$Description
 	)
 
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating config"
@@ -448,37 +537,21 @@ Function New-PWSHModuleList {
 	}
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 
-	if ($AddDefaultsToProfile) {
-		$PSDefaultParameterValues["*PWSHModule*:GitHubUserID"]   = $($GitHubUserID)
-		$PSDefaultParameterValues["*PWSHModule*:GitHubToken"]    = $($GitHubToken)
 
-		$addstring = @"
-		
-#######
-#region PWSHModule Defaults
-`$PSDefaultParameterValues["*PWSHModule*:GitHubUserID"]   = "$($GitHubUserID)"
-`$PSDefaultParameterValues["*PWSHModule*:GitHubToken"]    = "$($GitHubToken)"
-#endregion
-"@
-try {
-		$addstring | add-Content -Path (get-item $PROFILE).FullName -Encoding utf8
-		Write-Host '[Updated]' -NoNewline -ForegroundColor Yellow; Write-Host " Profile File:" -NoNewline -ForegroundColor Cyan; Write-Host " $((get-item $profile).FullName)" -ForegroundColor Green
-} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-	}
 } #end Function
  
 Export-ModuleMember -Function New-PWSHModuleList
 #endregion
  
 #region Remove-PWSHModule.ps1
-######## Function 4 of 8 ##################
+######## Function 5 of 10 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.24
+# ModuleVersion:    0.1.25
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
-# ModifiedOn:       2022/07/30 18:10:07
+# ModifiedOn:       2022/07/31 12:36:20
 # Synopsis:         Remove module from the specified list.
 #############################################
  
@@ -584,22 +657,109 @@ Function Remove-PWSHModule {
 
 $scriptblock = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Remove-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
 Export-ModuleMember -Function Remove-PWSHModule
 #endregion
  
+#region Remove-PWSHModuleList.ps1
+######## Function 6 of 10 ##################
+# Function:         Remove-PWSHModuleList
+# Module:           PWSHModule
+# ModuleVersion:    0.1.25
+# Author:           Pierre Smit
+# Company:          HTPCZA Tech
+# CreatedOn:        2022/07/31 11:14:51
+# ModifiedOn:       2022/07/31 12:35:30
+# Synopsis:         Deletes a list from GitHub Gist
+#############################################
+ 
+<#
+.SYNOPSIS
+Deletes a list from GitHub Gist
+
+.DESCRIPTION
+Deletes a list from GitHub Gist
+
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
+.PARAMETER ListName
+The Name of the list to remove.
+
+.EXAMPLE
+Remove-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base
+
+#>
+Function Remove-PWSHModuleList {
+	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Remove-PWSHModuleList')]
+	[OutputType([System.Object[]])]
+	PARAM(
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubUserID, 
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubToken,
+		[Parameter(Mandatory = $true)]
+		[string]$ListName
+	)
+
+	try {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to gist"
+		$headers = @{}
+		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+		$base64 = [System.Convert]::ToBase64String($bytes)
+		$headers.Authorization = 'Basic {0}' -f $base64
+
+		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+
+
+	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create object"
+	$CheckExist = $PRGist.files | Get-Member -MemberType NoteProperty | Where-Object {$_.name -like $ListName}
+	if (-not([string]::IsNullOrEmpty($CheckExist))) {
+		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Remove list from Gist"
+			$Body = @{}
+			$files = @{}
+			$Files["$($ListName)"] = $null
+			$Body.files = $Files
+			$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
+			$json = ConvertTo-Json -InputObject $Body
+			$json = [System.Text.Encoding]::UTF8.GetBytes($json)
+			$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
+			Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName)" -NoNewline -ForegroundColor Cyan; Write-Host ' from Github Gist' -ForegroundColor DarkRed
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] updated gist."
+		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+	}
+	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
+} #end Function
+
+$scriptblock = {
+	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if ([bool]($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
+}
+Register-ArgumentCompleter -CommandName Remove-PWSHModuleList -ParameterName ListName -ScriptBlock $scriptBlock
+ 
+Export-ModuleMember -Function Remove-PWSHModuleList
+#endregion
+ 
 #region Save-PWSHModule.ps1
-######## Function 5 of 8 ##################
+######## Function 7 of 10 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.24
+# ModuleVersion:    0.1.25
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
-# ModifiedOn:       2022/07/30 18:10:19
+# ModifiedOn:       2022/07/31 12:37:23
 # Synopsis:         Saves the modules from the specified list to a folder.
 #############################################
  
@@ -629,7 +789,7 @@ Save in the NuGet format
 Where to save
 
 .EXAMPLE
-Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GithubToken -ListName extended -AsNuGet -Path c:\temp\
+Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName extended -AsNuGet -Path c:\temp\
 
 #>
 Function Save-PWSHModule {
@@ -707,7 +867,7 @@ Function Save-PWSHModule {
 
 $scriptblock = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Save-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
@@ -715,14 +875,14 @@ Export-ModuleMember -Function Save-PWSHModule
 #endregion
  
 #region Show-PWSHModule.ps1
-######## Function 6 of 8 ##################
+######## Function 8 of 10 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.24
+# ModuleVersion:    0.1.25
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
-# ModifiedOn:       2022/07/30 18:10:50
+# ModifiedOn:       2022/07/31 12:36:20
 # Synopsis:         Show the details of the modules in a list.
 #############################################
  
@@ -849,7 +1009,7 @@ Function Show-PWSHModule {
 
 $scriptblock = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Show-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
@@ -857,10 +1017,10 @@ Export-ModuleMember -Function Show-PWSHModule
 #endregion
  
 #region Show-PWSHModuleList.ps1
-######## Function 7 of 8 ##################
+######## Function 9 of 10 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.24
+# ModuleVersion:    0.1.25
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -944,14 +1104,14 @@ Export-ModuleMember -Function Show-PWSHModuleList
 #endregion
  
 #region Uninstall-PWSHModule.ps1
-######## Function 8 of 8 ##################
+######## Function 10 of 10 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.24
+# ModuleVersion:    0.1.25
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
-# ModifiedOn:       2022/07/31 00:03:12
+# ModifiedOn:       2022/07/31 01:29:01
 # Synopsis:         Will uninstall the module from the system.
 #############################################
  
@@ -1034,6 +1194,8 @@ Function Uninstall-PWSHModule {
 		foreach ($collectmod in $ModuleName) {
 			$Content.Modules | Where-Object {$_.name -like $collectmod} | ForEach-Object {[void]$CollectObject.Add($_)}
 		}
+		#$mods = Get-Module -list | Where-Object path -NotMatch 'windows\\system32' | Group-Object -Property name | Where-Object count -GT 1
+		#$mods | ForEach-Object { $_.group | Select-Object -Skip 1 } | ForEach-Object { Uninstall-Module -Name $_.name -RequiredVersion $_.version -WhatIf }
 	}
 	end {
 		foreach ($module in $CollectObject) {
@@ -1083,8 +1245,8 @@ Function Uninstall-PWSHModule {
 
 
 $scriptblock = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if (($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  

@@ -59,9 +59,6 @@ The File Name on GitHub Gist.
 .PARAMETER Description
 Summary of the function for the list.
 
-.PARAMETER AddDefaultsToProfile
-This will add the userid and token to $PSDefaultParameterValues and save it in your profile file.
-
 .EXAMPLE
 New-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -Description "These modules needs to be installed on all servers"
 
@@ -76,8 +73,7 @@ Function New-PWSHModuleList {
 		[Parameter(Mandatory = $true)]
 		[string]$ListName,
 		[Parameter(Mandatory = $true)]
-		[string]$Description,
-		[switch]$AddDefaultsToProfile
+		[string]$Description
 	)
 
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating config"
@@ -153,21 +149,5 @@ Function New-PWSHModuleList {
 	}
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 
-	if ($AddDefaultsToProfile) {
-		$PSDefaultParameterValues["*PWSHModule*:GitHubUserID"]   = $($GitHubUserID)
-		$PSDefaultParameterValues["*PWSHModule*:GitHubToken"]    = $($GitHubToken)
 
-		$addstring = @"
-		
-#######
-#region PWSHModule Defaults
-`$PSDefaultParameterValues["*PWSHModule*:GitHubUserID"]   = "$($GitHubUserID)"
-`$PSDefaultParameterValues["*PWSHModule*:GitHubToken"]    = "$($GitHubToken)"
-#endregion
-"@
-try {
-		$addstring | add-Content -Path (get-item $PROFILE).FullName -Encoding utf8
-		Write-Host '[Updated]' -NoNewline -ForegroundColor Yellow; Write-Host " Profile File:" -NoNewline -ForegroundColor Cyan; Write-Host " $((get-item $profile).FullName)" -ForegroundColor Green
-} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-	}
 } #end Function

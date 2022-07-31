@@ -5,26 +5,26 @@ online version:
 schema: 2.0.0
 ---
 
-# New-PWSHModuleList
+# Remove-PWSHModuleList
 
 ## SYNOPSIS
-Add a new list to GitHub Gist.
+Deletes a list from GitHub Gist
 
 ## SYNTAX
 
 ```
-New-PWSHModuleList [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String>
- [-Description] <String> [<CommonParameters>]
+Remove-PWSHModuleList [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String>
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Add a new list to GitHub Gist.
+Deletes a list from GitHub Gist
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-New-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -Description "These modules needs to be installed on all servers"
+Remove-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base
 ```
 
 ## PARAMETERS
@@ -60,7 +60,7 @@ Accept wildcard characters: False
 ```
 
 ### -ListName
-The File Name on GitHub Gist.
+The Name of the list to remove.
 
 ```yaml
 Type: String
@@ -74,21 +74,6 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Description
-Summary of the function for the list.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 4
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
@@ -96,6 +81,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
+### System.Object[]
 ## NOTES
 
 ## RELATED LINKS

@@ -31,7 +31,7 @@ Saves the modules from the specified list to a folder.
 
 ### EXAMPLE 1
 ```
-Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GithubToken -ListName extended -AsNuGet -Path c:\temp\
+Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName extended -AsNuGet -Path c:\temp\
 ```
 
 ## PARAMETERS
