@@ -3,7 +3,7 @@
 ######## Function 1 of 10 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.33
+# ModuleVersion:    0.1.35
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
@@ -180,7 +180,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 10 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.33
+# ModuleVersion:    0.1.35
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
@@ -273,7 +273,7 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 ######## Function 3 of 10 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.33
+# ModuleVersion:    0.1.35
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
@@ -420,7 +420,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 4 of 10 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.33
+# ModuleVersion:    0.1.35
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -547,11 +547,11 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 5 of 10 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.33
+# ModuleVersion:    0.1.35
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
-# ModifiedOn:       2022/07/31 14:52:33
+# ModifiedOn:       2022/07/31 16:14:46
 # Synopsis:         Remove module from the specified list.
 #############################################
  
@@ -633,14 +633,15 @@ Function Remove-PWSHModule {
 				Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " from $($ListName)" -ForegroundColor Green
 				if ($ForceUninstallModules) {
 					try {
-						Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green
+						Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($mod) " -ForegroundColor Green
 						Uninstall-Module -Name $mod -AllVersions -Force -ErrorAction Stop
 					} catch {
 						Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"
 						Get-Module -Name $Mod -ListAvailable | ForEach-Object {
 							try {
 								Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
-								Remove-Item (Get-Item $_.Path).Directory -Recurse -Force -ErrorAction Stop
+								$Directory = join-path -Path (Get-Item $_.Path).FullName  -ChildPath "..\..\" -Resolve
+								Remove-Item -Path $Directory -Recurse -Force -ErrorAction Stop
 							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 						}
 					}
@@ -682,7 +683,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 6 of 10 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.33
+# ModuleVersion:    0.1.35
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
@@ -769,7 +770,7 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 ######## Function 7 of 10 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.33
+# ModuleVersion:    0.1.35
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -892,7 +893,7 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 8 of 10 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.33
+# ModuleVersion:    0.1.35
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -1045,7 +1046,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 9 of 10 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.33
+# ModuleVersion:    0.1.35
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -1132,11 +1133,11 @@ Export-ModuleMember -Function Show-PWSHModuleList
 ######## Function 10 of 10 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.33
+# ModuleVersion:    0.1.35
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
-# ModifiedOn:       2022/07/31 14:16:48
+# ModifiedOn:       2022/07/31 16:16:13
 # Synopsis:         Will uninstall the module from the system.
 #############################################
  
@@ -1248,15 +1249,18 @@ Function Uninstall-PWSHModule {
 				}
 			} else {
 				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uninstalling module $($module.Name)"
 					Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green
 					Uninstall-Module -Name $module.Name -AllVersions -Force -ErrorAction Stop
 				} catch { Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 				if ($ForceDeleteFolder) {
 					Get-Module -Name $Module.name -ListAvailable | ForEach-Object {
-						try {
+							Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Force Delete module $($module.Name)"
 							Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
-							Remove-Item (Get-Item $_.Path).Directory -Recurse -Force -ErrorAction Stop
-						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+							try {
+								$Directory = Join-Path -Path (Get-Item $_.Path).FullName -ChildPath '..\..\' -Resolve
+								Remove-Item -Path $Directory -Recurse -Force -ErrorAction Stop
+							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 					}
 				}
 			}

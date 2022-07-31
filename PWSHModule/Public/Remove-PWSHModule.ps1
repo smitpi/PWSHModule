@@ -119,14 +119,15 @@ Function Remove-PWSHModule {
 				Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " from $($ListName)" -ForegroundColor Green
 				if ($ForceUninstallModules) {
 					try {
-						Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green
+						Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($mod) " -ForegroundColor Green
 						Uninstall-Module -Name $mod -AllVersions -Force -ErrorAction Stop
 					} catch {
 						Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"
 						Get-Module -Name $Mod -ListAvailable | ForEach-Object {
 							try {
 								Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
-								Remove-Item (Get-Item $_.Path).Directory -Recurse -Force -ErrorAction Stop
+								$Directory = join-path -Path (Get-Item $_.Path).FullName  -ChildPath "..\..\" -Resolve
+								Remove-Item -Path $Directory -Recurse -Force -ErrorAction Stop
 							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 						}
 					}

@@ -148,15 +148,18 @@ Function Uninstall-PWSHModule {
 				}
 			} else {
 				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uninstalling module $($module.Name)"
 					Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green
 					Uninstall-Module -Name $module.Name -AllVersions -Force -ErrorAction Stop
 				} catch { Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 				if ($ForceDeleteFolder) {
 					Get-Module -Name $Module.name -ListAvailable | ForEach-Object {
-						try {
+							Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Force Delete module $($module.Name)"
 							Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
-							Remove-Item (Get-Item $_.Path).Directory -Recurse -Force -ErrorAction Stop
-						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+							try {
+								$Directory = Join-Path -Path (Get-Item $_.Path).FullName -ChildPath '..\..\' -Resolve
+								Remove-Item -Path $Directory -Recurse -Force -ErrorAction Stop
+							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 					}
 				}
 			}
