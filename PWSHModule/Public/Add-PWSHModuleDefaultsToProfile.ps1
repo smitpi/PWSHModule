@@ -82,14 +82,14 @@ Function Add-PWSHModuleDefaultsToProfile {
 
 	if ($PublicGist) {
 		$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = "$($GitHubUserID)"
-		$PSDefaultParameterValues['*PWSHModule*:PublicGist'] = "$($true)"
+		$PSDefaultParameterValues['*PWSHModule*:PublicGist'] = $true
 		$PSDefaultParameterValues['*PWSHModule*:Scope'] = "$($Scope)"
 
 		$ToAppend = @"
 
 #region PWSHModule Defaults
 `$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = "$($GitHubUserID)"
-`$PSDefaultParameterValues['*PWSHModule*:PublicGist'] = "`$(`$true)"
+`$PSDefaultParameterValues['*PWSHModule*:PublicGist'] = `$true
 `$PSDefaultParameterValues['*PWSHModule*:Scope'] = "$($Scope)"
 #endregion PWSHModule
 "@
