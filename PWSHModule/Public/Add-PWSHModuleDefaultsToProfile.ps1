@@ -81,28 +81,28 @@ Function Add-PWSHModuleDefaultsToProfile {
 	)
 
 	if ($PublicGist) {
-		$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = $($GitHubUserID)
-		$PSDefaultParameterValues['*PWSHModule*:PublicGist'] = $true
-		$PSDefaultParameterValues['*PWSHModule*:Scope'] = $Scope
+		$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = "$($GitHubUserID)"
+		$PSDefaultParameterValues['*PWSHModule*:PublicGist'] = "$($true)"
+		$PSDefaultParameterValues['*PWSHModule*:Scope'] = "$($Scope)"
 
 		$ToAppend = @"
 
 #region PWSHModule Defaults
-`$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = $($GitHubUserID)
-`$PSDefaultParameterValues['*PWSHModule*:PublicGist'] = `$true
-`$PSDefaultParameterValues['*PWSHModule*:Scope'] = $Scope
+`$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = "$($GitHubUserID)"
+`$PSDefaultParameterValues['*PWSHModule*:PublicGist'] = "`$(`$true)"
+`$PSDefaultParameterValues['*PWSHModule*:Scope'] = "$($Scope)"
 #endregion PWSHModule
 "@
 	} else {
-		$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = $($GitHubUserID)
-		$PSDefaultParameterValues['*PWSHModule*:GitHubToken'] = $($GitHubToken)
-		$PSDefaultParameterValues['*PWSHModule*:Scope'] = $Scope
+		$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = "$($GitHubUserID)"
+		$PSDefaultParameterValues['*PWSHModule*:GitHubToken'] = "$($GitHubToken)"
+		$PSDefaultParameterValues['*PWSHModule*:Scope'] = "$($Scope)"
 		$ToAppend = @"
 		
 #region PWSHModule Defaults
-`$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = $($GitHubUserID)
-`$PSDefaultParameterValues['*PWSHModule*:GitHubToken'] = $($GitHubToken)
-`$PSDefaultParameterValues['*PWSHModule*:Scope'] = $Scope
+`$PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] =  "$($GitHubUserID)"
+`$PSDefaultParameterValues['*PWSHModule*:GitHubToken'] =  "$($GitHubToken)"
+`$PSDefaultParameterValues['*PWSHModule*:Scope'] =  "$($Scope)"
 #endregion PWSHModule
 "@
 	}
