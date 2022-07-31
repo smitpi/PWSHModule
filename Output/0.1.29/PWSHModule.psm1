@@ -3,7 +3,7 @@
 ######## Function 1 of 10 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.28
+# ModuleVersion:    0.1.29
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
@@ -180,7 +180,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 10 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.28
+# ModuleVersion:    0.1.29
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
@@ -273,7 +273,7 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 ######## Function 3 of 10 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.28
+# ModuleVersion:    0.1.29
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
@@ -420,7 +420,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 4 of 10 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.28
+# ModuleVersion:    0.1.29
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -547,7 +547,7 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 5 of 10 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.28
+# ModuleVersion:    0.1.29
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
@@ -668,7 +668,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 6 of 10 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.28
+# ModuleVersion:    0.1.29
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
@@ -755,7 +755,7 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 ######## Function 7 of 10 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.28
+# ModuleVersion:    0.1.29
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -878,11 +878,11 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 8 of 10 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.28
+# ModuleVersion:    0.1.29
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
-# ModifiedOn:       2022/07/31 13:13:19
+# ModifiedOn:       2022/07/31 13:22:23
 # Synopsis:         Show the details of the modules in a list.
 #############################################
  
@@ -977,11 +977,11 @@ Function Show-PWSHModule {
 				}
 				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Local: $($CompareModule.name)"
 				$local = $null
-				$local = (Get-Module -Name $CompareModule.Name -ListAvailable | Sort-Object -Property Version -Descending)[0]
+				$local = Get-Module -Name $CompareModule.Name -ListAvailable | Sort-Object -Property Version -Descending | Select-Object -First 1
 				if ([string]::IsNullOrEmpty($local)) {
-					$InstallVer = 'Unknown'
-					$InstallCount = 'Unkown'
-					$InstallFolder = 'Unknown'
+					$InstallVer = 'NotInstalled'
+					$InstallCount = 'NotInstalled'
+					$InstallFolder = 'NotInstalled'
 				} else {
 					$InstallVer = $local.Version
 					$InstallCount = (Get-Module -Name $CompareModule.Name -ListAvailable).count
@@ -989,6 +989,7 @@ Function Show-PWSHModule {
 				}
 				if ($local.Version -lt $online.Version) {$update = $true}
 				else {$update = $false}
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Building List with module: $($CompareModule.name)"
 				[void]$CompareObject.Add([PSCustomObject]@{
 						Index           = $index
 						Name            = $CompareModule.Name
@@ -1011,7 +1012,7 @@ Function Show-PWSHModule {
 		if (-not([string]::IsNullOrEmpty($Content.Modules[$IndexURI].projecturi))) {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] open url"
 			Start-Process "$($Content.Modules[$IndexURI].projecturi)"
-		} else { Write-Warning 'Unknown ProjectURI'}
+		} else { Write-Warning 'NotInstalled ProjectURI'}
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
 } #end Function
@@ -1030,7 +1031,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 9 of 10 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.28
+# ModuleVersion:    0.1.29
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -1117,7 +1118,7 @@ Export-ModuleMember -Function Show-PWSHModuleList
 ######## Function 10 of 10 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.28
+# ModuleVersion:    0.1.29
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13

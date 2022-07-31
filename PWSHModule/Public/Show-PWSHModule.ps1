@@ -132,11 +132,11 @@ Function Show-PWSHModule {
 				}
 				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Local: $($CompareModule.name)"
 				$local = $null
-				$local = (Get-Module -Name $CompareModule.Name -ListAvailable | Sort-Object -Property Version -Descending)[0]
+				$local = Get-Module -Name $CompareModule.Name -ListAvailable | Sort-Object -Property Version -Descending | Select-Object -First 1
 				if ([string]::IsNullOrEmpty($local)) {
-					$InstallVer = 'Unknown'
-					$InstallCount = 'Unkown'
-					$InstallFolder = 'Unknown'
+					$InstallVer = 'NotInstalled'
+					$InstallCount = 'NotInstalled'
+					$InstallFolder = 'NotInstalled'
 				} else {
 					$InstallVer = $local.Version
 					$InstallCount = (Get-Module -Name $CompareModule.Name -ListAvailable).count
@@ -144,6 +144,7 @@ Function Show-PWSHModule {
 				}
 				if ($local.Version -lt $online.Version) {$update = $true}
 				else {$update = $false}
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Building List with module: $($CompareModule.name)"
 				[void]$CompareObject.Add([PSCustomObject]@{
 						Index           = $index
 						Name            = $CompareModule.Name
@@ -166,7 +167,7 @@ Function Show-PWSHModule {
 		if (-not([string]::IsNullOrEmpty($Content.Modules[$IndexURI].projecturi))) {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] open url"
 			Start-Process "$($Content.Modules[$IndexURI].projecturi)"
-		} else { Write-Warning 'Unknown ProjectURI'}
+		} else { Write-Warning 'NotInstalled ProjectURI'}
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
 } #end Function
