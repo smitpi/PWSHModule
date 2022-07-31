@@ -3,7 +3,7 @@
 ######## Function 1 of 10 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.30
+# ModuleVersion:    0.1.31
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
@@ -180,7 +180,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 10 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.30
+# ModuleVersion:    0.1.31
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
@@ -273,7 +273,7 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 ######## Function 3 of 10 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.30
+# ModuleVersion:    0.1.31
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
@@ -420,7 +420,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 4 of 10 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.30
+# ModuleVersion:    0.1.31
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -547,11 +547,11 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 5 of 10 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.30
+# ModuleVersion:    0.1.31
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
-# ModifiedOn:       2022/07/31 14:30:15
+# ModifiedOn:       2022/07/31 14:49:57
 # Synopsis:         Remove module from the specified list.
 #############################################
  
@@ -574,7 +574,7 @@ The File Name on GitHub Gist.
 .PARAMETER ModuleName
 Module to remove.
 
-.PARAMETER UninstallModules
+.PARAMETER ForceUninstallModules
 Will uninstall the modules as well.
 
 .EXAMPLE
@@ -595,7 +595,7 @@ Function Remove-PWSHModule {
 		[ValidateScript( { $IsAdmin = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
 				else { Throw 'Must be running an elevated prompt.' } })]
-		[switch]$UninstallModules
+		[switch]$ForceUninstallModules
 	)
 	begin {
 		try {
@@ -631,35 +631,47 @@ Function Remove-PWSHModule {
 				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Removing module"
 				$ModuleObject.Remove($Modremove)
 				Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " from $($ListName)" -ForegroundColor Green
-				if ($UninstallModules) {	
-					Uninstall-PWSHModule @PSBoundParameters -ForceDeleteFolder
-				}
+				if ($ForceUninstallModules) {
+					try {
+						Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green
+						Uninstall-Module -Name $mod -AllVersions -Force -ErrorAction Stop
+					} catch {
+						Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"
+						Get-Module -Name $Mod -ListAvailable | ForEach-Object {
+							try {
+								Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
+								Remove-Item (Get-Item $_.Path).Directory -Recurse -Force -ErrorAction Stop
+							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+						}
+					}
+				}	
 			}
 		}
 	}
-	end {
-		try {
-			$Content.Modules = $ModuleObject | Sort-Object -Property name
-			$Content.ModifiedDate = "$(Get-Date -Format u)"
-			$content.ModifiedUser = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to gist"
-			$Body = @{}
-			$files = @{}
-			$Files["$($PRGist.files.$($ListName).Filename)"] = @{content = ( $Content | ConvertTo-Json | Out-String ) }
-			$Body.files = $Files
-			$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
-			$json = ConvertTo-Json -InputObject $Body
-			$json = [System.Text.Encoding]::UTF8.GetBytes($json)
-			$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
-			Write-Host '[Uploaded] ' -NoNewline -ForegroundColor Yellow; Write-Host " List: $($ListName)" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
-		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
-	}
+}
+end {
+	try {
+		$Content.Modules = $ModuleObject | Sort-Object -Property name
+		$Content.ModifiedDate = "$(Get-Date -Format u)"
+		$content.ModifiedUser = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to gist"
+		$Body = @{}
+		$files = @{}
+		$Files["$($PRGist.files.$($ListName).Filename)"] = @{content = ( $Content | ConvertTo-Json | Out-String ) }
+		$Body.files = $Files
+		$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
+		$json = ConvertTo-Json -InputObject $Body
+		$json = [System.Text.Encoding]::UTF8.GetBytes($json)
+		$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
+		Write-Host '[Uploaded] ' -NoNewline -ForegroundColor Yellow; Write-Host " List: $($ListName)" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
+	} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+}
 } #end Function
 
 
 $scriptblock = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if ([bool]($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Remove-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
@@ -670,7 +682,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 6 of 10 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.30
+# ModuleVersion:    0.1.31
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
@@ -757,7 +769,7 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 ######## Function 7 of 10 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.30
+# ModuleVersion:    0.1.31
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -880,7 +892,7 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 8 of 10 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.30
+# ModuleVersion:    0.1.31
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -1033,7 +1045,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 9 of 10 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.30
+# ModuleVersion:    0.1.31
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -1120,7 +1132,7 @@ Export-ModuleMember -Function Show-PWSHModuleList
 ######## Function 10 of 10 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.30
+# ModuleVersion:    0.1.31
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13

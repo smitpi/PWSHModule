@@ -12,7 +12,6 @@ Functions in this module:
 	 Add-PWSHModuleDefaultsToProfile -- Creates PSDefaultParameterValues in the users profile files.
 	 Install-PWSHModule -- Install modules from the specified list.
 	 New-PWSHModuleList -- Add a new list to GitHub Gist.
-	 Remove-PWSHModule -- Remove module from the specified list.
 	 Remove-PWSHModuleList -- Deletes a list from GitHub Gist
 	 Save-PWSHModule -- Saves the modules from the specified list to a folder.
 	 Show-PWSHModule -- Show the details of the modules in a list.

@@ -60,7 +60,7 @@ The File Name on GitHub Gist.
 .PARAMETER ModuleName
 Module to remove.
 
-.PARAMETER UninstallModules
+.PARAMETER ForceUninstallModules
 Will uninstall the modules as well.
 
 .EXAMPLE
@@ -81,7 +81,7 @@ Function Remove-PWSHModule {
 		[ValidateScript( { $IsAdmin = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
 				else { Throw 'Must be running an elevated prompt.' } })]
-		[switch]$UninstallModules
+		[switch]$ForceUninstallModules
 	)
 	begin {
 		try {
@@ -117,34 +117,46 @@ Function Remove-PWSHModule {
 				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Removing module"
 				$ModuleObject.Remove($Modremove)
 				Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " from $($ListName)" -ForegroundColor Green
-				if ($UninstallModules) {	
-					Uninstall-PWSHModule @PSBoundParameters -ForceDeleteFolder
-				}
+				if ($ForceUninstallModules) {
+					try {
+						Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green
+						Uninstall-Module -Name $mod -AllVersions -Force -ErrorAction Stop
+					} catch {
+						Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"
+						Get-Module -Name $Mod -ListAvailable | ForEach-Object {
+							try {
+								Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
+								Remove-Item (Get-Item $_.Path).Directory -Recurse -Force -ErrorAction Stop
+							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+						}
+					}
+				}	
 			}
 		}
 	}
-	end {
-		try {
-			$Content.Modules = $ModuleObject | Sort-Object -Property name
-			$Content.ModifiedDate = "$(Get-Date -Format u)"
-			$content.ModifiedUser = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to gist"
-			$Body = @{}
-			$files = @{}
-			$Files["$($PRGist.files.$($ListName).Filename)"] = @{content = ( $Content | ConvertTo-Json | Out-String ) }
-			$Body.files = $Files
-			$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
-			$json = ConvertTo-Json -InputObject $Body
-			$json = [System.Text.Encoding]::UTF8.GetBytes($json)
-			$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
-			Write-Host '[Uploaded] ' -NoNewline -ForegroundColor Yellow; Write-Host " List: $($ListName)" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
-		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
-	}
+}
+end {
+	try {
+		$Content.Modules = $ModuleObject | Sort-Object -Property name
+		$Content.ModifiedDate = "$(Get-Date -Format u)"
+		$content.ModifiedUser = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to gist"
+		$Body = @{}
+		$files = @{}
+		$Files["$($PRGist.files.$($ListName).Filename)"] = @{content = ( $Content | ConvertTo-Json | Out-String ) }
+		$Body.files = $Files
+		$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
+		$json = ConvertTo-Json -InputObject $Body
+		$json = [System.Text.Encoding]::UTF8.GetBytes($json)
+		$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
+		Write-Host '[Uploaded] ' -NoNewline -ForegroundColor Yellow; Write-Host " List: $($ListName)" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
+	} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+}
 } #end Function
 
 
 $scriptblock = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if ([bool]($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Remove-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
