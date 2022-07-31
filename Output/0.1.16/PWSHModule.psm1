@@ -3,7 +3,7 @@
 ######## Function 1 of 10 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.35
+# ModuleVersion:    0.1.16
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
@@ -180,7 +180,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 10 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.35
+# ModuleVersion:    0.1.16
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
@@ -273,7 +273,7 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 ######## Function 3 of 10 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.35
+# ModuleVersion:    0.1.16
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
@@ -420,7 +420,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 4 of 10 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.35
+# ModuleVersion:    0.1.16
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -547,7 +547,7 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 5 of 10 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.35
+# ModuleVersion:    0.1.16
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
@@ -683,7 +683,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 6 of 10 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.35
+# ModuleVersion:    0.1.16
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
@@ -770,7 +770,7 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 ######## Function 7 of 10 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.35
+# ModuleVersion:    0.1.16
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -893,7 +893,7 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 8 of 10 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.35
+# ModuleVersion:    0.1.16
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -1046,7 +1046,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 9 of 10 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.35
+# ModuleVersion:    0.1.16
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -1133,7 +1133,7 @@ Export-ModuleMember -Function Show-PWSHModuleList
 ######## Function 10 of 10 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.35
+# ModuleVersion:    0.1.16
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
