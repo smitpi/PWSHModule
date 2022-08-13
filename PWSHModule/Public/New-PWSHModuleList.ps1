@@ -47,33 +47,33 @@ Add a new list to GitHub Gist.
 .DESCRIPTION
 Add a new list to GitHub Gist.
 
-.PARAMETER GitHubUserID
-The GitHub User ID.
-
-.PARAMETER GitHubToken
-GitHub Token with access to the Users' Gist.
-
 .PARAMETER ListName
 The File Name on GitHub Gist.
 
 .PARAMETER Description
 Summary of the function for the list.
 
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
 .EXAMPLE
-New-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -Description "These modules needs to be installed on all servers"
+New-PWSHModuleList -ListName Base -Description "These modules needs to be installed on all servers"  -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function New-PWSHModuleList {
 	[Cmdletbinding( HelpURI = 'https://smitpi.github.io/PWSHModule/New-PWSHModuleList')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
-		[string]$GitHubUserID, 
-		[Parameter(Mandatory = $true)]
-		[string]$GitHubToken,
-		[Parameter(Mandatory = $true)]
 		[string]$ListName,
 		[Parameter(Mandatory = $true)]
-		[string]$Description
+		[string]$Description,
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubUserID, 
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubToken
 	)
 
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating config"

@@ -19,7 +19,7 @@
 
 .ICONURI
 
-.EXTERNALMODULEDEPENDENCIES 
+.EXTERNALMODULEDEPENDENCIES
 
 .REQUIREDSCRIPTS
 
@@ -31,12 +31,12 @@ Created [09/07/2022_15:58] Initial Script Creating
 .PRIVATEDATA
 
 #>
-<# 
+<#
 
-.DESCRIPTION 
- Add a module to the config file 
+.DESCRIPTION
+ Add a module to the config file
 
-#> 
+#>
 
 <#
 .SYNOPSIS
@@ -44,12 +44,6 @@ Adds a new module to the GitHub Gist List.
 
 .DESCRIPTION
 Adds a new module to the GitHub Gist List.
-
-.PARAMETER GitHubUserID
-The GitHub User ID.
-
-.PARAMETER GitHubToken
-GitHub Token with access to the Users' Gist.
 
 .PARAMETER ListName
 The File Name on GitHub Gist.
@@ -63,24 +57,30 @@ Name of the Repository to hosting the module.
 .PARAMETER RequiredVersion
 This will force a version to be used. Leave blank to use the latest version.
 
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
 .EXAMPLE
-Add-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName base -ModuleName pslauncher -Repository PSgallery -RequiredVersion 0.1.19
+Add-PWSHModule -ListName base -ModuleName pslauncher -Repository PSgallery -RequiredVersion 0.1.19 -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function Add-PWSHModule {
 	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Add-PWSHModule')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
-		[string]$GitHubUserID, 
-		[Parameter(Mandatory = $true)]
-		[string]$GitHubToken,
-		[Parameter(Mandatory = $true)]
 		[string]$ListName,
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
 		[Alias('Name')]
 		[string[]]$ModuleName,
 		[String]$Repository = 'PSGallery',
-		[string]$RequiredVersion
+		[string]$RequiredVersion,
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubUserID,
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubToken
 	)
 
 	begin {
@@ -104,7 +104,7 @@ Function Add-PWSHModule {
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 		if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
 
-		[System.Collections.ArrayList]$ModuleObject = @()		
+		[System.Collections.ArrayList]$ModuleObject = @()
 		$Content.Modules | ForEach-Object {[void]$ModuleObject.Add($_)}
 	}
 	process {
@@ -136,7 +136,7 @@ Function Add-PWSHModule {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Looking for versions"
 					$tmp = Find-Module -Name $ModuleToAdd.name -RequiredVersion $RequiredVersion -Repository $Repository -ErrorAction Stop
 					$VersionToAdd = $RequiredVersion
-				} catch {	
+				} catch {
 					$index = 0
 					Find-Module -Name $ModuleToAdd.name -AllVersions -Repository $Repository | ForEach-Object {
 						[PSCustomObject]@{
@@ -151,7 +151,7 @@ Function Add-PWSHModule {
 			} else {$VersionToAdd = 'Latest'}
 
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create new Object"
-			
+
 			if (-not($ModuleObject.Name.Contains($ModuleToAdd.Name))) {
 				[void]$ModuleObject.Add([PSCustomObject]@{
 						Name        = $ModuleToAdd.Name

@@ -1,13 +1,13 @@
-﻿#region Public Functions
+#region Public Functions
 #region Add-PWSHModule.ps1
 ######## Function 1 of 10 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.16
+# ModuleVersion:    0.1.18
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
-# ModifiedOn:       2022/07/31 14:17:15
+# ModifiedOn:       2022/08/13 09:03:01
 # Synopsis:         Adds a new module to the GitHub Gist List.
 #############################################
  
@@ -17,12 +17,6 @@ Adds a new module to the GitHub Gist List.
 
 .DESCRIPTION
 Adds a new module to the GitHub Gist List.
-
-.PARAMETER GitHubUserID
-The GitHub User ID.
-
-.PARAMETER GitHubToken
-GitHub Token with access to the Users' Gist.
 
 .PARAMETER ListName
 The File Name on GitHub Gist.
@@ -36,24 +30,30 @@ Name of the Repository to hosting the module.
 .PARAMETER RequiredVersion
 This will force a version to be used. Leave blank to use the latest version.
 
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
 .EXAMPLE
-Add-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName base -ModuleName pslauncher -Repository PSgallery -RequiredVersion 0.1.19
+Add-PWSHModule -ListName base -ModuleName pslauncher -Repository PSgallery -RequiredVersion 0.1.19 -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function Add-PWSHModule {
 	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Add-PWSHModule')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
-		[string]$GitHubUserID, 
-		[Parameter(Mandatory = $true)]
-		[string]$GitHubToken,
-		[Parameter(Mandatory = $true)]
 		[string]$ListName,
 		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
 		[Alias('Name')]
 		[string[]]$ModuleName,
 		[String]$Repository = 'PSGallery',
-		[string]$RequiredVersion
+		[string]$RequiredVersion,
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubUserID,
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubToken
 	)
 
 	begin {
@@ -77,7 +77,7 @@ Function Add-PWSHModule {
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 		if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
 
-		[System.Collections.ArrayList]$ModuleObject = @()		
+		[System.Collections.ArrayList]$ModuleObject = @()
 		$Content.Modules | ForEach-Object {[void]$ModuleObject.Add($_)}
 	}
 	process {
@@ -109,7 +109,7 @@ Function Add-PWSHModule {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Looking for versions"
 					$tmp = Find-Module -Name $ModuleToAdd.name -RequiredVersion $RequiredVersion -Repository $Repository -ErrorAction Stop
 					$VersionToAdd = $RequiredVersion
-				} catch {	
+				} catch {
 					$index = 0
 					Find-Module -Name $ModuleToAdd.name -AllVersions -Repository $Repository | ForEach-Object {
 						[PSCustomObject]@{
@@ -124,7 +124,7 @@ Function Add-PWSHModule {
 			} else {$VersionToAdd = 'Latest'}
 
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create new Object"
-			
+
 			if (-not($ModuleObject.Name.Contains($ModuleToAdd.Name))) {
 				[void]$ModuleObject.Add([PSCustomObject]@{
 						Name        = $ModuleToAdd.Name
@@ -180,7 +180,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 10 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.16
+# ModuleVersion:    0.1.18
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
@@ -273,11 +273,11 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 ######## Function 3 of 10 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.16
+# ModuleVersion:    0.1.18
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
-# ModifiedOn:       2022/07/31 12:36:20
+# ModifiedOn:       2022/08/13 09:03:33
 # Synopsis:         Install modules from the specified list.
 #############################################
  
@@ -288,6 +288,12 @@ Install modules from the specified list.
 .DESCRIPTION
 Install modules from the specified list.
 
+.PARAMETER ListName
+The File Name on GitHub Gist.
+
+.PARAMETER Scope
+Where the module will be installed. AllUsers require admin access.
+
 .PARAMETER GitHubUserID
 The GitHub User ID.
 
@@ -297,30 +303,24 @@ Select if the list is hosted publicly.
 .PARAMETER GitHubToken
 GitHub Token with access to the Users' Gist.
 
-.PARAMETER ListName
-The File Name on GitHub Gist.
-
-.PARAMETER Scope
-Where the module will be installed. AllUsers require admin access.
-
 .EXAMPLE
-Install-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -Filename extended -Scope CurrentUser
+Install-PWSHModule -Filename extended -Scope CurrentUser -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function Install-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
 	PARAM(
+		[Parameter(Position = 0)]
+		[string]$ListName,
+		[Parameter(Position = 1)]
+		[ValidateSet('AllUsers', 'CurrentUser')]
+		[string]$Scope,
 		[Parameter(Mandatory = $true)]
-		[string]$GitHubUserID, 
+		[string]$GitHubUserID,
 		[Parameter(ParameterSetName = 'Public')]
 		[switch]$PublicGist,
 		[Parameter(ParameterSetName = 'Private')]
-		[string]$GitHubToken,
-		[Parameter(Mandatory = $true)]
-		[string]$ListName,
-		[Parameter(Mandatory = $true)]
-		[ValidateSet('AllUsers', 'CurrentUser')]
-		[string]$Scope
+		[string]$GitHubToken
 	)
 
 	if ($scope -like 'AllUsers') {
@@ -330,6 +330,13 @@ Function Install-PWSHModule {
 	}
 
 	try {
+		if ($PublicGist) {
+			Write-Host '[Using] ' -NoNewline -ForegroundColor Yellow 
+			Write-Host 'Public Gist:' -NoNewline -ForegroundColor Cyan 
+			Write-Host ' for list:' -ForegroundColor Green -NoNewline 
+			Write-Host "$($ListName)" -ForegroundColor Cyan
+		}
+
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
 		$headers = @{}
 		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
@@ -420,11 +427,11 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 4 of 10 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.16
+# ModuleVersion:    0.1.18
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
-# ModifiedOn:       2022/07/31 11:58:00
+# ModifiedOn:       2022/08/13 09:03:59
 # Synopsis:         Add a new list to GitHub Gist.
 #############################################
  
@@ -435,33 +442,33 @@ Add a new list to GitHub Gist.
 .DESCRIPTION
 Add a new list to GitHub Gist.
 
-.PARAMETER GitHubUserID
-The GitHub User ID.
-
-.PARAMETER GitHubToken
-GitHub Token with access to the Users' Gist.
-
 .PARAMETER ListName
 The File Name on GitHub Gist.
 
 .PARAMETER Description
 Summary of the function for the list.
 
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
 .EXAMPLE
-New-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -Description "These modules needs to be installed on all servers"
+New-PWSHModuleList -ListName Base -Description "These modules needs to be installed on all servers"  -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function New-PWSHModuleList {
 	[Cmdletbinding( HelpURI = 'https://smitpi.github.io/PWSHModule/New-PWSHModuleList')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
-		[string]$GitHubUserID, 
-		[Parameter(Mandatory = $true)]
-		[string]$GitHubToken,
-		[Parameter(Mandatory = $true)]
 		[string]$ListName,
 		[Parameter(Mandatory = $true)]
-		[string]$Description
+		[string]$Description,
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubUserID, 
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubToken
 	)
 
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating config"
@@ -547,11 +554,11 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 5 of 10 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.16
+# ModuleVersion:    0.1.18
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
-# ModifiedOn:       2022/07/31 16:14:46
+# ModifiedOn:       2022/08/13 09:04:25
 # Synopsis:         Remove module from the specified list.
 #############################################
  
@@ -578,13 +585,15 @@ Module to remove.
 Will uninstall the modules as well.
 
 .EXAMPLE
-Remove-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName base -ModuleName pslauncher
+Remove-PWSHModule -ListName base -ModuleName pslauncher -GitHubUserID smitpi -GitHubToken $GitHubToken
 #>
 Function Remove-PWSHModule {
-	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Remove-PWSHModule')]
+	[Cmdletbinding(SupportsShouldProcess = $true, HelpURI = 'https://smitpi.github.io/PWSHModule/Remove-PWSHModule')]
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '')]
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
-		[string]$GitHubUserID, 
+		[string]$GitHubUserID,
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubToken,
 		[Parameter(Mandatory = $true)]
@@ -616,36 +625,37 @@ Function Remove-PWSHModule {
 			$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($ListName)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 		if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
-		
-		[System.Collections.ArrayList]$ModuleObject = @()		
+
+		[System.Collections.ArrayList]$ModuleObject = @()
 		$Content.Modules | ForEach-Object {[void]$ModuleObject.Add($_)
 		}
 	}
 	process {
-		foreach ($mod in $ModuleName) {
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Find module to remove"
-			$Modremove = ($Content.Modules | Where-Object {$_.Name -like "*$Mod*"})
-			if ([string]::IsNullOrEmpty($Modremove) -or ($Modremove.name.count -gt 1)) {
-				Write-Error 'Module not found. Redevine your search'
-			} else {
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Removing module"
-				$ModuleObject.Remove($Modremove)
-				Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " from $($ListName)" -ForegroundColor Green
-				if ($ForceUninstallModules) {
-					try {
-						Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($mod) " -ForegroundColor Green
-						Uninstall-Module -Name $mod -AllVersions -Force -ErrorAction Stop
-					} catch {
-						Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"
-						Get-Module -Name $Mod -ListAvailable | ForEach-Object {
-							try {
-								Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
-								$Directory = join-path -Path (Get-Item $_.Path).FullName  -ChildPath "..\..\" -Resolve
-								Remove-Item -Path $Directory -Recurse -Force -ErrorAction Stop
-							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+		if ($pscmdlet.ShouldProcess('Target', 'Operation')) {
+			foreach ($mod in $ModuleName) {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Find module to remove"
+				$Modremove = ($Content.Modules | Where-Object {$_.Name -like "*$Mod*"})
+				if ([string]::IsNullOrEmpty($Modremove) -or ($Modremove.name.count -gt 1)) {
+					Write-Error 'Module not found. Redevine your search'
+				} else {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Removing module"
+					$ModuleObject.Remove($Modremove)
+					Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " from $($ListName)" -ForegroundColor Green
+					if ($ForceUninstallModules) {
+						try {
+							Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($mod) " -ForegroundColor Green
+							Uninstall-Module -Name $mod -AllVersions -Force -ErrorAction Stop
+						} catch {
+							Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"
+							Get-Module -Name $Mod -ListAvailable | ForEach-Object {
+								try {
+									Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
+									$Directory = Join-Path -Path (Get-Item $_.Path).FullName -ChildPath '..\..\' -Resolve
+									Remove-Item -Path $Directory -Recurse -Force -ErrorAction Stop
+								} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+							}
 						}
 					}
-					
 				}
 			}
 		}
@@ -683,11 +693,11 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 6 of 10 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.16
+# ModuleVersion:    0.1.18
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
-# ModifiedOn:       2022/07/31 12:35:30
+# ModifiedOn:       2022/08/13 09:04:57
 # Synopsis:         Deletes a list from GitHub Gist
 #############################################
  
@@ -698,17 +708,17 @@ Deletes a list from GitHub Gist
 .DESCRIPTION
 Deletes a list from GitHub Gist
 
+.PARAMETER ListName
+The Name of the list to remove.
+
 .PARAMETER GitHubUserID
 The GitHub User ID.
 
 .PARAMETER GitHubToken
 GitHub Token with access to the Users' Gist.
 
-.PARAMETER ListName
-The Name of the list to remove.
-
 .EXAMPLE
-Remove-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base
+Remove-PWSHModuleList -ListName Base  -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function Remove-PWSHModuleList {
@@ -716,11 +726,11 @@ Function Remove-PWSHModuleList {
 	[OutputType([System.Object[]])]
 	PARAM(
 		[Parameter(Mandatory = $true)]
+		[string]$ListName,
+		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
 		[Parameter(Mandatory = $true)]
-		[string]$GitHubToken,
-		[Parameter(Mandatory = $true)]
-		[string]$ListName
+		[string]$GitHubToken
 	)
 
 	try {
@@ -770,11 +780,11 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 ######## Function 7 of 10 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.16
+# ModuleVersion:    0.1.18
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
-# ModifiedOn:       2022/07/31 12:37:23
+# ModifiedOn:       2022/08/13 09:05:24
 # Synopsis:         Saves the modules from the specified list to a folder.
 #############################################
  
@@ -785,15 +795,6 @@ Saves the modules from the specified list to a folder.
 .DESCRIPTION
 Saves the modules from the specified list to a folder.
 
-.PARAMETER GitHubUserID
-The GitHub User ID.
-
-.PARAMETER PublicGist
-Select if the list is hosted publicly.
-
-.PARAMETER GitHubToken
-GitHub Token with access to the Users' Gist.
-
 .PARAMETER ListName
 The File Name on GitHub Gist.
 
@@ -803,28 +804,37 @@ Save in the NuGet format
 .PARAMETER Path
 Where to save
 
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
 .EXAMPLE
-Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName extended -AsNuGet -Path c:\temp\
+Save-PWSHModule -ListName extended -AsNuGet -Path c:\temp\ -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function Save-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Save-PWSHModule')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
-		[string]$GitHubUserID, 
-		[Parameter(ParameterSetName = 'Public')]
-		[switch]$PublicGist,
-		[Parameter(ParameterSetName = 'Private')]
-		[string]$GitHubToken,
-		[Parameter(Mandatory = $true)]
 		[string]$ListName,
 		[switch]$AsNuGet,
 		[ValidateScript( { if (Test-Path $_) { $true }
 				else { New-Item -Path $_ -ItemType Directory -Force | Out-Null; $true }
 			})]
-		[System.IO.DirectoryInfo]$Path = 'C:\Temp'
-	)        
-		
+		[System.IO.DirectoryInfo]$Path = 'C:\Temp',
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubUserID, 
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
+		[string]$GitHubToken
+	)
+
 	try {
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
 		$headers = @{}
@@ -881,8 +891,8 @@ Function Save-PWSHModule {
 
 
 $scriptblock = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if ([bool]($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Save-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
@@ -893,11 +903,11 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 8 of 10 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.16
+# ModuleVersion:    0.1.18
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
-# ModifiedOn:       2022/07/31 13:22:23
+# ModifiedOn:       2022/08/13 09:05:45
 # Synopsis:         Show the details of the modules in a list.
 #############################################
  
@@ -908,15 +918,6 @@ Show the details of the modules in a list.
 .DESCRIPTION
 Show the details of the modules in a list.
 
-.PARAMETER GitHubUserID
-The GitHub User ID.
-
-.PARAMETER PublicGist
-Select if the list is hosted publicly.
-
-.PARAMETER GitHubToken
-GitHub Token with access to the Users' Gist.
-
 .PARAMETER ListName
 The File Name on GitHub Gist.
 
@@ -926,23 +927,31 @@ Compare the list to what is installed.
 .PARAMETER ShowProjectURI
 Will open the browser to the the project URL.
 
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
 .EXAMPLE
-Show-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base
+Show-PWSHModule -ListName Base -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function Show-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModule')]
-	PARAM(
+	PARAM(		[Parameter(Mandatory = $true)]
+		[string]$ListName,
+		[switch]$CompareInstalled,
+		[switch]$ShowProjectURI,
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
 		[Parameter(ParameterSetName = 'Public')]
 		[switch]$PublicGist,
 		[Parameter(ParameterSetName = 'Private')]
-		[string]$GitHubToken,
-		[Parameter(Mandatory = $true)]
-		[string]$ListName,
-		[switch]$CompareInstalled,
-		[switch]$ShowProjectURI
+		[string]$GitHubToken
 	)
 
 	try {
@@ -1046,11 +1055,11 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 9 of 10 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.16
+# ModuleVersion:    0.1.18
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
-# ModifiedOn:       2022/07/20 17:59:55
+# ModifiedOn:       2022/08/13 09:06:01
 # Synopsis:         List all the GitHub Gist Lists.
 #############################################
  
@@ -1071,7 +1080,7 @@ Select if the list is hosted publicly.
 GitHub Token with access to the Users' Gist.
 
 .EXAMPLE
-Show-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken 
+Show-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function Show-PWSHModuleList {
@@ -1133,11 +1142,11 @@ Export-ModuleMember -Function Show-PWSHModuleList
 ######## Function 10 of 10 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.16
+# ModuleVersion:    0.1.18
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
-# ModifiedOn:       2022/07/31 16:16:13
+# ModifiedOn:       2022/08/13 08:15:50
 # Synopsis:         Will uninstall the module from the system.
 #############################################
  
@@ -1147,15 +1156,6 @@ Will uninstall the module from the system.
 
 .DESCRIPTION
 Will uninstall the module from the system. Select OldVersions to remove duplicates only.
-
-.PARAMETER GitHubUserID
-The GitHub User ID.
-
-.PARAMETER PublicGist
-Select if the list is hosted publicly.
-
-.PARAMETER GitHubToken
-GitHub Token with access to the Users' Gist.
 
 .PARAMETER ListName
 The File Name on GitHub Gist.
@@ -1169,19 +1169,22 @@ Will only uninstall old versions of the module.
 .PARAMETER ForceDeleteFolder
 Will force delete the base folder.
 
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
 .EXAMPLE
-Uninstall-PWSHModule -GitHubUserID smitpi -PublicGist -ListName base -OldVersions
+Uninstall-PWSHModule  -ListName base -OldVersions -GitHubUserID smitpi -PublicGist
 
 #>
 Function Uninstall-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
 	PARAM(
-		[Parameter(Mandatory = $true)]
-		[string]$GitHubUserID, 
-		[Parameter(ParameterSetName = 'Public')]
-		[switch]$PublicGist,
-		[Parameter(ParameterSetName = 'Private')]
-		[string]$GitHubToken,
 		[Parameter(Mandatory = $true)]
 		[ValidateScript( { $IsAdmin = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
@@ -1191,7 +1194,13 @@ Function Uninstall-PWSHModule {
 		[Alias('Name')]
 		[string[]]$ModuleName,
 		[switch]$OldVersions,
-		[switch]$ForceDeleteFolder
+		[switch]$ForceDeleteFolder,
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubUserID,
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
+		[string]$GitHubToken
 	)
 
 	begin {

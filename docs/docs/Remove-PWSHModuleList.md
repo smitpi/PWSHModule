@@ -13,7 +13,7 @@ Deletes a list from GitHub Gist
 ## SYNTAX
 
 ```
-Remove-PWSHModuleList [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String>
+Remove-PWSHModuleList [-ListName] <String> [-GitHubUserID] <String> [-GitHubToken] <String>
  [<CommonParameters>]
 ```
 
@@ -24,13 +24,13 @@ Deletes a list from GitHub Gist
 
 ### EXAMPLE 1
 ```
-Remove-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base
+Remove-PWSHModuleList -ListName Base  -GitHubUserID smitpi -GitHubToken $GitHubToken
 ```
 
 ## PARAMETERS
 
-### -GitHubUserID
-The GitHub User ID.
+### -ListName
+The Name of the list to remove.
 
 ```yaml
 Type: String
@@ -44,8 +44,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -GitHubToken
-GitHub Token with access to the Users' Gist.
+### -GitHubUserID
+The GitHub User ID.
 
 ```yaml
 Type: String
@@ -59,8 +59,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ListName
-The Name of the list to remove.
+### -GitHubToken
+GitHub Token with access to the Users' Gist.
 
 ```yaml
 Type: String

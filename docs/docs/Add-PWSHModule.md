@@ -13,8 +13,8 @@ Adds a new module to the GitHub Gist List.
 ## SYNTAX
 
 ```
-Add-PWSHModule [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String> [-ModuleName] <String[]>
- [[-Repository] <String>] [[-RequiredVersion] <String>] [<CommonParameters>]
+Add-PWSHModule [-ListName] <String> [-ModuleName] <String[]> [[-Repository] <String>]
+ [[-RequiredVersion] <String>] [-GitHubUserID] <String> [-GitHubToken] <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -24,40 +24,10 @@ Adds a new module to the GitHub Gist List.
 
 ### EXAMPLE 1
 ```
-Add-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName base -ModuleName pslauncher -Repository PSgallery -RequiredVersion 0.1.19
+Add-PWSHModule -ListName base -ModuleName pslauncher -Repository PSgallery -RequiredVersion 0.1.19 -GitHubUserID smitpi -GitHubToken $GitHubToken
 ```
 
 ## PARAMETERS
-
-### -GitHubUserID
-The GitHub User ID.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -GitHubToken
-GitHub Token with access to the Users' Gist.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
 
 ### -ListName
 The File Name on GitHub Gist.
@@ -68,7 +38,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 3
+Position: 1
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -84,7 +54,7 @@ Parameter Sets: (All)
 Aliases: Name
 
 Required: True
-Position: 4
+Position: 2
 Default value: None
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
@@ -99,7 +69,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 5
+Position: 3
 Default value: PSGallery
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -115,6 +85,36 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
+Position: 4
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -GitHubUserID
+The GitHub User ID.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: 5
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -GitHubToken
+GitHub Token with access to the Users' Gist.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
 Position: 6
 Default value: None
 Accept pipeline input: False

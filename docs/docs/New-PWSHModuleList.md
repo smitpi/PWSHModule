@@ -13,8 +13,8 @@ Add a new list to GitHub Gist.
 ## SYNTAX
 
 ```
-New-PWSHModuleList [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String>
- [-Description] <String> [<CommonParameters>]
+New-PWSHModuleList [-ListName] <String> [-Description] <String> [-GitHubUserID] <String>
+ [-GitHubToken] <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -24,13 +24,13 @@ Add a new list to GitHub Gist.
 
 ### EXAMPLE 1
 ```
-New-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -Description "These modules needs to be installed on all servers"
+New-PWSHModuleList -ListName Base -Description "These modules needs to be installed on all servers"  -GitHubUserID smitpi -GitHubToken $GitHubToken
 ```
 
 ## PARAMETERS
 
-### -GitHubUserID
-The GitHub User ID.
+### -ListName
+The File Name on GitHub Gist.
 
 ```yaml
 Type: String
@@ -44,8 +44,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -GitHubToken
-GitHub Token with access to the Users' Gist.
+### -Description
+Summary of the function for the list.
 
 ```yaml
 Type: String
@@ -59,8 +59,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ListName
-The File Name on GitHub Gist.
+### -GitHubUserID
+The GitHub User ID.
 
 ```yaml
 Type: String
@@ -74,8 +74,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Description
-Summary of the function for the list.
+### -GitHubToken
+GitHub Token with access to the Users' Gist.
 
 ```yaml
 Type: String

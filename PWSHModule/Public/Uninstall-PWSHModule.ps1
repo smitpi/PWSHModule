@@ -47,15 +47,6 @@ Will uninstall the module from the system.
 .DESCRIPTION
 Will uninstall the module from the system. Select OldVersions to remove duplicates only.
 
-.PARAMETER GitHubUserID
-The GitHub User ID.
-
-.PARAMETER PublicGist
-Select if the list is hosted publicly.
-
-.PARAMETER GitHubToken
-GitHub Token with access to the Users' Gist.
-
 .PARAMETER ListName
 The File Name on GitHub Gist.
 
@@ -68,19 +59,22 @@ Will only uninstall old versions of the module.
 .PARAMETER ForceDeleteFolder
 Will force delete the base folder.
 
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
 .EXAMPLE
-Uninstall-PWSHModule -GitHubUserID smitpi -PublicGist -ListName base -OldVersions
+Uninstall-PWSHModule  -ListName base -OldVersions -GitHubUserID smitpi -PublicGist
 
 #>
 Function Uninstall-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
 	PARAM(
-		[Parameter(Mandatory = $true)]
-		[string]$GitHubUserID, 
-		[Parameter(ParameterSetName = 'Public')]
-		[switch]$PublicGist,
-		[Parameter(ParameterSetName = 'Private')]
-		[string]$GitHubToken,
 		[Parameter(Mandatory = $true)]
 		[ValidateScript( { $IsAdmin = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
@@ -90,7 +84,13 @@ Function Uninstall-PWSHModule {
 		[Alias('Name')]
 		[string[]]$ModuleName,
 		[switch]$OldVersions,
-		[switch]$ForceDeleteFolder
+		[switch]$ForceDeleteFolder,
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubUserID,
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
+		[string]$GitHubToken
 	)
 
 	begin {

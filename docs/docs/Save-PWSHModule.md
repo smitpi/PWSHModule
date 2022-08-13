@@ -14,13 +14,13 @@ Saves the modules from the specified list to a folder.
 
 ### Private (Default)
 ```
-Save-PWSHModule -GitHubUserID <String> [-GitHubToken <String>] -ListName <String> [-AsNuGet]
- [-Path <DirectoryInfo>] [<CommonParameters>]
+Save-PWSHModule -ListName <String> [-AsNuGet] [-Path <DirectoryInfo>] -GitHubUserID <String>
+ [-GitHubToken <String>] [<CommonParameters>]
 ```
 
 ### Public
 ```
-Save-PWSHModule -GitHubUserID <String> [-PublicGist] -ListName <String> [-AsNuGet] [-Path <DirectoryInfo>]
+Save-PWSHModule -ListName <String> [-AsNuGet] [-Path <DirectoryInfo>] -GitHubUserID <String> [-PublicGist]
  [<CommonParameters>]
 ```
 
@@ -31,55 +31,10 @@ Saves the modules from the specified list to a folder.
 
 ### EXAMPLE 1
 ```
-Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName extended -AsNuGet -Path c:\temp\
+Save-PWSHModule -ListName extended -AsNuGet -Path c:\temp\ -GitHubUserID smitpi -GitHubToken $GitHubToken
 ```
 
 ## PARAMETERS
-
-### -GitHubUserID
-The GitHub User ID.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -PublicGist
-Select if the list is hosted publicly.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: Public
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -GitHubToken
-GitHub Token with access to the Users' Gist.
-
-```yaml
-Type: String
-Parameter Sets: Private
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
 
 ### -ListName
 The File Name on GitHub Gist.
@@ -122,6 +77,51 @@ Aliases:
 Required: False
 Position: Named
 Default value: C:\Temp
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -GitHubUserID
+The GitHub User ID.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -PublicGist
+Select if the list is hosted publicly.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: Public
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -GitHubToken
+GitHub Token with access to the Users' Gist.
+
+```yaml
+Type: String
+Parameter Sets: Private
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

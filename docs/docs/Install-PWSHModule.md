@@ -14,13 +14,14 @@ Install modules from the specified list.
 
 ### Private (Default)
 ```
-Install-PWSHModule -GitHubUserID <String> [-GitHubToken <String>] -ListName <String> -Scope <String>
+Install-PWSHModule [[-ListName] <String>] [[-Scope] <String>] -GitHubUserID <String> [-GitHubToken <String>]
  [<CommonParameters>]
 ```
 
 ### Public
 ```
-Install-PWSHModule -GitHubUserID <String> [-PublicGist] -ListName <String> -Scope <String> [<CommonParameters>]
+Install-PWSHModule [[-ListName] <String>] [[-Scope] <String>] -GitHubUserID <String> [-PublicGist]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -30,10 +31,41 @@ Install modules from the specified list.
 
 ### EXAMPLE 1
 ```
-Install-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -Filename extended -Scope CurrentUser
+Install-PWSHModule -Filename extended -Scope CurrentUser -GitHubUserID smitpi -GitHubToken $GitHubToken
 ```
 
 ## PARAMETERS
+
+### -ListName
+The File Name on GitHub Gist.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 1
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Scope
+Where the module will be installed.
+AllUsers require admin access.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 2
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
 
 ### -GitHubUserID
 The GitHub User ID.
@@ -74,37 +106,6 @@ Parameter Sets: Private
 Aliases:
 
 Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ListName
-The File Name on GitHub Gist.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Scope
-Where the module will be installed.
-AllUsers require admin access.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False

@@ -378,20 +378,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#-githubuserid" class="md-nav__link">
-    -GitHubUserID
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#-githubtoken" class="md-nav__link">
-    -GitHubToken
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#-listname" class="md-nav__link">
     -ListName
   </a>
@@ -401,6 +387,20 @@
           <li class="md-nav__item">
   <a href="#-description" class="md-nav__link">
     -Description
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-githubuserid" class="md-nav__link">
+    -GitHubUserID
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-githubtoken" class="md-nav__link">
+    -GitHubToken
   </a>
   
 </li>
@@ -619,20 +619,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#-githubuserid" class="md-nav__link">
-    -GitHubUserID
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#-githubtoken" class="md-nav__link">
-    -GitHubToken
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#-listname" class="md-nav__link">
     -ListName
   </a>
@@ -642,6 +628,20 @@
           <li class="md-nav__item">
   <a href="#-description" class="md-nav__link">
     -Description
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-githubuserid" class="md-nav__link">
+    -GitHubUserID
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-githubtoken" class="md-nav__link">
+    -GitHubToken
   </a>
   
 </li>
@@ -708,18 +708,18 @@
 <h2 id="synopsis">SYNOPSIS</h2>
 <p>Add a new list to GitHub Gist.</p>
 <h2 id="syntax">SYNTAX</h2>
-<div class="highlight"><pre><span></span><code>New-PWSHModuleList [-GitHubUserID] &lt;String&gt; [-GitHubToken] &lt;String&gt; [-ListName] &lt;String&gt;
- [-Description] &lt;String&gt; [&lt;CommonParameters&gt;]
+<div class="highlight"><pre><span></span><code>New-PWSHModuleList [-ListName] &lt;String&gt; [-Description] &lt;String&gt; [-GitHubUserID] &lt;String&gt;
+ [-GitHubToken] &lt;String&gt; [&lt;CommonParameters&gt;]
 </code></pre></div>
 <h2 id="description">DESCRIPTION</h2>
 <p>Add a new list to GitHub Gist.</p>
 <h2 id="examples">EXAMPLES</h2>
 <h3 id="example-1">EXAMPLE 1</h3>
-<div class="highlight"><pre><span></span><code>New-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base -Description &quot;These modules needs to be installed on all servers&quot;
+<div class="highlight"><pre><span></span><code>New-PWSHModuleList -ListName Base -Description &quot;These modules needs to be installed on all servers&quot;  -GitHubUserID smitpi -GitHubToken $GitHubToken
 </code></pre></div>
 <h2 id="parameters">PARAMETERS</h2>
-<h3 id="-githubuserid">-GitHubUserID</h3>
-<p>The GitHub User ID.</p>
+<h3 id="-listname">-ListName</h3>
+<p>The File Name on GitHub Gist.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String</span><span class="w"></span>
 <span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
 <span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
@@ -730,8 +730,8 @@
 <span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 <span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 </code></pre></div>
-<h3 id="-githubtoken">-GitHubToken</h3>
-<p>GitHub Token with access to the Users' Gist.</p>
+<h3 id="-description">-Description</h3>
+<p>Summary of the function for the list.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String</span><span class="w"></span>
 <span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
 <span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
@@ -742,8 +742,8 @@
 <span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 <span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 </code></pre></div>
-<h3 id="-listname">-ListName</h3>
-<p>The File Name on GitHub Gist.</p>
+<h3 id="-githubuserid">-GitHubUserID</h3>
+<p>The GitHub User ID.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String</span><span class="w"></span>
 <span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
 <span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
@@ -754,8 +754,8 @@
 <span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 <span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 </code></pre></div>
-<h3 id="-description">-Description</h3>
-<p>Summary of the function for the list.</p>
+<h3 id="-githubtoken">-GitHubToken</h3>
+<p>GitHub Token with access to the Users' Gist.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String</span><span class="w"></span>
 <span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
 <span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>

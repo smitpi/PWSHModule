@@ -47,6 +47,12 @@ Install modules from the specified list.
 .DESCRIPTION
 Install modules from the specified list.
 
+.PARAMETER ListName
+The File Name on GitHub Gist.
+
+.PARAMETER Scope
+Where the module will be installed. AllUsers require admin access.
+
 .PARAMETER GitHubUserID
 The GitHub User ID.
 
@@ -56,30 +62,24 @@ Select if the list is hosted publicly.
 .PARAMETER GitHubToken
 GitHub Token with access to the Users' Gist.
 
-.PARAMETER ListName
-The File Name on GitHub Gist.
-
-.PARAMETER Scope
-Where the module will be installed. AllUsers require admin access.
-
 .EXAMPLE
-Install-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -Filename extended -Scope CurrentUser
+Install-PWSHModule -Filename extended -Scope CurrentUser -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function Install-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
 	PARAM(
+		[Parameter(Position = 0)]
+		[string]$ListName,
+		[Parameter(Position = 1)]
+		[ValidateSet('AllUsers', 'CurrentUser')]
+		[string]$Scope,
 		[Parameter(Mandatory = $true)]
-		[string]$GitHubUserID, 
+		[string]$GitHubUserID,
 		[Parameter(ParameterSetName = 'Public')]
 		[switch]$PublicGist,
 		[Parameter(ParameterSetName = 'Private')]
-		[string]$GitHubToken,
-		[Parameter(Mandatory = $true)]
-		[string]$ListName,
-		[Parameter(Mandatory = $true)]
-		[ValidateSet('AllUsers', 'CurrentUser')]
-		[string]$Scope
+		[string]$GitHubToken
 	)
 
 	if ($scope -like 'AllUsers') {
@@ -89,6 +89,13 @@ Function Install-PWSHModule {
 	}
 
 	try {
+		if ($PublicGist) {
+			Write-Host '[Using] ' -NoNewline -ForegroundColor Yellow 
+			Write-Host 'Public Gist:' -NoNewline -ForegroundColor Cyan 
+			Write-Host ' for list:' -ForegroundColor Green -NoNewline 
+			Write-Host "$($ListName)" -ForegroundColor Cyan
+		}
+
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
 		$headers = @{}
 		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken

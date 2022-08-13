@@ -48,17 +48,17 @@ Deletes a list from GitHub Gist
 .DESCRIPTION
 Deletes a list from GitHub Gist
 
+.PARAMETER ListName
+The Name of the list to remove.
+
 .PARAMETER GitHubUserID
 The GitHub User ID.
 
 .PARAMETER GitHubToken
 GitHub Token with access to the Users' Gist.
 
-.PARAMETER ListName
-The Name of the list to remove.
-
 .EXAMPLE
-Remove-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base
+Remove-PWSHModuleList -ListName Base  -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function Remove-PWSHModuleList {
@@ -66,11 +66,11 @@ Function Remove-PWSHModuleList {
 	[OutputType([System.Object[]])]
 	PARAM(
 		[Parameter(Mandatory = $true)]
+		[string]$ListName,
+		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
 		[Parameter(Mandatory = $true)]
-		[string]$GitHubToken,
-		[Parameter(Mandatory = $true)]
-		[string]$ListName
+		[string]$GitHubToken
 	)
 
 	try {

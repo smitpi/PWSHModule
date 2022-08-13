@@ -14,13 +14,13 @@ Show the details of the modules in a list.
 
 ### Private (Default)
 ```
-Show-PWSHModule -GitHubUserID <String> [-GitHubToken <String>] -ListName <String> [-CompareInstalled]
- [-ShowProjectURI] [<CommonParameters>]
+Show-PWSHModule -ListName <String> [-CompareInstalled] [-ShowProjectURI] -GitHubUserID <String>
+ [-GitHubToken <String>] [<CommonParameters>]
 ```
 
 ### Public
 ```
-Show-PWSHModule -GitHubUserID <String> [-PublicGist] -ListName <String> [-CompareInstalled] [-ShowProjectURI]
+Show-PWSHModule -ListName <String> [-CompareInstalled] [-ShowProjectURI] -GitHubUserID <String> [-PublicGist]
  [<CommonParameters>]
 ```
 
@@ -31,55 +31,10 @@ Show the details of the modules in a list.
 
 ### EXAMPLE 1
 ```
-Show-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base
+Show-PWSHModule -ListName Base -GitHubUserID smitpi -GitHubToken $GitHubToken
 ```
 
 ## PARAMETERS
-
-### -GitHubUserID
-The GitHub User ID.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -PublicGist
-Select if the list is hosted publicly.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: Public
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -GitHubToken
-GitHub Token with access to the Users' Gist.
-
-```yaml
-Type: String
-Parameter Sets: Private
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
 
 ### -ListName
 The File Name on GitHub Gist.
@@ -122,6 +77,51 @@ Aliases:
 Required: False
 Position: Named
 Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -GitHubUserID
+The GitHub User ID.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -PublicGist
+Select if the list is hosted publicly.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: Public
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -GitHubToken
+GitHub Token with access to the Users' Gist.
+
+```yaml
+Type: String
+Parameter Sets: Private
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

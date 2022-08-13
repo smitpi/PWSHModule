@@ -19,7 +19,7 @@
 
 .ICONURI
 
-.EXTERNALMODULEDEPENDENCIES 
+.EXTERNALMODULEDEPENDENCIES
 
 .REQUIREDSCRIPTS
 
@@ -33,12 +33,12 @@ Created [09/07/2022_15:58] Initial Script Creating
 #>
 
 
-<# 
+<#
 
-.DESCRIPTION 
- Remove a module to the config file 
+.DESCRIPTION
+ Remove a module to the config file
 
-#> 
+#>
 
 
 <#
@@ -64,13 +64,15 @@ Module to remove.
 Will uninstall the modules as well.
 
 .EXAMPLE
-Remove-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName base -ModuleName pslauncher
+Remove-PWSHModule -ListName base -ModuleName pslauncher -GitHubUserID smitpi -GitHubToken $GitHubToken
 #>
 Function Remove-PWSHModule {
-	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Remove-PWSHModule')]
+	[Cmdletbinding(SupportsShouldProcess = $true, HelpURI = 'https://smitpi.github.io/PWSHModule/Remove-PWSHModule')]
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '')]
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
-		[string]$GitHubUserID, 
+		[string]$GitHubUserID,
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubToken,
 		[Parameter(Mandatory = $true)]
@@ -102,36 +104,37 @@ Function Remove-PWSHModule {
 			$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($ListName)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 		if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
-		
-		[System.Collections.ArrayList]$ModuleObject = @()		
+
+		[System.Collections.ArrayList]$ModuleObject = @()
 		$Content.Modules | ForEach-Object {[void]$ModuleObject.Add($_)
 		}
 	}
 	process {
-		foreach ($mod in $ModuleName) {
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Find module to remove"
-			$Modremove = ($Content.Modules | Where-Object {$_.Name -like "*$Mod*"})
-			if ([string]::IsNullOrEmpty($Modremove) -or ($Modremove.name.count -gt 1)) {
-				Write-Error 'Module not found. Redevine your search'
-			} else {
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Removing module"
-				$ModuleObject.Remove($Modremove)
-				Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " from $($ListName)" -ForegroundColor Green
-				if ($ForceUninstallModules) {
-					try {
-						Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($mod) " -ForegroundColor Green
-						Uninstall-Module -Name $mod -AllVersions -Force -ErrorAction Stop
-					} catch {
-						Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"
-						Get-Module -Name $Mod -ListAvailable | ForEach-Object {
-							try {
-								Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
-								$Directory = join-path -Path (Get-Item $_.Path).FullName  -ChildPath "..\..\" -Resolve
-								Remove-Item -Path $Directory -Recurse -Force -ErrorAction Stop
-							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+		if ($pscmdlet.ShouldProcess('Target', 'Operation')) {
+			foreach ($mod in $ModuleName) {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Find module to remove"
+				$Modremove = ($Content.Modules | Where-Object {$_.Name -like "*$Mod*"})
+				if ([string]::IsNullOrEmpty($Modremove) -or ($Modremove.name.count -gt 1)) {
+					Write-Error 'Module not found. Redevine your search'
+				} else {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Removing module"
+					$ModuleObject.Remove($Modremove)
+					Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($Modremove.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " from $($ListName)" -ForegroundColor Green
+					if ($ForceUninstallModules) {
+						try {
+							Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($mod) " -ForegroundColor Green
+							Uninstall-Module -Name $mod -AllVersions -Force -ErrorAction Stop
+						} catch {
+							Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"
+							Get-Module -Name $Mod -ListAvailable | ForEach-Object {
+								try {
+									Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
+									$Directory = Join-Path -Path (Get-Item $_.Path).FullName -ChildPath '..\..\' -Resolve
+									Remove-Item -Path $Directory -Recurse -Force -ErrorAction Stop
+								} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+							}
 						}
 					}
-					
 				}
 			}
 		}

@@ -458,27 +458,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#-githubuserid" class="md-nav__link">
-    -GitHubUserID
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#-publicgist" class="md-nav__link">
-    -PublicGist
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#-githubtoken" class="md-nav__link">
-    -GitHubToken
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#-listname" class="md-nav__link">
     -ListName
   </a>
@@ -495,6 +474,27 @@
           <li class="md-nav__item">
   <a href="#-showprojecturi" class="md-nav__link">
     -ShowProjectURI
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-githubuserid" class="md-nav__link">
+    -GitHubUserID
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-publicgist" class="md-nav__link">
+    -PublicGist
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-githubtoken" class="md-nav__link">
+    -GitHubToken
   </a>
   
 </li>
@@ -673,27 +673,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#-githubuserid" class="md-nav__link">
-    -GitHubUserID
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#-publicgist" class="md-nav__link">
-    -PublicGist
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#-githubtoken" class="md-nav__link">
-    -GitHubToken
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#-listname" class="md-nav__link">
     -ListName
   </a>
@@ -710,6 +689,27 @@
           <li class="md-nav__item">
   <a href="#-showprojecturi" class="md-nav__link">
     -ShowProjectURI
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-githubuserid" class="md-nav__link">
+    -GitHubUserID
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-publicgist" class="md-nav__link">
+    -PublicGist
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-githubtoken" class="md-nav__link">
+    -GitHubToken
   </a>
   
 </li>
@@ -777,56 +777,20 @@
 <p>Show the details of the modules in a list.</p>
 <h2 id="syntax">SYNTAX</h2>
 <h3 id="private-default">Private (Default)</h3>
-<div class="highlight"><pre><span></span><code>Show-PWSHModule -GitHubUserID &lt;String&gt; [-GitHubToken &lt;String&gt;] -ListName &lt;String&gt; [-CompareInstalled]
- [-ShowProjectURI] [&lt;CommonParameters&gt;]
+<div class="highlight"><pre><span></span><code>Show-PWSHModule -ListName &lt;String&gt; [-CompareInstalled] [-ShowProjectURI] -GitHubUserID &lt;String&gt;
+ [-GitHubToken &lt;String&gt;] [&lt;CommonParameters&gt;]
 </code></pre></div>
 <h3 id="public">Public</h3>
-<div class="highlight"><pre><span></span><code>Show-PWSHModule -GitHubUserID &lt;String&gt; [-PublicGist] -ListName &lt;String&gt; [-CompareInstalled] [-ShowProjectURI]
+<div class="highlight"><pre><span></span><code>Show-PWSHModule -ListName &lt;String&gt; [-CompareInstalled] [-ShowProjectURI] -GitHubUserID &lt;String&gt; [-PublicGist]
  [&lt;CommonParameters&gt;]
 </code></pre></div>
 <h2 id="description">DESCRIPTION</h2>
 <p>Show the details of the modules in a list.</p>
 <h2 id="examples">EXAMPLES</h2>
 <h3 id="example-1">EXAMPLE 1</h3>
-<div class="highlight"><pre><span></span><code>Show-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base
+<div class="highlight"><pre><span></span><code>Show-PWSHModule -ListName Base -GitHubUserID smitpi -GitHubToken $GitHubToken
 </code></pre></div>
 <h2 id="parameters">PARAMETERS</h2>
-<h3 id="-githubuserid">-GitHubUserID</h3>
-<p>The GitHub User ID.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String</span><span class="w"></span>
-<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
-<span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
-
-<span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
-<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Named</span><span class="w"></span>
-<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">None</span><span class="w"></span>
-<span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-<span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-</code></pre></div>
-<h3 id="-publicgist">-PublicGist</h3>
-<p>Select if the list is hosted publicly.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SwitchParameter</span><span class="w"></span>
-<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Public</span><span class="w"></span>
-<span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
-
-<span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Named</span><span class="w"></span>
-<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-<span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-<span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-</code></pre></div>
-<h3 id="-githubtoken">-GitHubToken</h3>
-<p>GitHub Token with access to the Users' Gist.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String</span><span class="w"></span>
-<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Private</span><span class="w"></span>
-<span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
-
-<span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Named</span><span class="w"></span>
-<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">None</span><span class="w"></span>
-<span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-<span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-</code></pre></div>
 <h3 id="-listname">-ListName</h3>
 <p>The File Name on GitHub Gist.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String</span><span class="w"></span>
@@ -860,6 +824,42 @@
 <span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 <span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Named</span><span class="w"></span>
 <span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+</code></pre></div>
+<h3 id="-githubuserid">-GitHubUserID</h3>
+<p>The GitHub User ID.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String</span><span class="w"></span>
+<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
+<span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
+
+<span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Named</span><span class="w"></span>
+<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">None</span><span class="w"></span>
+<span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+</code></pre></div>
+<h3 id="-publicgist">-PublicGist</h3>
+<p>Select if the list is hosted publicly.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SwitchParameter</span><span class="w"></span>
+<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Public</span><span class="w"></span>
+<span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
+
+<span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Named</span><span class="w"></span>
+<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+</code></pre></div>
+<h3 id="-githubtoken">-GitHubToken</h3>
+<p>GitHub Token with access to the Users' Gist.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String</span><span class="w"></span>
+<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Private</span><span class="w"></span>
+<span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
+
+<span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
+<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Named</span><span class="w"></span>
+<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">None</span><span class="w"></span>
 <span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 <span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 </code></pre></div>

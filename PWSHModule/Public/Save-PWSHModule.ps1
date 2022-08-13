@@ -48,15 +48,6 @@ Saves the modules from the specified list to a folder.
 .DESCRIPTION
 Saves the modules from the specified list to a folder.
 
-.PARAMETER GitHubUserID
-The GitHub User ID.
-
-.PARAMETER PublicGist
-Select if the list is hosted publicly.
-
-.PARAMETER GitHubToken
-GitHub Token with access to the Users' Gist.
-
 .PARAMETER ListName
 The File Name on GitHub Gist.
 
@@ -66,28 +57,37 @@ Save in the NuGet format
 .PARAMETER Path
 Where to save
 
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
 .EXAMPLE
-Save-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName extended -AsNuGet -Path c:\temp\
+Save-PWSHModule -ListName extended -AsNuGet -Path c:\temp\ -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function Save-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Save-PWSHModule')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
-		[string]$GitHubUserID, 
-		[Parameter(ParameterSetName = 'Public')]
-		[switch]$PublicGist,
-		[Parameter(ParameterSetName = 'Private')]
-		[string]$GitHubToken,
-		[Parameter(Mandatory = $true)]
 		[string]$ListName,
 		[switch]$AsNuGet,
 		[ValidateScript( { if (Test-Path $_) { $true }
 				else { New-Item -Path $_ -ItemType Directory -Force | Out-Null; $true }
 			})]
-		[System.IO.DirectoryInfo]$Path = 'C:\Temp'
-	)        
-		
+		[System.IO.DirectoryInfo]$Path = 'C:\Temp',
+		[Parameter(Mandatory = $true)]
+		[string]$GitHubUserID, 
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
+		[string]$GitHubToken
+	)
+
 	try {
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
 		$headers = @{}
@@ -144,7 +144,7 @@ Function Save-PWSHModule {
 
 
 $scriptblock = {
-    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys	 -like "*GitHubUserID*")) {(Show-PWSHModuleList).name}
+	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if ([bool]($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Save-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock

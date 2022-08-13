@@ -58,7 +58,7 @@ Select if the list is hosted publicly.
 GitHub Token with access to the Users' Gist.
 
 .EXAMPLE
-Show-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken 
+Show-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function Show-PWSHModuleList {

@@ -48,15 +48,6 @@ Show the details of the modules in a list.
 .DESCRIPTION
 Show the details of the modules in a list.
 
-.PARAMETER GitHubUserID
-The GitHub User ID.
-
-.PARAMETER PublicGist
-Select if the list is hosted publicly.
-
-.PARAMETER GitHubToken
-GitHub Token with access to the Users' Gist.
-
 .PARAMETER ListName
 The File Name on GitHub Gist.
 
@@ -66,23 +57,31 @@ Compare the list to what is installed.
 .PARAMETER ShowProjectURI
 Will open the browser to the the project URL.
 
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
 .EXAMPLE
-Show-PWSHModule -GitHubUserID smitpi -GitHubToken $GitHubToken -ListName Base
+Show-PWSHModule -ListName Base -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
 Function Show-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModule')]
-	PARAM(
+	PARAM(		[Parameter(Mandatory = $true)]
+		[string]$ListName,
+		[switch]$CompareInstalled,
+		[switch]$ShowProjectURI,
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
 		[Parameter(ParameterSetName = 'Public')]
 		[switch]$PublicGist,
 		[Parameter(ParameterSetName = 'Private')]
-		[string]$GitHubToken,
-		[Parameter(Mandatory = $true)]
-		[string]$ListName,
-		[switch]$CompareInstalled,
-		[switch]$ShowProjectURI
+		[string]$GitHubToken
 	)
 
 	try {
