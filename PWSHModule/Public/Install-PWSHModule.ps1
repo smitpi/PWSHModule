@@ -114,6 +114,14 @@ Function Install-PWSHModule {
 	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
 
+
+	$InstallModuleSettings = @{
+		AllowClobber       = $true
+		Force              = $true
+		SkipPublisherCheck = $true
+		AllowPrerelease    = $true
+	}
+
 	foreach ($module in $Content.Modules) {
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module"
 		if ($module.Version -like 'Latest') {
@@ -123,7 +131,7 @@ Function Install-PWSHModule {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
 					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
-					Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope -Force -AllowClobber -SkipPublisherCheck
+					Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope @InstallModuleSettings
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
 				try {
@@ -140,7 +148,7 @@ Function Install-PWSHModule {
 						Update-Module -Name $module.Name -Force -ErrorAction Stop
 					} catch {
 						try {
-							Install-Module -Name $module.name -Scope $Scope -Repository $module.Repository -AllowClobber -Force -SkipPublisherCheck
+							Install-Module -Name $module.name -Scope $Scope -Repository $module.Repository @InstallModuleSettings
 						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 					}
 					Get-Module $module.name -ListAvailable | Remove-Module -Force -ErrorAction SilentlyContinue
@@ -162,7 +170,7 @@ Function Install-PWSHModule {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
 					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($module.Version))" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
-					Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope -Force -AllowClobber
+					Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope @InstallModuleSettings
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
 				Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
