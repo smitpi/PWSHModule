@@ -8,7 +8,7 @@ schema: 2.0.0
 # Move-PWSHModuleBetweenScope
 
 ## SYNOPSIS
-Will move modules between scopes (CurrentUser and AllUsers)
+Moves modules between scopes (CurrentUser and AllUsers).
 
 ## SYNTAX
 
@@ -18,19 +18,19 @@ Move-PWSHModuleBetweenScope [-SourceScope] <DirectoryInfo> [-DestinationScope] <
 ```
 
 ## DESCRIPTION
-Will move modules between scopes (CurrentUser and AllUsers)
+Moves modules between scopes (CurrentUser and AllUsers).
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Move-PWSHModuleBetweenScope -Export HTML -ReportPath C:\temp
+Move-PWSHModuleBetweenScope -SourceScope D:\Documents\PowerShell\Modules -DestinationScope C:\Program Files\PowerShell\Modules -ModuleName PWSHMOdule -PSRepository psgallery
 ```
 
 ## PARAMETERS
 
 ### -SourceScope
-{{ Fill SourceScope Description }}
+From where the modules will be copied.
 
 ```yaml
 Type: DirectoryInfo
@@ -45,7 +45,7 @@ Accept wildcard characters: False
 ```
 
 ### -DestinationScope
-{{ Fill DestinationScope Description }}
+To there the modules will be copied.
 
 ```yaml
 Type: DirectoryInfo
@@ -60,7 +60,8 @@ Accept wildcard characters: False
 ```
 
 ### -ModuleName
-{{ Fill ModuleName Description }}
+Name of the modules to move.
+You can select multiple names or you can use * to select all.
 
 ```yaml
 Type: String[]
@@ -75,7 +76,7 @@ Accept wildcard characters: False
 ```
 
 ### -PSRepository
-{{ Fill PSRepository Description }}
+The repository will be used to install the module at the destination.
 
 ```yaml
 Type: String

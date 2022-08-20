@@ -32,10 +32,6 @@ Created [20/08/2022_12:38] Initial Script Creating
 
 #>
 
-#Requires -Module ImportExcel
-#Requires -Module PSWriteHTML
-#Requires -Module PSWriteColor
-
 <# 
 
 .DESCRIPTION 
@@ -46,19 +42,25 @@ Created [20/08/2022_12:38] Initial Script Creating
 
 <#
 .SYNOPSIS
-Will move modules between scopes (CurrentUser and AllUsers)
+Moves modules between scopes (CurrentUser and AllUsers).
 
 .DESCRIPTION
-Will move modules between scopes (CurrentUser and AllUsers)
+Moves modules between scopes (CurrentUser and AllUsers).
 
-.PARAMETER Export
-Export the result to a report file. (Excel or html). Or select Host to display the object on screen.
+.PARAMETER SourceScope
+From where the modules will be copied.
 
-.PARAMETER ReportPath
-Where to save the report.
+.PARAMETER DestinationScope
+To there the modules will be copied.
+
+.PARAMETER ModuleName
+Name of the modules to move. You can select multiple names or you can use * to select all.
+
+.PARAMETER PSRepository
+The repository will be used to install the module at the destination.
 
 .EXAMPLE
-Move-PWSHModuleBetweenScope -Export HTML -ReportPath C:\temp
+Move-PWSHModuleBetweenScope -SourceScope D:\Documents\PowerShell\Modules -DestinationScope C:\Program Files\PowerShell\Modules -ModuleName PWSHMOdule -PSRepository psgallery
 
 #>
 Function Move-PWSHModuleBetweenScope {
