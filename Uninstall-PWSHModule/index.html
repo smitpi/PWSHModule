@@ -295,6 +295,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../Move-PWSHModuleBetweenScope/" class="md-nav__link">
+        Move-PWSHModuleBetweenScope
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../New-PWSHModuleList/" class="md-nav__link">
         New-PWSHModuleList
       </a>
@@ -791,11 +806,11 @@
 <p>Will uninstall the module from the system.</p>
 <h2 id="syntax">SYNTAX</h2>
 <h3 id="private-default">Private (Default)</h3>
-<div class="highlight"><pre><span></span><code>Uninstall-PWSHModule -ListName &lt;String&gt; -ModuleName &lt;String[]&gt; [-OldVersions] [-ForceDeleteFolder]
+<div class="highlight"><pre><span></span><code>Uninstall-PWSHModule -ListName &lt;String&gt; [-ModuleName &lt;String[]&gt;] [-OldVersions] [-ForceDeleteFolder]
  -GitHubUserID &lt;String&gt; [-GitHubToken &lt;String&gt;] [&lt;CommonParameters&gt;]
 </code></pre></div>
 <h3 id="public">Public</h3>
-<div class="highlight"><pre><span></span><code>Uninstall-PWSHModule -ListName &lt;String&gt; -ModuleName &lt;String[]&gt; [-OldVersions] [-ForceDeleteFolder]
+<div class="highlight"><pre><span></span><code>Uninstall-PWSHModule -ListName &lt;String&gt; [-ModuleName &lt;String[]&gt;] [-OldVersions] [-ForceDeleteFolder]
  -GitHubUserID &lt;String&gt; [-PublicGist] [&lt;CommonParameters&gt;]
 </code></pre></div>
 <h2 id="description">DESCRIPTION</h2>
@@ -825,9 +840,9 @@ Use * to select all modules in the list.</p>
 <span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
 <span class="nt">Aliases</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Name</span><span class="w"></span>
 
-<span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
+<span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 <span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Named</span><span class="w"></span>
-<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">None</span><span class="w"></span>
+<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="err">*</span><span class="w"></span>
 <span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True (ByPropertyName)</span><span class="w"></span>
 <span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 </code></pre></div>
