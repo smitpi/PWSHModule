@@ -80,9 +80,9 @@ Function Uninstall-PWSHModule {
 				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
 				else { Throw 'Must be running an elevated prompt.' } })]
 		[string]$ListName,
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(ValueFromPipelineByPropertyName = $true)]
 		[Alias('Name')]
-		[string[]]$ModuleName,
+		[string[]]$ModuleName = "*",
 		[switch]$OldVersions,
 		[switch]$ForceDeleteFolder,
 		[Parameter(Mandatory = $true)]
@@ -120,7 +120,7 @@ Function Uninstall-PWSHModule {
 			$Content.Modules | Where-Object {$_.name -like $collectmod} | ForEach-Object {[void]$CollectObject.Add($_)}
 		}
 		#$mods = Get-Module -list | Where-Object path -NotMatch 'windows\\system32' | Group-Object -Property name | Where-Object count -GT 1
-		#$mods | ForEach-Object { $_.group | Select-Object -Skip 1 } | ForEach-Object { Uninstall-Module -Name $_.name -RequiredVersion $_.version -WhatIf }
+		#$mods | ForEach-Object { $_.group | Sort-Object -Property version -Descending| Select-Object -Skip 1 } | ForEach-Object { Uninstall-Module -Name $_.name -RequiredVersion $_.version -WhatIf }
 	}
 	end {
 		foreach ($module in $CollectObject) {
@@ -143,7 +143,7 @@ Function Uninstall-PWSHModule {
 					Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($mod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
 					try {
 						$folder = Get-Module -Name $mod.name -ListAvailable | Where-Object {$_.version -like $mod.version}
-						Remove-Item (Get-Item $folder.Path).Directory -Recurse -Force -ErrorAction Stop
+                        join-path -Path (get-item $folder.Path) -ChildPath "..\.." -Resolve -ErrorAction Stop | Remove-Item -Recurse -Force						
 					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 				}
 			} else {
@@ -157,8 +157,7 @@ Function Uninstall-PWSHModule {
 							Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Force Delete module $($module.Name)"
 							Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
 							try {
-								$Directory = Join-Path -Path (Get-Item $_.Path).FullName -ChildPath '..\..\' -Resolve
-								Remove-Item -Path $Directory -Recurse -Force -ErrorAction Stop
+								Join-Path -Path (Get-Item $_.Path).FullName -ChildPath '..\..\' -Resolve |  Remove-Item -Recurse -Force -ErrorAction Stop
 							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 					}
 				}
