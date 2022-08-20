@@ -27,6 +27,7 @@ Documentation can be found at: [Github_Pages](https://smitpi.github.io/PWSHModul
 - [`Add-PWSHModule`](https://smitpi.github.io/PWSHModule/Add-PWSHModule) -- Adds a new module to the GitHub Gist List.
 - [`Add-PWSHModuleDefaultsToProfile`](https://smitpi.github.io/PWSHModule/Add-PWSHModuleDefaultsToProfile) -- Creates PSDefaultParameterValues in the users profile files.
 - [`Install-PWSHModule`](https://smitpi.github.io/PWSHModule/Install-PWSHModule) -- Install modules from the specified list.
+- [`Move-PWSHModuleBetweenScope`](https://smitpi.github.io/PWSHModule/Move-PWSHModuleBetweenScope) -- Will move modules between scopes (CurrentUser and AllUsers)
 - [`New-PWSHModuleList`](https://smitpi.github.io/PWSHModule/New-PWSHModuleList) -- Add a new list to GitHub Gist.
 - [`Remove-PWSHModule`](https://smitpi.github.io/PWSHModule/Remove-PWSHModule) -- Remove module from the specified list.
 - [`Remove-PWSHModuleList`](https://smitpi.github.io/PWSHModule/Remove-PWSHModuleList) -- Deletes a list from GitHub Gist

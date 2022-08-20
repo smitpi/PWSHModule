@@ -14,13 +14,13 @@ Will uninstall the module from the system.
 
 ### Private (Default)
 ```
-Uninstall-PWSHModule -ListName <String> -ModuleName <String[]> [-OldVersions] [-ForceDeleteFolder]
+Uninstall-PWSHModule -ListName <String> [-ModuleName <String[]>] [-OldVersions] [-ForceDeleteFolder]
  -GitHubUserID <String> [-GitHubToken <String>] [<CommonParameters>]
 ```
 
 ### Public
 ```
-Uninstall-PWSHModule -ListName <String> -ModuleName <String[]> [-OldVersions] [-ForceDeleteFolder]
+Uninstall-PWSHModule -ListName <String> [-ModuleName <String[]>] [-OldVersions] [-ForceDeleteFolder]
  -GitHubUserID <String> [-PublicGist] [<CommonParameters>]
 ```
 
@@ -61,9 +61,9 @@ Type: String[]
 Parameter Sets: (All)
 Aliases: Name
 
-Required: True
+Required: False
 Position: Named
-Default value: None
+Default value: *
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```

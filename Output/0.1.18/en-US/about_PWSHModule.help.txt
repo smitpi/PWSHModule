@@ -11,6 +11,7 @@ Functions in this module:
 	 Add-PWSHModule -- Adds a new module to the GitHub Gist List.
 	 Add-PWSHModuleDefaultsToProfile -- Creates PSDefaultParameterValues in the users profile files.
 	 Install-PWSHModule -- Install modules from the specified list.
+	 Move-PWSHModuleBetweenScope -- Will move modules between scopes (CurrentUser and AllUsers)
 	 New-PWSHModuleList -- Add a new list to GitHub Gist.
 	 Remove-PWSHModule -- Remove module from the specified list.
 	 Remove-PWSHModuleList -- Deletes a list from GitHub Gist

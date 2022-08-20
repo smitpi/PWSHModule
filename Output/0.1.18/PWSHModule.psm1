@@ -1,6 +1,6 @@
-#region Public Functions
+﻿#region Public Functions
 #region Add-PWSHModule.ps1
-######## Function 1 of 10 ##################
+######## Function 1 of 11 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
 # ModuleVersion:    0.1.18
@@ -177,7 +177,7 @@ Export-ModuleMember -Function Add-PWSHModule
 #endregion
  
 #region Add-PWSHModuleDefaultsToProfile.ps1
-######## Function 2 of 10 ##################
+######## Function 2 of 11 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
 # ModuleVersion:    0.1.18
@@ -270,14 +270,14 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 #endregion
  
 #region Install-PWSHModule.ps1
-######## Function 3 of 10 ##################
+######## Function 3 of 11 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
 # ModuleVersion:    0.1.18
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
-# ModifiedOn:       2022/08/13 09:03:33
+# ModifiedOn:       2022/08/17 12:47:39
 # Synopsis:         Install modules from the specified list.
 #############################################
  
@@ -355,6 +355,14 @@ Function Install-PWSHModule {
 	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
 
+
+	$InstallModuleSettings = @{
+		AllowClobber       = $true
+		Force              = $true
+		SkipPublisherCheck = $true
+		AllowPrerelease    = $true
+	}
+
 	foreach ($module in $Content.Modules) {
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module"
 		if ($module.Version -like 'Latest') {
@@ -364,7 +372,7 @@ Function Install-PWSHModule {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
 					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
-					Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope -Force -AllowClobber -SkipPublisherCheck
+					Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope @InstallModuleSettings
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
 				try {
@@ -381,7 +389,7 @@ Function Install-PWSHModule {
 						Update-Module -Name $module.Name -Force -ErrorAction Stop
 					} catch {
 						try {
-							Install-Module -Name $module.name -Scope $Scope -Repository $module.Repository -AllowClobber -Force -SkipPublisherCheck
+							Install-Module -Name $module.name -Scope $Scope -Repository $module.Repository @InstallModuleSettings
 						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 					}
 					Get-Module $module.name -ListAvailable | Remove-Module -Force -ErrorAction SilentlyContinue
@@ -403,7 +411,7 @@ Function Install-PWSHModule {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
 					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($module.Version))" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
-					Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope -Force -AllowClobber
+					Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope @InstallModuleSettings
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
 				Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
@@ -423,8 +431,103 @@ Register-ArgumentCompleter -CommandName Install-PWSHModule -ParameterName ListNa
 Export-ModuleMember -Function Install-PWSHModule
 #endregion
  
+#region Move-PWSHModuleBetweenScope.ps1
+######## Function 4 of 11 ##################
+# Function:         Move-PWSHModuleBetweenScope
+# Module:           PWSHModule
+# ModuleVersion:    0.1.18
+# Author:           Pierre Smit
+# Company:          HTPCZA Tech
+# CreatedOn:        2022/08/20 12:38:44
+# ModifiedOn:       2022/08/20 22:54:16
+# Synopsis:         Will move modules between scopes (CurrentUser and AllUsers)
+#############################################
+ 
+<#
+.SYNOPSIS
+Will move modules between scopes (CurrentUser and AllUsers)
+
+.DESCRIPTION
+Will move modules between scopes (CurrentUser and AllUsers)
+
+.PARAMETER Export
+Export the result to a report file. (Excel or html). Or select Host to display the object on screen.
+
+.PARAMETER ReportPath
+Where to save the report.
+
+.EXAMPLE
+Move-PWSHModuleBetweenScope -Export HTML -ReportPath C:\temp
+
+#>
+Function Move-PWSHModuleBetweenScope {
+	[Cmdletbinding(DefaultParameterSetName = 'Set1', HelpURI = 'https://smitpi.github.io/PWSHModule/Move-PWSHModuleBetweenScope')]
+	[OutputType([System.Object[]])]
+	PARAM(
+		[Parameter(Mandatory = $true)]
+		[ValidateScript( { $IsAdmin = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
+				else { Throw 'Must be running an elevated prompt.' } })]
+		[System.IO.DirectoryInfo]$SourceScope,
+
+		[Parameter(Mandatory = $true)]
+		[System.IO.DirectoryInfo]$DestinationScope,
+
+		[Parameter(ValueFromPipeline, Mandatory)]
+		[Alias('Name')]
+		[ValidateScript( { if (Get-Module -Name $_ -ListAvailable) { $True }
+				else { Throw 'Module not found.' } })]
+		[string[]]$ModuleName,
+
+		[string]$PSRepository = 'PSGallery'
+	)
+
+	foreach ($mod in $ModuleName) {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module $($mod)"
+		try {
+			$MoveMod = Get-Module -Name $mod -ListAvailable -ErrorAction Stop | Where-Object {$_.path -like "$($SourceScope)*"} | Sort-Object -Property Version -Descending | Select-Object -First 1
+		} catch {Write-Warning "Did not find $($ModuleName) in $($SourceScope)"}
+		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Saving] Module $($MoveMod.name)"
+			Write-Host '[Moving] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($MoveMod.Name)($($MoveMod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($DestinationScope)" -ForegroundColor DarkRed			
+			Save-Module -Name $MoveMod.Name -RequiredVersion $MoveMod.Version -Repository $PSRepository -Force -AllowPrerelease -AcceptLicense -Path (Get-Item $DestinationScope).FullName -ErrorAction Stop
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Uninstalling] Module $($MoveMod.name)"
+			Write-Host "`t[Deleteing] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($MoveMod.Name)($($MoveMod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($SourceScope)" -ForegroundColor DarkRed			
+			if (Test-Path (Join-Path $DestinationScope -ChildPath "$($MoveMod.Name)\$($MoveMod.Version)")) {
+				Join-Path -Path (Get-Item $MoveMod.Path) -ChildPath '..\..' -Resolve -ErrorAction Stop | Remove-Item -Recurse -Force
+			} else {Write-Warning 'Move failed, leaving source directory.'}
+		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) Complete"
+	}
+} #end Function
+$scriptblock = {
+	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	$env:PSModulePath.Split(';') | ForEach-Object {"""$($_)"""}
+}
+Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName SourceScope -ScriptBlock $scriptBlock
+Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName DestinationScope -ScriptBlock $scriptBlock
+
+$scriptblock2 = {
+	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	
+	(@([IO.Path]::Combine("$([Environment]::GetFolderPath('MyDocuments'))", 'WindowsPowerShell', 'Modules'),
+		[IO.Path]::Combine("$([Environment]::GetFolderPath('MyDocuments'))", 'PowerShell', 'Modules'),
+		[IO.Path]::Combine("$($env:ProgramFiles)", 'WindowsPowerShell', 'Modules'),
+		[IO.Path]::Combine("$($env:ProgramFiles)", 'PowerShell', 'Modules')) | Get-ChildItem -Directory).Name | Sort-Object -Unique	
+}
+Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName ModuleName -ScriptBlock $scriptBlock2
+
+$scriptblock3 = {
+	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	Get-PSRepository | ForEach-Object {$_.name}
+}
+Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName PSRepository -ScriptBlock $scriptBlock3
+ 
+Export-ModuleMember -Function Move-PWSHModuleBetweenScope
+#endregion
+ 
 #region New-PWSHModuleList.ps1
-######## Function 4 of 10 ##################
+######## Function 5 of 11 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
 # ModuleVersion:    0.1.18
@@ -551,7 +654,7 @@ Export-ModuleMember -Function New-PWSHModuleList
 #endregion
  
 #region Remove-PWSHModule.ps1
-######## Function 5 of 10 ##################
+######## Function 6 of 11 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
 # ModuleVersion:    0.1.18
@@ -690,7 +793,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 #endregion
  
 #region Remove-PWSHModuleList.ps1
-######## Function 6 of 10 ##################
+######## Function 7 of 11 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
 # ModuleVersion:    0.1.18
@@ -777,7 +880,7 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 #endregion
  
 #region Save-PWSHModule.ps1
-######## Function 7 of 10 ##################
+######## Function 8 of 11 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
 # ModuleVersion:    0.1.18
@@ -900,7 +1003,7 @@ Export-ModuleMember -Function Save-PWSHModule
 #endregion
  
 #region Show-PWSHModule.ps1
-######## Function 8 of 10 ##################
+######## Function 9 of 11 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
 # ModuleVersion:    0.1.18
@@ -1052,7 +1155,7 @@ Export-ModuleMember -Function Show-PWSHModule
 #endregion
  
 #region Show-PWSHModuleList.ps1
-######## Function 9 of 10 ##################
+######## Function 10 of 11 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
 # ModuleVersion:    0.1.18
@@ -1139,14 +1242,14 @@ Export-ModuleMember -Function Show-PWSHModuleList
 #endregion
  
 #region Uninstall-PWSHModule.ps1
-######## Function 10 of 10 ##################
+######## Function 11 of 11 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
 # ModuleVersion:    0.1.18
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
-# ModifiedOn:       2022/08/13 08:15:50
+# ModifiedOn:       2022/08/20 13:52:57
 # Synopsis:         Will uninstall the module from the system.
 #############################################
  
@@ -1190,9 +1293,9 @@ Function Uninstall-PWSHModule {
 				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
 				else { Throw 'Must be running an elevated prompt.' } })]
 		[string]$ListName,
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(ValueFromPipelineByPropertyName = $true)]
 		[Alias('Name')]
-		[string[]]$ModuleName,
+		[string[]]$ModuleName = "*",
 		[switch]$OldVersions,
 		[switch]$ForceDeleteFolder,
 		[Parameter(Mandatory = $true)]
@@ -1230,7 +1333,7 @@ Function Uninstall-PWSHModule {
 			$Content.Modules | Where-Object {$_.name -like $collectmod} | ForEach-Object {[void]$CollectObject.Add($_)}
 		}
 		#$mods = Get-Module -list | Where-Object path -NotMatch 'windows\\system32' | Group-Object -Property name | Where-Object count -GT 1
-		#$mods | ForEach-Object { $_.group | Select-Object -Skip 1 } | ForEach-Object { Uninstall-Module -Name $_.name -RequiredVersion $_.version -WhatIf }
+		#$mods | ForEach-Object { $_.group | Sort-Object -Property version -Descending| Select-Object -Skip 1 } | ForEach-Object { Uninstall-Module -Name $_.name -RequiredVersion $_.version -WhatIf }
 	}
 	end {
 		foreach ($module in $CollectObject) {
@@ -1253,7 +1356,7 @@ Function Uninstall-PWSHModule {
 					Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($mod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
 					try {
 						$folder = Get-Module -Name $mod.name -ListAvailable | Where-Object {$_.version -like $mod.version}
-						Remove-Item (Get-Item $folder.Path).Directory -Recurse -Force -ErrorAction Stop
+                        join-path -Path (get-item $folder.Path) -ChildPath "..\.." -Resolve -ErrorAction Stop | Remove-Item -Recurse -Force						
 					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 				}
 			} else {
@@ -1267,8 +1370,7 @@ Function Uninstall-PWSHModule {
 							Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Force Delete module $($module.Name)"
 							Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
 							try {
-								$Directory = Join-Path -Path (Get-Item $_.Path).FullName -ChildPath '..\..\' -Resolve
-								Remove-Item -Path $Directory -Recurse -Force -ErrorAction Stop
+								Join-Path -Path (Get-Item $_.Path).FullName -ChildPath '..\..\' -Resolve |  Remove-Item -Recurse -Force -ErrorAction Stop
 							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 					}
 				}

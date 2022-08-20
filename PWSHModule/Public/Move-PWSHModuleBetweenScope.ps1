@@ -74,9 +74,9 @@ Function Move-PWSHModuleBetweenScope {
 		[Parameter(Mandatory = $true)]
 		[System.IO.DirectoryInfo]$DestinationScope,
 
-		[Parameter(ValueFromPipeline,Mandatory)]
+		[Parameter(ValueFromPipeline, Mandatory)]
 		[Alias('Name')]
-        [ValidateScript( { if (get-module -name $_ -ListAvailable) { $True }
+		[ValidateScript( { if (Get-Module -Name $_ -ListAvailable) { $True }
 				else { Throw 'Module not found.' } })]
 		[string[]]$ModuleName,
 
@@ -91,27 +91,30 @@ Function Move-PWSHModuleBetweenScope {
 		try {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Saving] Module $($MoveMod.name)"
 			Write-Host '[Moving] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($MoveMod.Name)($($MoveMod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($DestinationScope)" -ForegroundColor DarkRed			
-            Save-Module -Name $MoveMod.Name -RequiredVersion $MoveMod.Version -Repository $PSRepository -Force -AllowPrerelease -AcceptLicense -Path (get-item $DestinationScope).FullName -ErrorAction Stop
-        	Write-Verbose "[$(Get-Date -Format HH:mm:ss) Uninstalling] Module $($MoveMod.name)"
-            Write-Host "`t[Deleteing] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($MoveMod.Name)($($MoveMod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($SourceScope)" -ForegroundColor DarkRed			
-            if (Test-Path (Join-Path $DestinationScope -ChildPath "$($MoveMod.Name)\$($MoveMod.Version)")) {
-                  join-path -Path (get-item $MoveMod.Path) -ChildPath "..\.." -Resolve -ErrorAction Stop | Remove-Item -Recurse -Force
-            }
-            else {Write-Warning "Move failed, leaving source directory."}
+			Save-Module -Name $MoveMod.Name -RequiredVersion $MoveMod.Version -Repository $PSRepository -Force -AllowPrerelease -AcceptLicense -Path (Get-Item $DestinationScope).FullName -ErrorAction Stop
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Uninstalling] Module $($MoveMod.name)"
+			Write-Host "`t[Deleteing] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($MoveMod.Name)($($MoveMod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($SourceScope)" -ForegroundColor DarkRed			
+			if (Test-Path (Join-Path $DestinationScope -ChildPath "$($MoveMod.Name)\$($MoveMod.Version)")) {
+				Join-Path -Path (Get-Item $MoveMod.Path) -ChildPath '..\..' -Resolve -ErrorAction Stop | Remove-Item -Recurse -Force
+			} else {Write-Warning 'Move failed, leaving source directory.'}
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-        	Write-Verbose "[$(Get-Date -Format HH:mm:ss) Complete"
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) Complete"
 	}
 } #end Function
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    $env:PSModulePath.Split(';') | ForEach-Object {"""$($_)"""}
+	$env:PSModulePath.Split(';') | ForEach-Object {"""$($_)"""}
 }
 Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName SourceScope -ScriptBlock $scriptBlock
 Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName DestinationScope -ScriptBlock $scriptBlock
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	Get-Module -ListAvailable | Sort-Object -Unique -Property name | ForEach-Object {$_}
+	
+	(@([IO.Path]::Combine("$([Environment]::GetFolderPath('MyDocuments'))", 'WindowsPowerShell', 'Modules'),
+		[IO.Path]::Combine("$([Environment]::GetFolderPath('MyDocuments'))", 'PowerShell', 'Modules'),
+		[IO.Path]::Combine("$($env:ProgramFiles)", 'WindowsPowerShell', 'Modules'),
+		[IO.Path]::Combine("$($env:ProgramFiles)", 'PowerShell', 'Modules')) | Get-ChildItem -Directory).Name | Sort-Object -Unique	
 }
 Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName ModuleName -ScriptBlock $scriptBlock2
 
