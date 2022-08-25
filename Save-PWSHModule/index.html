@@ -792,11 +792,11 @@
 <p>Saves the modules from the specified list to a folder.</p>
 <h2 id="syntax">SYNTAX</h2>
 <h3 id="private-default">Private (Default)</h3>
-<div class="highlight"><pre><span></span><code>Save-PWSHModule -ListName &lt;String&gt; [-AsNuGet] [-Path &lt;DirectoryInfo&gt;] -GitHubUserID &lt;String&gt;
+<div class="highlight"><pre><span></span><code>Save-PWSHModule -ListName &lt;String[]&gt; [-AsNuGet] [-Path &lt;DirectoryInfo&gt;] -GitHubUserID &lt;String&gt;
  [-GitHubToken &lt;String&gt;] [&lt;CommonParameters&gt;]
 </code></pre></div>
 <h3 id="public">Public</h3>
-<div class="highlight"><pre><span></span><code>Save-PWSHModule -ListName &lt;String&gt; [-AsNuGet] [-Path &lt;DirectoryInfo&gt;] -GitHubUserID &lt;String&gt; [-PublicGist]
+<div class="highlight"><pre><span></span><code>Save-PWSHModule -ListName &lt;String[]&gt; [-AsNuGet] [-Path &lt;DirectoryInfo&gt;] -GitHubUserID &lt;String&gt; [-PublicGist]
  [&lt;CommonParameters&gt;]
 </code></pre></div>
 <h2 id="description">DESCRIPTION</h2>
@@ -808,7 +808,7 @@
 <h2 id="parameters">PARAMETERS</h2>
 <h3 id="-listname">-ListName</h3>
 <p>The File Name on GitHub Gist.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String[]</span><span class="w"></span>
 <span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
 <span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
 
