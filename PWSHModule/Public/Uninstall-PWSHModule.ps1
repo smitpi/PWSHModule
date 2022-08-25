@@ -53,11 +53,11 @@ The File Name on GitHub Gist.
 .PARAMETER ModuleName
 Name of the module to uninstall. Use * to select all modules in the list.
 
-.PARAMETER OldVersions
-Will only uninstall old versions of the module.
+.PARAMETER UninstallOldVersions
+Will uninstall old versions of All modules.
 
-.PARAMETER ForceDeleteFolder
-Will force delete the base folder.
+.PARAMETER ForceUninstall
+Will force delete the base folder if uninstall fail.
 
 .PARAMETER GitHubUserID
 The GitHub User ID.

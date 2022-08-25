@@ -34,7 +34,7 @@ Created [09/07/2022_15:58] Initial Script Creating
 <#
 
 .DESCRIPTION
- Add a module to the config file
+Add a module to the config file
 
 #>
 
@@ -135,7 +135,7 @@ Function Add-PWSHModule {
 				if ($RequiredVersion) {
 					try {
 						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Looking for versions"
-						$tmp = Find-Module -Name $ModuleToAdd.name -RequiredVersion $RequiredVersion -Repository $Repository -ErrorAction Stop
+						Find-Module -Name $ModuleToAdd.name -RequiredVersion $RequiredVersion -Repository $Repository -ErrorAction Stop | Out-Null
 						$VersionToAdd = $RequiredVersion
 					} catch {
 						$index = 0
@@ -198,6 +198,6 @@ Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName Repository
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like "*PWSHModule*:GitHubUserID")) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock2

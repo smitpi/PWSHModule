@@ -1832,7 +1832,7 @@
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
           <maml:name>UninstallOldVersions</maml:name>
           <maml:description>
-            <maml:para>{{ Fill UninstallOldVersions Description }}</maml:para>
+            <maml:para>Will uninstall old versions of All modules.</maml:para>
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
@@ -1843,7 +1843,7 @@
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
           <maml:name>ForceUninstall</maml:name>
           <maml:description>
-            <maml:para>{{ Fill ForceUninstall Description }}</maml:para>
+            <maml:para>Will force delete the base folder if uninstall fail.</maml:para>
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
@@ -1910,7 +1910,7 @@
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
         <maml:name>UninstallOldVersions</maml:name>
         <maml:description>
-          <maml:para>{{ Fill UninstallOldVersions Description }}</maml:para>
+          <maml:para>Will uninstall old versions of All modules.</maml:para>
         </maml:description>
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
@@ -1922,7 +1922,7 @@
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="2" aliases="none">
         <maml:name>ForceUninstall</maml:name>
         <maml:description>
-          <maml:para>{{ Fill ForceUninstall Description }}</maml:para>
+          <maml:para>Will force delete the base folder if uninstall fail.</maml:para>
         </maml:description>
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>

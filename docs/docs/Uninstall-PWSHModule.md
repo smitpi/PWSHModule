@@ -78,7 +78,7 @@ Accept wildcard characters: False
 ```
 
 ### -UninstallOldVersions
-{{ Fill UninstallOldVersions Description }}
+Will uninstall old versions of All modules.
 
 ```yaml
 Type: SwitchParameter
@@ -93,7 +93,7 @@ Accept wildcard characters: False
 ```
 
 ### -ForceUninstall
-{{ Fill ForceUninstall Description }}
+Will force delete the base folder if uninstall fail.
 
 ```yaml
 Type: SwitchParameter

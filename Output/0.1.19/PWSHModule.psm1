@@ -3,11 +3,11 @@
 ######## Function 1 of 11 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.18
+# ModuleVersion:    0.1.19
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
-# ModifiedOn:       2022/08/25 23:29:14
+# ModifiedOn:       2022/08/25 23:36:32
 # Synopsis:         Adds a new module to the GitHub Gist List.
 #############################################
  
@@ -108,7 +108,7 @@ Function Add-PWSHModule {
 				if ($RequiredVersion) {
 					try {
 						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Looking for versions"
-						$tmp = Find-Module -Name $ModuleToAdd.name -RequiredVersion $RequiredVersion -Repository $Repository -ErrorAction Stop
+						Find-Module -Name $ModuleToAdd.name -RequiredVersion $RequiredVersion -Repository $Repository -ErrorAction Stop | Out-Null
 						$VersionToAdd = $RequiredVersion
 					} catch {
 						$index = 0
@@ -171,7 +171,7 @@ Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName Repository
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like "*PWSHModule*:GitHubUserID")) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock2
  
@@ -182,7 +182,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 11 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.18
+# ModuleVersion:    0.1.19
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
@@ -275,7 +275,7 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 ######## Function 3 of 11 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.18
+# ModuleVersion:    0.1.19
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
@@ -443,7 +443,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 4 of 11 ##################
 # Function:         Move-PWSHModuleBetweenScope
 # Module:           PWSHModule
-# ModuleVersion:    0.1.18
+# ModuleVersion:    0.1.19
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/08/20 12:38:44
@@ -547,7 +547,7 @@ Export-ModuleMember -Function Move-PWSHModuleBetweenScope
 ######## Function 5 of 11 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.18
+# ModuleVersion:    0.1.19
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -674,7 +674,7 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 6 of 11 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.18
+# ModuleVersion:    0.1.19
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
@@ -821,7 +821,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 7 of 11 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.18
+# ModuleVersion:    0.1.19
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
@@ -909,7 +909,7 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 ######## Function 8 of 11 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.18
+# ModuleVersion:    0.1.19
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -1034,7 +1034,7 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 9 of 11 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.18
+# ModuleVersion:    0.1.19
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -1188,7 +1188,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 10 of 11 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.18
+# ModuleVersion:    0.1.19
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -1275,11 +1275,11 @@ Export-ModuleMember -Function Show-PWSHModuleList
 ######## Function 11 of 11 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.18
+# ModuleVersion:    0.1.19
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
-# ModifiedOn:       2022/08/25 22:49:07
+# ModifiedOn:       2022/08/25 23:33:16
 # Synopsis:         Will uninstall the module from the system.
 #############################################
  
@@ -1296,11 +1296,11 @@ The File Name on GitHub Gist.
 .PARAMETER ModuleName
 Name of the module to uninstall. Use * to select all modules in the list.
 
-.PARAMETER OldVersions
-Will only uninstall old versions of the module.
+.PARAMETER UninstallOldVersions
+Will uninstall old versions of All modules.
 
-.PARAMETER ForceDeleteFolder
-Will force delete the base folder.
+.PARAMETER ForceUninstall
+Will force delete the base folder if uninstall fail.
 
 .PARAMETER GitHubUserID
 The GitHub User ID.
