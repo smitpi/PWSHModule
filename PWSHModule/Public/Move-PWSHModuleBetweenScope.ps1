@@ -64,7 +64,7 @@ Move-PWSHModuleBetweenScope -SourceScope D:\Documents\PowerShell\Modules -Destin
 
 #>
 Function Move-PWSHModuleBetweenScope {
-	[Cmdletbinding(DefaultParameterSetName = 'Set1', HelpURI = 'https://smitpi.github.io/PWSHModule/Move-PWSHModuleBetweenScope')]
+	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Move-PWSHModuleBetweenScope')]
 	[OutputType([System.Object[]])]
 	PARAM(
 		[Parameter(Mandatory = $true)]
@@ -84,6 +84,7 @@ Function Move-PWSHModuleBetweenScope {
 
 		[string]$PSRepository = 'PSGallery'
 	)
+	if ($ModuleName -like 'All') {$ModuleName = (Get-ChildItem -Path $($SourceScope)).Name }
 
 	foreach ($mod in $ModuleName) {
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module $($mod)"
@@ -112,11 +113,13 @@ Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterNa
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	
-	(@([IO.Path]::Combine("$([Environment]::GetFolderPath('MyDocuments'))", 'WindowsPowerShell', 'Modules'),
-		[IO.Path]::Combine("$([Environment]::GetFolderPath('MyDocuments'))", 'PowerShell', 'Modules'),
-		[IO.Path]::Combine("$($env:ProgramFiles)", 'WindowsPowerShell', 'Modules'),
-		[IO.Path]::Combine("$($env:ProgramFiles)", 'PowerShell', 'Modules')) | Get-ChildItem -Directory).Name | Sort-Object -Unique	
+	$ModList = @()
+	$ModList += 'All'
+	$modlist += ([IO.Path]::Combine("$([Environment]::GetFolderPath('MyDocuments'))", 'WindowsPowerShell', 'Modules') | Get-ChildItem -Directory).Name
+	$modlist += ([IO.Path]::Combine("$([Environment]::GetFolderPath('MyDocuments'))", 'PowerShell', 'Modules') | Get-ChildItem -Directory).Name
+	$modlist += ([IO.Path]::Combine("$($env:ProgramFiles)", 'WindowsPowerShell', 'Modules') | Get-ChildItem -Directory).Name
+	$modlist += ([IO.Path]::Combine("$($env:ProgramFiles)", 'PowerShell', 'Modules') | Get-ChildItem -Directory).Name
+	$ModList | Select-Object -Unique
 }
 Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName ModuleName -ScriptBlock $scriptBlock2
 

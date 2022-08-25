@@ -64,7 +64,7 @@ Show-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken
 Function Show-PWSHModuleList {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModuleList')]
 	PARAM(
-		[Parameter(Mandatory = $true)]
+		[Parameter(Mandatory)]
 		[string]$GitHubUserID, 
 		[Parameter(ParameterSetName = 'Public')]
 		[switch]$PublicGist,

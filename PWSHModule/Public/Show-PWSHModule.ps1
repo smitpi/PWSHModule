@@ -72,8 +72,9 @@ Show-PWSHModule -ListName Base -GitHubUserID smitpi -GitHubToken $GitHubToken
 #>
 Function Show-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModule')]
-	PARAM(		[Parameter(Mandatory = $true)]
-		[string]$ListName,
+	PARAM(		
+		[Parameter(Mandatory = $true)]
+		[string[]]$ListName,
 		[switch]$CompareInstalled,
 		[switch]$ShowProjectURI,
 		[Parameter(Mandatory = $true)]
@@ -97,27 +98,28 @@ Function Show-PWSHModule {
 		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
 	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
 
-	try {
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking config file"
-		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($Listname)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
-	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Throw 'Invalid Config File'}
-
-	$index = 0
-	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating object"
 	[System.Collections.ArrayList]$ModuleObject = @()		
-	$Content.Modules | ForEach-Object {				
-		[void]$ModuleObject.Add([PSCustomObject]@{
-				Index       = $index
-				Name        = $_.Name
-				Version     = $_.version
-				Description = $_.Description
-				Repository  = $_.Repository
-				Projecturi  = $_.projecturi
-			})
-		$index++
-	}
+	foreach ($List in $ListName) {
+		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking config file"
+			$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($List)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
+		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+		if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Throw 'Invalid Config File'}
 
+		$index = 0
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating object"
+		$Content.Modules | ForEach-Object {				
+			[void]$ModuleObject.Add([PSCustomObject]@{
+					Index       = $index
+					Name        = $_.Name
+					Version     = $_.version
+					Description = $_.Description
+					Repository  = $_.Repository
+					Projecturi  = $_.projecturi
+				})
+			$index++
+		}
+	}
 	if ($CompareInstalled) {
 		[System.Collections.ArrayList]$CompareObject = @()		
 		$index = 0
@@ -174,6 +176,6 @@ Function Show-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Show-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock

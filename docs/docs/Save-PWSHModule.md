@@ -14,13 +14,13 @@ Saves the modules from the specified list to a folder.
 
 ### Private (Default)
 ```
-Save-PWSHModule -ListName <String> [-AsNuGet] [-Path <DirectoryInfo>] -GitHubUserID <String>
+Save-PWSHModule -ListName <String[]> [-AsNuGet] [-Path <DirectoryInfo>] -GitHubUserID <String>
  [-GitHubToken <String>] [<CommonParameters>]
 ```
 
 ### Public
 ```
-Save-PWSHModule -ListName <String> [-AsNuGet] [-Path <DirectoryInfo>] -GitHubUserID <String> [-PublicGist]
+Save-PWSHModule -ListName <String[]> [-AsNuGet] [-Path <DirectoryInfo>] -GitHubUserID <String> [-PublicGist]
  [<CommonParameters>]
 ```
 
@@ -40,7 +40,7 @@ Save-PWSHModule -ListName extended -AsNuGet -Path c:\temp\ -GitHubUserID smitpi 
 The File Name on GitHub Gist.
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
 Aliases:
 

@@ -13,8 +13,8 @@ Remove module from the specified list.
 ## SYNTAX
 
 ```
-Remove-PWSHModule [-GitHubUserID] <String> [-GitHubToken] <String> [-ListName] <String>
- [-ModuleName] <String[]> [-ForceUninstallModules] [-WhatIf] [-Confirm] [<CommonParameters>]
+Remove-PWSHModule [-ListName] <String[]> [-ModuleName] <String[]> [-GitHubUserID] <String>
+ [-GitHubToken] <String> [-UninstallModule] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -29,6 +29,36 @@ Remove-PWSHModule -ListName base -ModuleName pslauncher -GitHubUserID smitpi -Gi
 
 ## PARAMETERS
 
+### -ListName
+The File Name on GitHub Gist.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: 1
+Default value: None
+Accept pipeline input: True (ByPropertyName)
+Accept wildcard characters: False
+```
+
+### -ModuleName
+Module to remove.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases: Name
+
+Required: True
+Position: 2
+Default value: None
+Accept pipeline input: True (ByPropertyName)
+Accept wildcard characters: False
+```
+
 ### -GitHubUserID
 The GitHub User ID.
 
@@ -38,7 +68,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 1
+Position: 3
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -53,43 +83,13 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ListName
-The File Name on GitHub Gist.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 3
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ModuleName
-Module to remove.
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases: Name
-
-Required: True
 Position: 4
 Default value: None
-Accept pipeline input: True (ByPropertyName)
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ForceUninstallModules
+### -UninstallModule
 Will uninstall the modules as well.
 
 ```yaml

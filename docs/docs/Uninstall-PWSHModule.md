@@ -14,14 +14,23 @@ Will uninstall the module from the system.
 
 ### Private (Default)
 ```
-Uninstall-PWSHModule -ListName <String> [-ModuleName <String[]>] [-OldVersions] [-ForceDeleteFolder]
- -GitHubUserID <String> [-GitHubToken <String>] [<CommonParameters>]
+Uninstall-PWSHModule [-GitHubToken <String>] [<CommonParameters>]
+```
+
+### List
+```
+Uninstall-PWSHModule [-ListName] <String[]> [-ModuleName] <String[]> -GitHubUserID <String> [-PublicGist]
+ [-GitHubToken <String>] [<CommonParameters>]
+```
+
+### OldVersions
+```
+Uninstall-PWSHModule [-UninstallOldVersions] [-ForceUninstall] [<CommonParameters>]
 ```
 
 ### Public
 ```
-Uninstall-PWSHModule -ListName <String> [-ModuleName <String[]>] [-OldVersions] [-ForceDeleteFolder]
- -GitHubUserID <String> [-PublicGist] [<CommonParameters>]
+Uninstall-PWSHModule [-PublicGist] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -41,12 +50,12 @@ Uninstall-PWSHModule  -ListName base -OldVersions -GitHubUserID smitpi -PublicGi
 The File Name on GitHub Gist.
 
 ```yaml
-Type: String
-Parameter Sets: (All)
+Type: String[]
+Parameter Sets: List
 Aliases:
 
 Required: True
-Position: Named
+Position: 1
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -58,41 +67,41 @@ Use * to select all modules in the list.
 
 ```yaml
 Type: String[]
-Parameter Sets: (All)
+Parameter Sets: List
 Aliases: Name
 
-Required: False
-Position: Named
-Default value: *
+Required: True
+Position: 2
+Default value: None
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
-### -OldVersions
-Will only uninstall old versions of the module.
+### -UninstallOldVersions
+{{ Fill UninstallOldVersions Description }}
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: (All)
+Parameter Sets: OldVersions
 Aliases:
 
 Required: False
-Position: Named
+Position: 1
 Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ForceDeleteFolder
-Will force delete the base folder.
+### -ForceUninstall
+{{ Fill ForceUninstall Description }}
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: (All)
+Parameter Sets: OldVersions
 Aliases:
 
 Required: False
-Position: Named
+Position: 2
 Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -103,7 +112,7 @@ The GitHub User ID.
 
 ```yaml
 Type: String
-Parameter Sets: (All)
+Parameter Sets: List
 Aliases:
 
 Required: True
@@ -118,7 +127,7 @@ Select if the list is hosted publicly.
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: Public
+Parameter Sets: List, Public
 Aliases:
 
 Required: False
@@ -133,7 +142,7 @@ GitHub Token with access to the Users' Gist.
 
 ```yaml
 Type: String
-Parameter Sets: Private
+Parameter Sets: Private, List
 Aliases:
 
 Required: False

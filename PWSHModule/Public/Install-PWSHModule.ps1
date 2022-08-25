@@ -53,6 +53,9 @@ The File Name on GitHub Gist.
 .PARAMETER Scope
 Where the module will be installed. AllUsers require admin access.
 
+.PARAMETER AllowPrerelease
+Allow the installation on beta modules.
+
 .PARAMETER GitHubUserID
 The GitHub User ID.
 
@@ -70,10 +73,11 @@ Function Install-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
 	PARAM(
 		[Parameter(Position = 0)]
-		[string]$ListName,
+		[string[]]$ListName,
 		[Parameter(Position = 1)]
 		[ValidateSet('AllUsers', 'CurrentUser')]
 		[string]$Scope,
+		[switch]$AllowPrerelease,
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID,
 		[Parameter(ParameterSetName = 'Public')]
@@ -108,81 +112,83 @@ Function Install-PWSHModule {
 		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
 	} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 
-	try {
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking Config File"
-		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($ListName)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
-	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
+	foreach ($List in $ListName) {
+		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking Config File"
+			$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($List)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
+		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+		if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
 
 
-	$InstallModuleSettings = @{
-		AllowClobber       = $true
-		Force              = $true
-		SkipPublisherCheck = $true
-		AllowPrerelease    = $true
-	}
+		$InstallModuleSettings = @{
+			AllowClobber       = $true
+			Force              = $true
+			SkipPublisherCheck = $true
+		}
+		if ($AllowPrerelease) {$InstallModuleSettings.add('AllowPrerelease', $true)}
 
-	foreach ($module in $Content.Modules) {
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module"
-		if ($module.Version -like 'Latest') {
-			$mod = Get-Module -Name $module.Name
-			if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
-			if (-not($mod)) { 
-				try {
-					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
-					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
-					Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope @InstallModuleSettings
-				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-			} else {
-				try {
-					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking versions"
-					Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
-					$OnlineMod = Find-Module -Name $module.name -Repository $module.Repository
-					[version]$Onlineversion = $OnlineMod.version 
-					[version]$Localversion = ($mod | Sort-Object -Property Version -Descending)[0].Version
-				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-				if ($Localversion -lt $Onlineversion) {
-					Write-Host "`t[Upgrading] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline; Write-Host " v$($OnlineMod.version)" -ForegroundColor DarkRed
+		foreach ($module in $Content.Modules) {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module"
+			if ($module.Version -like 'Latest') {
+				$mod = Get-Module -Name $module.Name
+				if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
+				if (-not($mod)) { 
 					try {
-						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Updating module"
-						Update-Module -Name $module.Name -Force -ErrorAction Stop
-					} catch {
+						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
+						Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
+						Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope @InstallModuleSettings
+					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+				} else {
+					try {
+						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking versions"
+						Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
+						$OnlineMod = Find-Module -Name $module.name -Repository $module.Repository
+						[version]$Onlineversion = $OnlineMod.version 
+						[version]$Localversion = ($mod | Sort-Object -Property Version -Descending)[0].Version
+					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+					if ($Localversion -lt $Onlineversion) {
+						Write-Host "`t[Upgrading] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline; Write-Host " v$($OnlineMod.version)" -ForegroundColor DarkRed
 						try {
-							Install-Module -Name $module.name -Scope $Scope -Repository $module.Repository @InstallModuleSettings
-						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-					}
-					Get-Module $module.name -ListAvailable | Remove-Module -Force -ErrorAction SilentlyContinue
-					$mods = (Get-Module $module.name -ListAvailable | Sort-Object -Property version -Descending) | Select-Object -Skip 1
-					foreach ($mod in $mods) {
-						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] UnInstalling module"
-						Write-Host "`t[Uninstalling] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($mod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
-						try {
-							Uninstall-Module -Name $mod.name -RequiredVersion $mod.Version -Force
-						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+							Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Updating module"
+							Update-Module -Name $module.Name -Force -ErrorAction Stop
+						} catch {
+							try {
+								Install-Module -Name $module.name -Scope $Scope -Repository $module.Repository @InstallModuleSettings
+							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+						}
+						Get-Module $module.name -ListAvailable | Remove-Module -Force -ErrorAction SilentlyContinue
+						$mods = (Get-Module $module.name -ListAvailable | Sort-Object -Property version -Descending) | Select-Object -Skip 1
+						foreach ($mod in $mods) {
+							Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] UnInstalling module"
+							Write-Host "`t[Uninstalling] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($mod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
+							try {
+								Uninstall-Module -Name $mod.name -RequiredVersion $mod.Version -Force
+							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+						}
 					}
 				}
-			}
-		} else {
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking installed module"
-			$mod = Get-Module -Name $module.Name
-			if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
-			if ((-not($mod)) -or $mod.Version -lt $module.Version) {
-				try {
-					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
-					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($module.Version))" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
-					Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope @InstallModuleSettings
-				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
-				Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking installed module"
+				$mod = Get-Module -Name $module.Name
+				if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
+				if ((-not($mod)) -or $mod.Version -lt $module.Version) {
+					try {
+						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
+						Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($module.Version))" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
+						Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope @InstallModuleSettings
+					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+				} else {
+					Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
+				}
 			}
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 		}
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
 } #end Function
 
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys -like "*PWSHModule*:GitHubUserID")) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Install-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock

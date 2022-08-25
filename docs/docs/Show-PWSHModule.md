@@ -14,13 +14,13 @@ Show the details of the modules in a list.
 
 ### Private (Default)
 ```
-Show-PWSHModule -ListName <String> [-CompareInstalled] [-ShowProjectURI] -GitHubUserID <String>
+Show-PWSHModule -ListName <String[]> [-CompareInstalled] [-ShowProjectURI] -GitHubUserID <String>
  [-GitHubToken <String>] [<CommonParameters>]
 ```
 
 ### Public
 ```
-Show-PWSHModule -ListName <String> [-CompareInstalled] [-ShowProjectURI] -GitHubUserID <String> [-PublicGist]
+Show-PWSHModule -ListName <String[]> [-CompareInstalled] [-ShowProjectURI] -GitHubUserID <String> [-PublicGist]
  [<CommonParameters>]
 ```
 
@@ -40,7 +40,7 @@ Show-PWSHModule -ListName Base -GitHubUserID smitpi -GitHubToken $GitHubToken
 The File Name on GitHub Gist.
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
 Aliases:
 

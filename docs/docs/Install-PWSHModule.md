@@ -14,14 +14,14 @@ Install modules from the specified list.
 
 ### Private (Default)
 ```
-Install-PWSHModule [[-ListName] <String>] [[-Scope] <String>] -GitHubUserID <String> [-GitHubToken <String>]
- [<CommonParameters>]
+Install-PWSHModule [[-ListName] <String[]>] [[-Scope] <String>] [-AllowPrerelease] -GitHubUserID <String>
+ [-GitHubToken <String>] [<CommonParameters>]
 ```
 
 ### Public
 ```
-Install-PWSHModule [[-ListName] <String>] [[-Scope] <String>] -GitHubUserID <String> [-PublicGist]
- [<CommonParameters>]
+Install-PWSHModule [[-ListName] <String[]>] [[-Scope] <String>] [-AllowPrerelease] -GitHubUserID <String>
+ [-PublicGist] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -40,7 +40,7 @@ Install-PWSHModule -Filename extended -Scope CurrentUser -GitHubUserID smitpi -G
 The File Name on GitHub Gist.
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
 Aliases:
 
@@ -63,6 +63,21 @@ Aliases:
 Required: False
 Position: 2
 Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -AllowPrerelease
+Allow the installation on beta modules.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

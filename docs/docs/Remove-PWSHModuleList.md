@@ -13,7 +13,7 @@ Deletes a list from GitHub Gist
 ## SYNTAX
 
 ```
-Remove-PWSHModuleList [-ListName] <String> [-GitHubUserID] <String> [-GitHubToken] <String>
+Remove-PWSHModuleList [-ListName] <String[]> [-GitHubUserID] <String> [-GitHubToken] <String>
  [<CommonParameters>]
 ```
 
@@ -33,7 +33,7 @@ Remove-PWSHModuleList -ListName Base  -GitHubUserID smitpi -GitHubToken $GitHubT
 The Name of the list to remove.
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
 Aliases:
 

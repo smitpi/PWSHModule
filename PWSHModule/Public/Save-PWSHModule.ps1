@@ -74,7 +74,7 @@ Function Save-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Save-PWSHModule')]
 	PARAM(
 		[Parameter(Mandatory = $true)]
-		[string]$ListName,
+		[string[]]$ListName,
 		[switch]$AsNuGet,
 		[ValidateScript( { if (Test-Path $_) { $true }
 				else { New-Item -Path $_ -ItemType Directory -Force | Out-Null; $true }
@@ -101,50 +101,52 @@ Function Save-PWSHModule {
 		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
 	} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 
-	try {
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking Config File"
-		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($ListName)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
-	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-	if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
+	foreach ($list in $ListName) {
+		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking Config File"
+			$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($List)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
+		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+		if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
 
-	foreach ($module in $Content.Modules) {
-		if ($module.Version -like 'Latest') {
-			if ($AsNuGet) {
-				try {
-					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
-					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'NuGet: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-					Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -Path $Path | Out-Null
-				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+		foreach ($module in $Content.Modules) {
+			if ($module.Version -like 'Latest') {
+				if ($AsNuGet) {
+					try {
+						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+						Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'NuGet: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
+						Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -Path $Path | Out-Null
+					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+				} else {
+					try {
+						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+						Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
+						Save-Module -Name $module.name -Repository $module.Repository -Path $Path
+					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+				}
 			} else {
-				try {
-					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
-					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-					Save-Module -Name $module.name -Repository $module.Repository -Path $Path
-				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-			}
-		} else {
-			if ($AsNuGet) {
-				try {
-					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
-					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'NuGet: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)(ver $($module.version)) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-					Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -RequiredVersion $module.Version -Path $Path | Out-Null
-				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-			} else {
-				try {
-					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
-					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)(ver $($module.version)) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-					Save-Module -Name $module.name -Repository $module.Repository -RequiredVersion $module.Version -Path $Path
-				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-			}
+				if ($AsNuGet) {
+					try {
+						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+						Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'NuGet: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)(ver $($module.version)) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
+						Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -RequiredVersion $module.Version -Path $Path | Out-Null
+					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+				} else {
+					try {
+						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+						Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)(ver $($module.version)) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
+						Save-Module -Name $module.name -Repository $module.Repository -RequiredVersion $module.Version -Path $Path
+					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+				}
 
+			}
 		}
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
-	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 } #end Function
 
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Save-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock

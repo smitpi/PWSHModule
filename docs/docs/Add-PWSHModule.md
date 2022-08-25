@@ -13,7 +13,7 @@ Adds a new module to the GitHub Gist List.
 ## SYNTAX
 
 ```
-Add-PWSHModule [-ListName] <String> [-ModuleName] <String[]> [[-Repository] <String>]
+Add-PWSHModule [-ListName] <String[]> [-ModuleName] <String[]> [[-Repository] <String>]
  [[-RequiredVersion] <String>] [-GitHubUserID] <String> [-GitHubToken] <String> [<CommonParameters>]
 ```
 
@@ -33,7 +33,7 @@ Add-PWSHModule -ListName base -ModuleName pslauncher -Repository PSgallery -Requ
 The File Name on GitHub Gist.
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
 Aliases:
 

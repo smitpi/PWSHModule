@@ -75,21 +75,31 @@ Uninstall-PWSHModule  -ListName base -OldVersions -GitHubUserID smitpi -PublicGi
 Function Uninstall-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Install-PWSHModule')]
 	PARAM(
-		[Parameter(Mandatory = $true)]
+		[Parameter(Position = 0, Mandatory, ParameterSetName = 'List')]
 		[ValidateScript( { $IsAdmin = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
 				else { Throw 'Must be running an elevated prompt.' } })]
-		[string]$ListName,
-		[Parameter(ValueFromPipelineByPropertyName = $true)]
+		[string[]]$ListName,
+
+		[Parameter(Position = 1, Mandatory, ValueFromPipelineByPropertyName, ParameterSetName = 'List')]
 		[Alias('Name')]
-		[string[]]$ModuleName = "*",
-		[switch]$OldVersions,
-		[switch]$ForceDeleteFolder,
-		[Parameter(Mandatory = $true)]
+		[string[]]$ModuleName,
+
+		[Parameter(Position = 0, ParameterSetName = 'OldVersions')]
+		[switch]$UninstallOldVersions,
+
+		[Parameter(Position = 1, ParameterSetName = 'OldVersions')]
+		[switch]$ForceUninstall,
+
+		[Parameter(Mandatory, ParameterSetName = 'List')]
 		[string]$GitHubUserID,
+
 		[Parameter(ParameterSetName = 'Public')]
+		[Parameter(ParameterSetName = 'List')]
 		[switch]$PublicGist,
+
 		[Parameter(ParameterSetName = 'Private')]
+		[Parameter(ParameterSetName = 'List')]
 		[string]$GitHubToken
 	)
 
@@ -107,77 +117,71 @@ Function Uninstall-PWSHModule {
 			$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 
-		try {
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking Config File"
-			$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($ListName)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
-		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-		if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
-		[System.Collections.ArrayList]$CollectObject = @()
 	}
 	process {
-		
-		foreach ($collectmod in $ModuleName) {
-			$Content.Modules | Where-Object {$_.name -like $collectmod} | ForEach-Object {[void]$CollectObject.Add($_)}
+		foreach ($List in $ListName) {
+			try {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking Config File"
+				$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($List)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
+			} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
+			[System.Collections.ArrayList]$CollectObject = @()
+
+			foreach ($collectmod in $ModuleName) {
+				$Content.Modules | Where-Object {$_.name -like $collectmod} | ForEach-Object {[void]$CollectObject.Add($_)}
+			}
+			
 		}
-		#$mods = Get-Module -list | Where-Object path -NotMatch 'windows\\system32' | Group-Object -Property name | Where-Object count -GT 1
-		#$mods | ForEach-Object { $_.group | Sort-Object -Property version -Descending| Select-Object -Skip 1 } | ForEach-Object { Uninstall-Module -Name $_.name -RequiredVersion $_.version -WhatIf }
 	}
 	end {
-		foreach ($module in $CollectObject) {
+		foreach ($module in ($CollectObject | Select-Object -Unique) ) {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module"
-			if ($OldVersions) {
-				Get-Module $module.name -ListAvailable | Remove-Module -Force -ErrorAction SilentlyContinue
-				$mods = (Get-Module $module.name -ListAvailable | Sort-Object -Property version -Descending) | Select-Object -Skip 1
-				foreach ($mod in $mods) {
-					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] UnInstalling module"
-					Write-Host '[Uninstalling] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($mod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
-					try {
-						Uninstall-Module -Name $mod.name -RequiredVersion $mod.Version -Force
-					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-				}
-			} elseif ($OldVersions -and $ForceDeleteFolder) {
-				Get-Module $module.name -ListAvailable | Remove-Module -Force -ErrorAction SilentlyContinue
-				$mods = (Get-Module $module.name -ListAvailable | Sort-Object -Property version -Descending) | Select-Object -Skip 1
-				foreach ($mod in $mods) {
-					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Deleting Folder"
-					Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($mod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
-					try {
-						$folder = Get-Module -Name $mod.name -ListAvailable | Where-Object {$_.version -like $mod.version}
-                        join-path -Path (get-item $folder.Path) -ChildPath "..\.." -Resolve -ErrorAction Stop | Remove-Item -Recurse -Force						
-					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-				}
-			} else {
-				try {
-					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uninstalling module $($module.Name)"
-					Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green
-					Uninstall-Module -Name $module.Name -AllVersions -Force -ErrorAction Stop
-				} catch { Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-				if ($ForceDeleteFolder) {
-					Get-Module -Name $Module.name -ListAvailable | ForEach-Object {
-							Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Force Delete module $($module.Name)"
-							Write-Host '[Deleting] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($_.Name)($($_.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($_.Path)" -ForegroundColor DarkRed
-							try {
-								Join-Path -Path (Get-Item $_.Path).FullName -ChildPath '..\..\' -Resolve |  Remove-Item -Recurse -Force -ErrorAction Stop
-							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-					}
-				}
-			}
+			try {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uninstalling module $($module.Name)"
+				Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host 'All Versions of Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green
+				Uninstall-Module -Name $module.Name -AllVersions -Force -ErrorAction Stop
+			} catch { Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 		}
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
+
+		if ($UninstallOldVersions) {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for duplicate module"
+			$DuplicateMods = Get-Module -list | Where-Object path -NotMatch 'windows\\system32' | Group-Object -Property name | Where-Object count -GT 1
+			foreach ($Duplicate in $DuplicateMods) {
+				$Duplicate.Group | Sort-Object -Property version -Descending | Select-Object -Skip 1 | ForEach-Object {
+					Write-Host '[Uninstalling]' -NoNewline -ForegroundColor Yellow ; Write-Host ' Duplicate Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($Duplicate.Name) " -ForegroundColor Green -NoNewline ; Write-Host " [$($_.version)] - $($_.path) " -ForegroundColor DarkRed
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uninstalling duplicate $($Duplicate.Name) $($_.Path)"
+					try {
+						Uninstall-Module -Name $Duplicate.Name -RequiredVersion $_.Version -Force -AllowPrerelease -ErrorAction Stop
+					} catch {
+						Write-Warning "Uninstall for module $($Duplicate.Name) Failed.`n`tMessage:$($_.Exception.Message)"
+						if ($ForceUninstall) {
+							try {
+								Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uninstalling duplicate $($Duplicate.Name) $($_.Path) - Force delete folder"
+								$Modpath = Get-Item (Join-Path $Duplicate.Group[1].Path -ChildPath '..\' -Resolve)
+								$Modpath | Remove-Item -Recurse -Force
+							} catch { Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+						}
+					}
+				}
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE] $($Duplicate.Name)"
+			}
+		}
 	}
 } #end Function
 
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
+	if (($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {
+	if (($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {
 	(Show-PWSHModule -ListName * -ErrorAction SilentlyContinue).name | Sort-Object -Unique
 	}
 }
 Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ModuleName -ScriptBlock $scriptBlock2
+

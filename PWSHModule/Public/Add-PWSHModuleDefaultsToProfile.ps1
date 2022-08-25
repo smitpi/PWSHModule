@@ -70,7 +70,7 @@ Function Add-PWSHModuleDefaultsToProfile {
 	[Cmdletbinding(DefaultParameterSetName = 'Public', HelpURI = 'https://smitpi.github.io/PWSHModule/Add-PWSHModuleDefaultsToProfile')]
 	[OutputType([System.Object[]])]
 	PARAM(
-		[Parameter(Mandatory = $true)]
+		[Parameter(Mandatory)]
 		[string]$GitHubUserID, 
 		[Parameter(ParameterSetName = 'Public')]
 		[switch]$PublicGist,

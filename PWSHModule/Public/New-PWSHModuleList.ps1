@@ -66,13 +66,13 @@ New-PWSHModuleList -ListName Base -Description "These modules needs to be instal
 Function New-PWSHModuleList {
 	[Cmdletbinding( HelpURI = 'https://smitpi.github.io/PWSHModule/New-PWSHModuleList')]
 	PARAM(
-		[Parameter(Mandatory = $true)]
+		[Parameter(Mandatory)]
 		[string]$ListName,
-		[Parameter(Mandatory = $true)]
+		[Parameter(Mandatory)]
 		[string]$Description,
-		[Parameter(Mandatory = $true)]
+		[Parameter(Mandatory)]
 		[string]$GitHubUserID, 
-		[Parameter(Mandatory = $true)]
+		[Parameter(Mandatory)]
 		[string]$GitHubToken
 	)
 
@@ -80,7 +80,7 @@ Function New-PWSHModuleList {
 	$NewConfig = [PSCustomObject]@{
 		CreateDate   = (Get-Date -Format u)
 		Description  = $Description
-		Author       = "$($env:USERNAME.ToLower())@$($env:USERDNSDOMAIN.ToLower())"
+		Author       = "$($env:USERNAME.ToLower())"
 		ModifiedDate = 'Unknown'
 		ModifiedUser = 'Unknown'
 		Modules      = [PSCustomObject]@{

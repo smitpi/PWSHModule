@@ -66,7 +66,7 @@ Function Remove-PWSHModuleList {
 	[OutputType([System.Object[]])]
 	PARAM(
 		[Parameter(Mandatory = $true)]
-		[string]$ListName,
+		[string[]]$ListName,
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
 		[Parameter(Mandatory = $true)]
@@ -86,29 +86,30 @@ Function Remove-PWSHModuleList {
 		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
 	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
 
-
-	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create object"
-	$CheckExist = $PRGist.files | Get-Member -MemberType NoteProperty | Where-Object {$_.name -like $ListName}
-	if (-not([string]::IsNullOrEmpty($CheckExist))) {
-		try {
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Remove list from Gist"
-			$Body = @{}
-			$files = @{}
-			$Files["$($ListName)"] = $null
-			$Body.files = $Files
-			$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
-			$json = ConvertTo-Json -InputObject $Body
-			$json = [System.Text.Encoding]::UTF8.GetBytes($json)
-			$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
-			Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName)" -NoNewline -ForegroundColor Cyan; Write-Host ' from Github Gist' -ForegroundColor DarkRed
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] updated gist."
-		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+	foreach ($List in $ListName) {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create object"
+		$CheckExist = $PRGist.files | Get-Member -MemberType NoteProperty | Where-Object {$_.name -like $List}
+		if (-not([string]::IsNullOrEmpty($CheckExist))) {
+			try {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Remove list from Gist"
+				$Body = @{}
+				$files = @{}
+				$Files["$($List)"] = $null
+				$Body.files = $Files
+				$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
+				$json = ConvertTo-Json -InputObject $Body
+				$json = [System.Text.Encoding]::UTF8.GetBytes($json)
+				$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
+				Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($List)" -NoNewline -ForegroundColor Cyan; Write-Host ' from Github Gist' -ForegroundColor DarkRed
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] updated gist."
+			} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+		}
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
-	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 } #end Function
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*GitHubUserID*')) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {(Show-PWSHModuleList).name}
 }
 Register-ArgumentCompleter -CommandName Remove-PWSHModuleList -ParameterName ListName -ScriptBlock $scriptBlock
