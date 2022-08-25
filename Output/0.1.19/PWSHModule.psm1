@@ -445,7 +445,7 @@ Export-ModuleMember -Function Install-PWSHModule
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/08/20 12:38:44
-# ModifiedOn:       2022/08/25 21:42:22
+# ModifiedOn:       2022/08/25 23:45:08
 # Synopsis:         Moves modules between scopes (CurrentUser and AllUsers).
 #############################################
  
@@ -487,7 +487,7 @@ Function Move-PWSHModuleBetweenScope {
 
 		[Parameter(ValueFromPipeline, Mandatory)]
 		[Alias('Name')]
-		[ValidateScript( { if (Get-Module -Name $_ -ListAvailable) { $True }
+		[ValidateScript( { if ((Get-Module -Name $_ -ListAvailable) -or ($_ -like 'All')) { $True }
 				else { Throw 'Module not found.' } })]
 		[string[]]$ModuleName,
 

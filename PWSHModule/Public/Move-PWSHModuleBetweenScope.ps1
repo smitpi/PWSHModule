@@ -78,7 +78,7 @@ Function Move-PWSHModuleBetweenScope {
 
 		[Parameter(ValueFromPipeline, Mandatory)]
 		[Alias('Name')]
-		[ValidateScript( { if (Get-Module -Name $_ -ListAvailable) { $True }
+		[ValidateScript( { if ((Get-Module -Name $_ -ListAvailable) -or ($_ -like 'All')) { $True }
 				else { Throw 'Module not found.' } })]
 		[string[]]$ModuleName,
 
