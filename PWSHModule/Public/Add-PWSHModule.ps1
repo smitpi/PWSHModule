@@ -165,10 +165,7 @@ Function Add-PWSHModule {
 				} else {
 					Write-Host '[Duplicate]' -NoNewline -ForegroundColor DarkRed; Write-Host " $($ModuleToAdd.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to $($List)" -ForegroundColor Green
 				}
-
 			}
-		}
-		end {
 			$Content.Modules = $ModuleObject | Sort-Object -Property name
 			$Content.ModifiedDate = "$(Get-Date -Format u)"
 			$content.ModifiedUser = "$($env:USERNAME.ToLower())"
@@ -187,6 +184,7 @@ Function Add-PWSHModule {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 		}
 	}
+	end {}
 } #end Function
 
 

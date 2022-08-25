@@ -7,7 +7,7 @@
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
-# ModifiedOn:       2022/08/25 23:36:32
+# ModifiedOn:       2022/08/25 23:41:06
 # Synopsis:         Adds a new module to the GitHub Gist List.
 #############################################
  
@@ -138,10 +138,7 @@ Function Add-PWSHModule {
 				} else {
 					Write-Host '[Duplicate]' -NoNewline -ForegroundColor DarkRed; Write-Host " $($ModuleToAdd.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to $($List)" -ForegroundColor Green
 				}
-
 			}
-		}
-		end {
 			$Content.Modules = $ModuleObject | Sort-Object -Property name
 			$Content.ModifiedDate = "$(Get-Date -Format u)"
 			$content.ModifiedUser = "$($env:USERNAME.ToLower())"
@@ -160,6 +157,7 @@ Function Add-PWSHModule {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 		}
 	}
+	end {}
 } #end Function
 
 
