@@ -104,6 +104,7 @@ Function Uninstall-PWSHModule {
 	)
 
 	begin {
+		if (-not($UninstallOldVersions)) {
 		try {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
 			$headers = @{}
@@ -116,7 +117,7 @@ Function Uninstall-PWSHModule {
 			$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
 			$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
-
+	}
 	}
 	process {
 		foreach ($List in $ListName) {
@@ -143,7 +144,7 @@ Function Uninstall-PWSHModule {
 			} catch { Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 		}
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
-
+	
 		if ($UninstallOldVersions) {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for duplicate module"
 			$DuplicateMods = Get-Module -list | Where-Object path -NotMatch 'windows\\system32' | Group-Object -Property name | Where-Object count -GT 1

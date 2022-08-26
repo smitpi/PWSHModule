@@ -1036,7 +1036,7 @@ Export-ModuleMember -Function Save-PWSHModule
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
-# ModifiedOn:       2022/08/25 22:52:15
+# ModifiedOn:       2022/08/26 00:03:45
 # Synopsis:         Show the details of the modules in a list.
 #############################################
  
@@ -1098,6 +1098,7 @@ Function Show-PWSHModule {
 	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
 
 	[System.Collections.ArrayList]$ModuleObject = @()		
+	$index = 0
 	foreach ($List in $ListName) {
 		try {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking config file"
@@ -1105,12 +1106,12 @@ Function Show-PWSHModule {
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 		if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Throw 'Invalid Config File'}
 
-		$index = 0
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating object"
 		$Content.Modules | ForEach-Object {				
 			[void]$ModuleObject.Add([PSCustomObject]@{
 					Index       = $index
 					Name        = $_.Name
+					List        = $List
 					Version     = $_.version
 					Description = $_.Description
 					Repository  = $_.Repository
@@ -1148,6 +1149,7 @@ Function Show-PWSHModule {
 				[void]$CompareObject.Add([PSCustomObject]@{
 						Index           = $index
 						Name            = $CompareModule.Name
+						List            = $CompareModule.List
 						InstalledVer    = $InstallVer
 						OnlineVer       = $online.Version
 						UpdateAvailable = $update
@@ -1277,7 +1279,7 @@ Export-ModuleMember -Function Show-PWSHModuleList
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
-# ModifiedOn:       2022/08/25 23:33:16
+# ModifiedOn:       2022/08/25 23:59:31
 # Synopsis:         Will uninstall the module from the system.
 #############################################
  
@@ -1345,6 +1347,7 @@ Function Uninstall-PWSHModule {
 	)
 
 	begin {
+		if (-not($UninstallOldVersions)) {
 		try {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
 			$headers = @{}
@@ -1357,7 +1360,7 @@ Function Uninstall-PWSHModule {
 			$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
 			$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
-
+	}
 	}
 	process {
 		foreach ($List in $ListName) {
@@ -1384,7 +1387,7 @@ Function Uninstall-PWSHModule {
 			} catch { Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 		}
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
-
+	
 		if ($UninstallOldVersions) {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for duplicate module"
 			$DuplicateMods = Get-Module -list | Where-Object path -NotMatch 'windows\\system32' | Group-Object -Property name | Where-Object count -GT 1

@@ -99,6 +99,7 @@ Function Show-PWSHModule {
 	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
 
 	[System.Collections.ArrayList]$ModuleObject = @()		
+	$index = 0
 	foreach ($List in $ListName) {
 		try {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking config file"
@@ -106,12 +107,12 @@ Function Show-PWSHModule {
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 		if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Throw 'Invalid Config File'}
 
-		$index = 0
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating object"
 		$Content.Modules | ForEach-Object {				
 			[void]$ModuleObject.Add([PSCustomObject]@{
 					Index       = $index
 					Name        = $_.Name
+					List        = $List
 					Version     = $_.version
 					Description = $_.Description
 					Repository  = $_.Repository
@@ -149,6 +150,7 @@ Function Show-PWSHModule {
 				[void]$CompareObject.Add([PSCustomObject]@{
 						Index           = $index
 						Name            = $CompareModule.Name
+						List            = $CompareModule.List
 						InstalledVer    = $InstallVer
 						OnlineVer       = $online.Version
 						UpdateAvailable = $update
