@@ -78,13 +78,13 @@ Function Move-PWSHModuleBetweenScope {
 
 		[Parameter(ValueFromPipeline, Mandatory)]
 		[Alias('Name')]
-		[ValidateScript( { if ((Get-Module -Name $_ -ListAvailable) -or ($_ -like 'All')) { $True }
+		[ValidateScript( { if ((Get-Module -Name $_ -ListAvailable) -or ($_ -eq 'All')) { $True }
 				else { Throw 'Module not found.' } })]
 		[string[]]$ModuleName,
 
 		[string]$PSRepository = 'PSGallery'
 	)
-	if ($ModuleName -like 'All') {$ModuleName = (Get-ChildItem -Path $($SourceScope)).Name }
+	if ($ModuleName -like 'All') {$ModuleName = (Get-ChildItem -Path $($SourceScope) -Directory).Name }
 
 	foreach ($mod in $ModuleName) {
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module $($mod)"

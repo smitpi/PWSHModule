@@ -3,7 +3,7 @@
 ######## Function 1 of 11 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
@@ -180,11 +180,11 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 11 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
-# ModifiedOn:       2022/08/25 23:30:11
+# ModifiedOn:       2022/08/28 18:42:24
 # Synopsis:         Creates PSDefaultParameterValues in the users profile files.
 #############################################
  
@@ -224,6 +224,8 @@ Function Add-PWSHModuleDefaultsToProfile {
 		[ValidateSet('AllUsers', 'CurrentUser')]
 		[string]$Scope
 	)
+
+	## TODO Add remove config from profile.
 
 	if ($PublicGist) {
 		$Script:PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = "$($GitHubUserID)"
@@ -273,7 +275,7 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 ######## Function 3 of 11 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
@@ -441,11 +443,11 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 4 of 11 ##################
 # Function:         Move-PWSHModuleBetweenScope
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/08/20 12:38:44
-# ModifiedOn:       2022/08/25 23:45:08
+# ModifiedOn:       2022/08/30 08:57:14
 # Synopsis:         Moves modules between scopes (CurrentUser and AllUsers).
 #############################################
  
@@ -487,13 +489,13 @@ Function Move-PWSHModuleBetweenScope {
 
 		[Parameter(ValueFromPipeline, Mandatory)]
 		[Alias('Name')]
-		[ValidateScript( { if ((Get-Module -Name $_ -ListAvailable) -or ($_ -like 'All')) { $True }
+		[ValidateScript( { if ((Get-Module -Name $_ -ListAvailable) -or ($_ -eq 'All')) { $True }
 				else { Throw 'Module not found.' } })]
 		[string[]]$ModuleName,
 
 		[string]$PSRepository = 'PSGallery'
 	)
-	if ($ModuleName -like 'All') {$ModuleName = (Get-ChildItem -Path $($SourceScope)).Name }
+	if ($ModuleName -like 'All') {$ModuleName = (Get-ChildItem -Path $($SourceScope) -Directory).Name }
 
 	foreach ($mod in $ModuleName) {
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module $($mod)"
@@ -545,7 +547,7 @@ Export-ModuleMember -Function Move-PWSHModuleBetweenScope
 ######## Function 5 of 11 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -672,7 +674,7 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 6 of 11 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
@@ -819,7 +821,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 7 of 11 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
@@ -907,7 +909,7 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 ######## Function 8 of 11 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -1032,11 +1034,11 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 9 of 11 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
-# ModifiedOn:       2022/08/26 00:03:45
+# ModifiedOn:       2022/08/30 08:37:07
 # Synopsis:         Show the details of the modules in a list.
 #############################################
  
@@ -1150,6 +1152,8 @@ Function Show-PWSHModule {
 						Index           = $index
 						Name            = $CompareModule.Name
 						List            = $CompareModule.List
+						Publisheddate   = [datetime]$online.PublishedDate
+						UpdateDate      = [datetime]$online.AdditionalMetadata.lastUpdated
 						InstalledVer    = $InstallVer
 						OnlineVer       = $online.Version
 						UpdateAvailable = $update
@@ -1188,7 +1192,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 10 of 11 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -1275,7 +1279,7 @@ Export-ModuleMember -Function Show-PWSHModuleList
 ######## Function 11 of 11 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13

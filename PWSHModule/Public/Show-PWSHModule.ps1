@@ -151,6 +151,8 @@ Function Show-PWSHModule {
 						Index           = $index
 						Name            = $CompareModule.Name
 						List            = $CompareModule.List
+						Publisheddate   = [datetime]$online.PublishedDate
+						UpdateDate      = [datetime]$online.AdditionalMetadata.lastUpdated
 						InstalledVer    = $InstallVer
 						OnlineVer       = $online.Version
 						UpdateAvailable = $update

@@ -80,6 +80,8 @@ Function Add-PWSHModuleDefaultsToProfile {
 		[string]$Scope
 	)
 
+	## TODO Add remove config from profile.
+
 	if ($PublicGist) {
 		$Script:PSDefaultParameterValues['*PWSHModule*:GitHubUserID'] = "$($GitHubUserID)"
 		$Script:PSDefaultParameterValues['*PWSHModule*:PublicGist'] = $true
