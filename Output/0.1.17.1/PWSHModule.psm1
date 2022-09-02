@@ -3,11 +3,11 @@
 ######## Function 1 of 11 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.0
+# ModuleVersion:    0.1.17.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
-# ModifiedOn:       2022/08/25 23:41:06
+# ModifiedOn:       2022/09/02 13:18:05
 # Synopsis:         Adds a new module to the GitHub Gist List.
 #############################################
  
@@ -43,9 +43,9 @@ Add-PWSHModule -ListName base -ModuleName pslauncher -Repository PSgallery -Requ
 Function Add-PWSHModule {
 	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Add-PWSHModule')]
 	PARAM(
-		[Parameter(Mandatory = $true)]
+		[Parameter(Mandatory,ValueFromPipelineByPropertyName)]
 		[string[]]$ListName,
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(Mandatory,ValueFromPipeline)]
 		[Alias('Name')]
 		[string[]]$ModuleName,
 		[String]$Repository = 'PSGallery',
@@ -139,6 +139,7 @@ Function Add-PWSHModule {
 					Write-Host '[Duplicate]' -NoNewline -ForegroundColor DarkRed; Write-Host " $($ModuleToAdd.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to $($List)" -ForegroundColor Green
 				}
 			}
+			
 			$Content.Modules = $ModuleObject | Sort-Object -Property name
 			$Content.ModifiedDate = "$(Get-Date -Format u)"
 			$content.ModifiedUser = "$($env:USERNAME.ToLower())"
@@ -169,7 +170,7 @@ Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName Repository
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock2
  
@@ -180,11 +181,11 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 11 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.0
+# ModuleVersion:    0.1.17.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
-# ModifiedOn:       2022/08/28 18:42:24
+# ModifiedOn:       2022/09/02 13:00:37
 # Synopsis:         Creates PSDefaultParameterValues in the users profile files.
 #############################################
  
@@ -207,6 +208,9 @@ GitHub Token with access to the Users' Gist.
 .PARAMETER Scope
 Where the module will be installed. AllUsers require admin access.
 
+.PARAMETER RemoveConfig
+Removes the config from your profile.
+
 .EXAMPLE
 Add-PWSHModuleDefaultsToProfile -GitHubUserID smitpi -PublicGist -Scope AllUsers
 
@@ -222,7 +226,8 @@ Function Add-PWSHModuleDefaultsToProfile {
 		[Parameter(ParameterSetName = 'Private')]
 		[string]$GitHubToken,
 		[ValidateSet('AllUsers', 'CurrentUser')]
-		[string]$Scope
+		[string]$Scope,
+		[switch]$RemoveConfig
 	)
 
 	## TODO Add remove config from profile.
@@ -262,7 +267,7 @@ Function Add-PWSHModuleDefaultsToProfile {
 	foreach ($file in $files) {	
 		$tmp = Get-Content -Path $file.FullName | Where-Object { $_ -notlike '*PWSHModule*'}
 		$tmp | Set-Content -Path $file.FullName -Force
-		Add-Content -Value $ToAppend -Path $file.FullName -Force -Encoding utf8
+		if (-not($RemoveConfig)) {Add-Content -Value $ToAppend -Path $file.FullName -Force -Encoding utf8}
 		Write-Host '[Updated]' -NoNewline -ForegroundColor Yellow; Write-Host ' Profile File:' -NoNewline -ForegroundColor Cyan; Write-Host " $($file.FullName)" -ForegroundColor Green
 	}
 
@@ -275,11 +280,11 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 ######## Function 3 of 11 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.0
+# ModuleVersion:    0.1.17.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
-# ModifiedOn:       2022/08/25 22:23:11
+# ModifiedOn:       2022/09/02 12:56:32
 # Synopsis:         Install modules from the specified list.
 #############################################
  
@@ -432,7 +437,7 @@ Function Install-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like "*PWSHModule*:GitHubUserID")) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 Register-ArgumentCompleter -CommandName Install-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
@@ -443,11 +448,11 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 4 of 11 ##################
 # Function:         Move-PWSHModuleBetweenScope
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.0
+# ModuleVersion:    0.1.17.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/08/20 12:38:44
-# ModifiedOn:       2022/08/30 09:49:03
+# ModifiedOn:       2022/09/02 12:48:34
 # Synopsis:         Moves modules between scopes (CurrentUser and AllUsers).
 #############################################
  
@@ -525,17 +530,14 @@ $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
 	$ModList = @()
 	$ModList += 'All'
-	$modlist += ([IO.Path]::Combine("$([Environment]::GetFolderPath('MyDocuments'))", 'WindowsPowerShell', 'Modules') | Get-ChildItem -Directory).Name
-	$modlist += ([IO.Path]::Combine("$([Environment]::GetFolderPath('MyDocuments'))", 'PowerShell', 'Modules') | Get-ChildItem -Directory).Name
-	$modlist += ([IO.Path]::Combine("$($env:ProgramFiles)", 'WindowsPowerShell', 'Modules') | Get-ChildItem -Directory).Name
-	$modlist += ([IO.Path]::Combine("$($env:ProgramFiles)", 'PowerShell', 'Modules') | Get-ChildItem -Directory).Name
-	$ModList | Select-Object -Unique
+	$ModList += ($fakeBoundParameters.SourceScope | Get-ChildItem -Directory).Name
+	$ModList  | Where-Object {$_ -like "*$wordToComplete*"}
 }
 Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName ModuleName -ScriptBlock $scriptBlock2
 
 $scriptblock3 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	Get-PSRepository | ForEach-Object {$_.name}
+	(Get-PSRepository).name | Where-Object {$_ -like "*$wordToComplete*"}
 }
 Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName PSRepository -ScriptBlock $scriptBlock3
  
@@ -546,7 +548,7 @@ Export-ModuleMember -Function Move-PWSHModuleBetweenScope
 ######## Function 5 of 11 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.0
+# ModuleVersion:    0.1.17.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -673,11 +675,11 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 6 of 11 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.0
+# ModuleVersion:    0.1.17.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
-# ModifiedOn:       2022/08/25 23:29:25
+# ModifiedOn:       2022/09/02 12:50:19
 # Synopsis:         Remove module from the specified list.
 #############################################
  
@@ -797,20 +799,18 @@ Function Remove-PWSHModule {
 	}
 	end {}
 } #end Function
-
-
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
-Register-ArgumentCompleter -CommandName Remove-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {
-	(Show-PWSHModule -ListName * -ErrorAction SilentlyContinue).name | Sort-Object -Unique
+	if (($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {
+	(Show-PWSHModule -ListName $fakeBoundParameters.Listname -ErrorAction SilentlyContinue).name | Where-Object {$_ -like "*$wordToComplete*"}
 	}
 }
+Register-ArgumentCompleter -CommandName Remove-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 Register-ArgumentCompleter -CommandName Remove-PWSHModule -ParameterName ModuleName -ScriptBlock $scriptBlock2
  
 Export-ModuleMember -Function Remove-PWSHModule
@@ -820,11 +820,11 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 7 of 11 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.0
+# ModuleVersion:    0.1.17.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
-# ModifiedOn:       2022/08/25 23:23:02
+# ModifiedOn:       2022/09/02 12:56:08
 # Synopsis:         Deletes a list from GitHub Gist
 #############################################
  
@@ -897,7 +897,7 @@ Function Remove-PWSHModuleList {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 Register-ArgumentCompleter -CommandName Remove-PWSHModuleList -ParameterName ListName -ScriptBlock $scriptBlock
  
@@ -908,11 +908,11 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 ######## Function 8 of 11 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.0
+# ModuleVersion:    0.1.17.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
-# ModifiedOn:       2022/08/25 23:25:09
+# ModifiedOn:       2022/09/02 12:51:34
 # Synopsis:         Saves the modules from the specified list to a folder.
 #############################################
  
@@ -1022,7 +1022,7 @@ Function Save-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 Register-ArgumentCompleter -CommandName Save-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
@@ -1033,11 +1033,11 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 9 of 11 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.0
+# ModuleVersion:    0.1.17.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
-# ModifiedOn:       2022/08/30 08:37:07
+# ModifiedOn:       2022/09/02 12:43:12
 # Synopsis:         Show the details of the modules in a list.
 #############################################
  
@@ -1180,7 +1180,7 @@ Function Show-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 Register-ArgumentCompleter -CommandName Show-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
@@ -1191,7 +1191,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 10 of 11 ##################
 # Function:         Show-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.0
+# ModuleVersion:    0.1.17.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -1278,11 +1278,11 @@ Export-ModuleMember -Function Show-PWSHModuleList
 ######## Function 11 of 11 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.0
+# ModuleVersion:    0.1.17.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
-# ModifiedOn:       2022/08/25 23:59:31
+# ModifiedOn:       2022/09/02 12:45:46
 # Synopsis:         Will uninstall the module from the system.
 #############################################
  
@@ -1351,19 +1351,19 @@ Function Uninstall-PWSHModule {
 
 	begin {
 		if (-not($UninstallOldVersions)) {
-		try {
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
-			$headers = @{}
-			$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
-			$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
-			$base64 = [System.Convert]::ToBase64String($bytes)
-			$headers.Authorization = 'Basic {0}' -f $base64
+			try {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
+				$headers = @{}
+				$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+				$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+				$base64 = [System.Convert]::ToBase64String($bytes)
+				$headers.Authorization = 'Basic {0}' -f $base64
 
-			$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
-			$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
-			$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
-		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
-	}
+				$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+				$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+				$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+			} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+		}
 	}
 	process {
 		foreach ($List in $ListName) {
@@ -1420,14 +1420,14 @@ Function Uninstall-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {
-	(Show-PWSHModule -ListName * -ErrorAction SilentlyContinue).name | Sort-Object -Unique
+	if (($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {
+	(Show-PWSHModule -ListName $fakeBoundParameters.Listname -ErrorAction SilentlyContinue).name | Where-Object {$_ -like "*$wordToComplete*"}
 	}
 }
 Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ModuleName -ScriptBlock $scriptBlock2

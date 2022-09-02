@@ -62,6 +62,9 @@ GitHub Token with access to the Users' Gist.
 .PARAMETER Scope
 Where the module will be installed. AllUsers require admin access.
 
+.PARAMETER RemoveConfig
+Removes the config from your profile.
+
 .EXAMPLE
 Add-PWSHModuleDefaultsToProfile -GitHubUserID smitpi -PublicGist -Scope AllUsers
 
@@ -77,7 +80,8 @@ Function Add-PWSHModuleDefaultsToProfile {
 		[Parameter(ParameterSetName = 'Private')]
 		[string]$GitHubToken,
 		[ValidateSet('AllUsers', 'CurrentUser')]
-		[string]$Scope
+		[string]$Scope,
+		[switch]$RemoveConfig
 	)
 
 	## TODO Add remove config from profile.
@@ -117,7 +121,7 @@ Function Add-PWSHModuleDefaultsToProfile {
 	foreach ($file in $files) {	
 		$tmp = Get-Content -Path $file.FullName | Where-Object { $_ -notlike '*PWSHModule*'}
 		$tmp | Set-Content -Path $file.FullName -Force
-		Add-Content -Value $ToAppend -Path $file.FullName -Force -Encoding utf8
+		if (-not($RemoveConfig)) {Add-Content -Value $ToAppend -Path $file.FullName -Force -Encoding utf8}
 		Write-Host '[Updated]' -NoNewline -ForegroundColor Yellow; Write-Host ' Profile File:' -NoNewline -ForegroundColor Cyan; Write-Host " $($file.FullName)" -ForegroundColor Green
 	}
 

@@ -105,19 +105,19 @@ Function Uninstall-PWSHModule {
 
 	begin {
 		if (-not($UninstallOldVersions)) {
-		try {
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
-			$headers = @{}
-			$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
-			$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
-			$base64 = [System.Convert]::ToBase64String($bytes)
-			$headers.Authorization = 'Basic {0}' -f $base64
+			try {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
+				$headers = @{}
+				$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+				$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+				$base64 = [System.Convert]::ToBase64String($bytes)
+				$headers.Authorization = 'Basic {0}' -f $base64
 
-			$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
-			$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
-			$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
-		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
-	}
+				$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+				$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+				$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+			} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+		}
 	}
 	process {
 		foreach ($List in $ListName) {
@@ -174,14 +174,14 @@ Function Uninstall-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {
-	(Show-PWSHModule -ListName * -ErrorAction SilentlyContinue).name | Sort-Object -Unique
+	if (($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {
+	(Show-PWSHModule -ListName $fakeBoundParameters.Listname -ErrorAction SilentlyContinue).name | Where-Object {$_ -like "*$wordToComplete*"}
 	}
 }
 Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ModuleName -ScriptBlock $scriptBlock2

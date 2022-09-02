@@ -114,16 +114,13 @@ $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
 	$ModList = @()
 	$ModList += 'All'
-	$modlist += ([IO.Path]::Combine("$([Environment]::GetFolderPath('MyDocuments'))", 'WindowsPowerShell', 'Modules') | Get-ChildItem -Directory).Name
-	$modlist += ([IO.Path]::Combine("$([Environment]::GetFolderPath('MyDocuments'))", 'PowerShell', 'Modules') | Get-ChildItem -Directory).Name
-	$modlist += ([IO.Path]::Combine("$($env:ProgramFiles)", 'WindowsPowerShell', 'Modules') | Get-ChildItem -Directory).Name
-	$modlist += ([IO.Path]::Combine("$($env:ProgramFiles)", 'PowerShell', 'Modules') | Get-ChildItem -Directory).Name
-	$ModList | Select-Object -Unique
+	$ModList += ($fakeBoundParameters.SourceScope | Get-ChildItem -Directory).Name
+	$ModList  | Where-Object {$_ -like "*$wordToComplete*"}
 }
 Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName ModuleName -ScriptBlock $scriptBlock2
 
 $scriptblock3 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	Get-PSRepository | ForEach-Object {$_.name}
+	(Get-PSRepository).name | Where-Object {$_ -like "*$wordToComplete*"}
 }
 Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName PSRepository -ScriptBlock $scriptBlock3

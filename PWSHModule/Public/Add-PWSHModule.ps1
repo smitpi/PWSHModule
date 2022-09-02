@@ -3,7 +3,7 @@
 
 .VERSION 0.1.0
 
-.GUID 956d0d59-2167-433c-ab10-31c260546997
+.GUID 9dd484ac-5162-49b4-8fc4-057d26eae6ee
 
 .AUTHOR Pierre Smit
 
@@ -11,7 +11,7 @@
 
 .COPYRIGHT
 
-.TAGS ps
+.TAGS
 
 .LICENSEURI
 
@@ -19,24 +19,27 @@
 
 .ICONURI
 
-.EXTERNALMODULEDEPENDENCIES
+.EXTERNALMODULEDEPENDENCIES 
 
 .REQUIREDSCRIPTS
 
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
-Created [09/07/2022_15:58] Initial Script Creating
+
 
 .PRIVATEDATA
 
 #>
-<#
 
-.DESCRIPTION
-Add a module to the config file
+<# 
 
-#>
+.DESCRIPTION 
+ Adds a new module to the GitHub Gist List. 
+
+#> 
+
+
 
 <#
 .SYNOPSIS
@@ -70,9 +73,9 @@ Add-PWSHModule -ListName base -ModuleName pslauncher -Repository PSgallery -Requ
 Function Add-PWSHModule {
 	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Add-PWSHModule')]
 	PARAM(
-		[Parameter(Mandatory = $true)]
+		[Parameter(Mandatory,ValueFromPipelineByPropertyName)]
 		[string[]]$ListName,
-		[Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+		[Parameter(Mandatory,ValueFromPipeline)]
 		[Alias('Name')]
 		[string[]]$ModuleName,
 		[String]$Repository = 'PSGallery',
@@ -166,6 +169,7 @@ Function Add-PWSHModule {
 					Write-Host '[Duplicate]' -NoNewline -ForegroundColor DarkRed; Write-Host " $($ModuleToAdd.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to $($List)" -ForegroundColor Green
 				}
 			}
+			
 			$Content.Modules = $ModuleObject | Sort-Object -Property name
 			$Content.ModifiedDate = "$(Get-Date -Format u)"
 			$content.ModifiedUser = "$($env:USERNAME.ToLower())"
@@ -196,6 +200,6 @@ Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName Repository
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*PWSHModule*:GitHubUserID')) {(Show-PWSHModuleList).name}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock2
