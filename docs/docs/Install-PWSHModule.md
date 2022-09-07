@@ -24,6 +24,12 @@ Install-PWSHModule [[-ListName] <String[]>] [[-Scope] <String>] [-AllowPrereleas
  [-PublicGist] [<CommonParameters>]
 ```
 
+### local
+```
+Install-PWSHModule [[-ListName] <String[]>] [[-Scope] <String>] [-AllowPrerelease] [-LocalList]
+ [-Path <DirectoryInfo>] [<CommonParameters>]
+```
+
 ## DESCRIPTION
 Install modules from the specified list.
 
@@ -87,7 +93,7 @@ The GitHub User ID.
 
 ```yaml
 Type: String
-Parameter Sets: (All)
+Parameter Sets: Private, Public
 Aliases:
 
 Required: True
@@ -118,6 +124,36 @@ GitHub Token with access to the Users' Gist.
 ```yaml
 Type: String
 Parameter Sets: Private
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -LocalList
+Select if the list is saved locally.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: local
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Path
+Directory where files are saved.
+
+```yaml
+Type: DirectoryInfo
+Parameter Sets: local
 Aliases:
 
 Required: False

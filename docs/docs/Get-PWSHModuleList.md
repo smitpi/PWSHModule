@@ -5,33 +5,31 @@ online version:
 schema: 2.0.0
 ---
 
-# Add-PWSHModuleDefaultsToProfile
+# Get-PWSHModuleList
 
 ## SYNOPSIS
-Creates PSDefaultParameterValues in the users profile files.
+List all the GitHub Gist Lists.
 
 ## SYNTAX
 
-### Public (Default)
+### Private (Default)
 ```
-Add-PWSHModuleDefaultsToProfile -GitHubUserID <String> [-PublicGist] [-Scope <String>] [-RemoveConfig]
- [<CommonParameters>]
+Get-PWSHModuleList -GitHubUserID <String> [-GitHubToken <String>] [<CommonParameters>]
 ```
 
-### Private
+### Public
 ```
-Add-PWSHModuleDefaultsToProfile -GitHubUserID <String> [-GitHubToken <String>] [-Scope <String>]
- [-RemoveConfig] [<CommonParameters>]
+Get-PWSHModuleList -GitHubUserID <String> [-PublicGist] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Creates PSDefaultParameterValues in the users profile files.
+List all the GitHub Gist Lists.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Add-PWSHModuleDefaultsToProfile -GitHubUserID smitpi -PublicGist -Scope AllUsers
+Get-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken
 ```
 
 ## PARAMETERS
@@ -81,37 +79,6 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Scope
-Where the module will be installed.
-AllUsers require admin access.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -RemoveConfig
-Removes the config from your profile.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
@@ -119,7 +86,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### System.Object[]
 ## NOTES
 
 ## RELATED LINKS

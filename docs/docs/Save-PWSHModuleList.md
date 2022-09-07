@@ -5,39 +5,74 @@ online version:
 schema: 2.0.0
 ---
 
-# Add-PWSHModuleDefaultsToProfile
+# Save-PWSHModuleList
 
 ## SYNOPSIS
-Creates PSDefaultParameterValues in the users profile files.
+Save the Gist file to a local file
 
 ## SYNTAX
 
-### Public (Default)
+### Set1 (Default)
 ```
-Add-PWSHModuleDefaultsToProfile -GitHubUserID <String> [-PublicGist] [-Scope <String>] [-RemoveConfig]
+Save-PWSHModuleList -ListName <String[]> -Path <DirectoryInfo> -GitHubUserID <String> [<CommonParameters>]
+```
+
+### Public
+```
+Save-PWSHModuleList -ListName <String[]> -Path <DirectoryInfo> -GitHubUserID <String> [-PublicGist]
  [<CommonParameters>]
 ```
 
 ### Private
 ```
-Add-PWSHModuleDefaultsToProfile -GitHubUserID <String> [-GitHubToken <String>] [-Scope <String>]
- [-RemoveConfig] [<CommonParameters>]
+Save-PWSHModuleList -ListName <String[]> -Path <DirectoryInfo> -GitHubUserID <String> [-GitHubToken <String>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Creates PSDefaultParameterValues in the users profile files.
+Save the Gist file to a local file
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Add-PWSHModuleDefaultsToProfile -GitHubUserID smitpi -PublicGist -Scope AllUsers
+Save-PWSHModuleList -ListName Base,twee -Path C:\temp
 ```
 
 ## PARAMETERS
 
+### -ListName
+Name of the list.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Path
+Directory where files will be saved.
+
+```yaml
+Type: DirectoryInfo
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -GitHubUserID
-The GitHub User ID.
+User with access to the gist.
 
 ```yaml
 Type: String
@@ -67,7 +102,7 @@ Accept wildcard characters: False
 ```
 
 ### -GitHubToken
-GitHub Token with access to the Users' Gist.
+The token for that gist.
 
 ```yaml
 Type: String
@@ -81,37 +116,6 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Scope
-Where the module will be installed.
-AllUsers require admin access.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -RemoveConfig
-Removes the config from your profile.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
@@ -119,7 +123,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### System.Object[]
 ## NOTES
 
 ## RELATED LINKS
