@@ -8,10 +8,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <meta name="author" content="Pierre Smit">
-    <link rel="canonical" href="https://smitpi.github.io/PWSHModule/Uninstall-PWSHModule/">
+    <link rel="canonical" href="https://smitpi.github.io/PWSHModule/Save-PWSHModuleList/">
     <link rel="shortcut icon" href="../img/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-    <title>Uninstall-PWSHModule - PWSHModule</title>
+    <title>Save-PWSHModuleList - PWSHModule</title>
     <link href="../css/bootstrap-3.3.7.min.css" rel="stylesheet">
     <link href="../css/font-awesome-4.7.0.css" rel="stylesheet">
     <link href="../css/base.css" rel="stylesheet">
@@ -32,7 +32,7 @@
       var is_top_frame = false;
         
         var pageToc = [
-          {title: "Uninstall-PWSHModule", url: "#_top", children: [
+          {title: "Save-PWSHModuleList", url: "#_top", children: [
               {title: "SYNOPSIS", url: "#synopsis" },
               {title: "SYNTAX", url: "#syntax" },
               {title: "DESCRIPTION", url: "#description" },
@@ -67,11 +67,21 @@ if (is_top_frame) { $('body').addClass('wm-top-page'); }
 
   <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
     
-    <div class="wm-article-nav">
-      <a href="../Show-PWSHModule/" class="btn btn-xs btn-default pull-left">
-        <i class="fa fa-chevron-left" aria-hidden="true"></i>
-        Previous</a><a href="../Show-PWSHModule/" class="btn btn-xs btn-link">
+    <div class="wm-article-nav pull-right">
+      <a href="../Show-PWSHModule/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../Show-PWSHModule/" class="btn btn-xs btn-link">
         Show-PWSHModule
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../Save-PWSHModule/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../Save-PWSHModule/" class="btn btn-xs btn-link">
+        Save-PWSHModule
       </a>
     </div>
     
@@ -79,84 +89,56 @@ if (is_top_frame) { $('body').addClass('wm-top-page'); }
 
     
 
-    <h1 id="uninstall-pwshmodule">Uninstall-PWSHModule</h1>
+    <h1 id="save-pwshmodulelist">Save-PWSHModuleList</h1>
 <h2 id="synopsis">SYNOPSIS</h2>
-<p>Will uninstall the module from the system.</p>
+<p>Save the Gist file to a local file</p>
 <h2 id="syntax">SYNTAX</h2>
-<h3 id="private-default">Private (Default)</h3>
-<div class="highlight"><pre><span></span><code>Uninstall-PWSHModule [-GitHubToken &lt;String&gt;] [&lt;CommonParameters&gt;]
-</code></pre></div>
-<h3 id="list">List</h3>
-<div class="highlight"><pre><span></span><code>Uninstall-PWSHModule [-ListName] &lt;String[]&gt; [-ModuleName] &lt;String[]&gt; -GitHubUserID &lt;String&gt; [-PublicGist]
- [-GitHubToken &lt;String&gt;] [&lt;CommonParameters&gt;]
-</code></pre></div>
-<h3 id="oldversions">OldVersions</h3>
-<div class="highlight"><pre><span></span><code>Uninstall-PWSHModule [-UninstallOldVersions] [-ForceUninstall] [&lt;CommonParameters&gt;]
+<h3 id="set1-default">Set1 (Default)</h3>
+<div class="highlight"><pre><span></span><code>Save-PWSHModuleList -ListName &lt;String[]&gt; -Path &lt;DirectoryInfo&gt; -GitHubUserID &lt;String&gt; [&lt;CommonParameters&gt;]
 </code></pre></div>
 <h3 id="public">Public</h3>
-<div class="highlight"><pre><span></span><code>Uninstall-PWSHModule [-PublicGist] [&lt;CommonParameters&gt;]
+<div class="highlight"><pre><span></span><code>Save-PWSHModuleList -ListName &lt;String[]&gt; -Path &lt;DirectoryInfo&gt; -GitHubUserID &lt;String&gt; [-PublicGist]
+ [&lt;CommonParameters&gt;]
+</code></pre></div>
+<h3 id="private">Private</h3>
+<div class="highlight"><pre><span></span><code>Save-PWSHModuleList -ListName &lt;String[]&gt; -Path &lt;DirectoryInfo&gt; -GitHubUserID &lt;String&gt; [-GitHubToken &lt;String&gt;]
+ [&lt;CommonParameters&gt;]
 </code></pre></div>
 <h2 id="description">DESCRIPTION</h2>
-<p>Will uninstall the module from the system.
-Select OldVersions to remove duplicates only.</p>
+<p>Save the Gist file to a local file</p>
 <h2 id="examples">EXAMPLES</h2>
 <h3 id="example-1">EXAMPLE 1</h3>
-<div class="highlight"><pre><span></span><code>Uninstall-PWSHModule  -ListName base -OldVersions -GitHubUserID smitpi -PublicGist
+<div class="highlight"><pre><span></span><code>Save-PWSHModuleList -ListName Base,twee -Path C:\temp
 </code></pre></div>
 <h2 id="parameters">PARAMETERS</h2>
 <h3 id="-listname">-ListName</h3>
-<p>The File Name on GitHub Gist.</p>
+<p>Name of the list.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String[]</span><span class="w"></span>
-<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">List</span><span class="w"></span>
+<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
 <span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
 
 <span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
-<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
+<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Named</span><span class="w"></span>
 <span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">None</span><span class="w"></span>
 <span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 <span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 </code></pre></div>
-<h3 id="-modulename">-ModuleName</h3>
-<p>Name of the module to uninstall.
-Use * to select all modules in the list.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String[]</span><span class="w"></span>
-<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">List</span><span class="w"></span>
-<span class="nt">Aliases</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Name</span><span class="w"></span>
+<h3 id="-path">-Path</h3>
+<p>Directory where files will be saved.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DirectoryInfo</span><span class="w"></span>
+<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
+<span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
 
 <span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
-<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
+<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Named</span><span class="w"></span>
 <span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">None</span><span class="w"></span>
-<span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True (ByPropertyName)</span><span class="w"></span>
-<span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-</code></pre></div>
-<h3 id="-uninstalloldversions">-UninstallOldVersions</h3>
-<p>Will uninstall old versions of All modules.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SwitchParameter</span><span class="w"></span>
-<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">OldVersions</span><span class="w"></span>
-<span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
-
-<span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
-<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-<span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-<span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-</code></pre></div>
-<h3 id="-forceuninstall">-ForceUninstall</h3>
-<p>Will force delete the base folder if uninstall fail.</p>
-<div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SwitchParameter</span><span class="w"></span>
-<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">OldVersions</span><span class="w"></span>
-<span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
-
-<span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
-<span class="nt">Position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
-<span class="nt">Default value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 <span class="nt">Accept pipeline input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 <span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 </code></pre></div>
 <h3 id="-githubuserid">-GitHubUserID</h3>
-<p>The GitHub User ID.</p>
+<p>User with access to the gist.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String</span><span class="w"></span>
-<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">List</span><span class="w"></span>
+<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(All)</span><span class="w"></span>
 <span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
 
 <span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span><span class="w"></span>
@@ -168,7 +150,7 @@ Use * to select all modules in the list.</p>
 <h3 id="-publicgist">-PublicGist</h3>
 <p>Select if the list is hosted publicly.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SwitchParameter</span><span class="w"></span>
-<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">List, Public</span><span class="w"></span>
+<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Public</span><span class="w"></span>
 <span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
 
 <span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
@@ -178,9 +160,9 @@ Use * to select all modules in the list.</p>
 <span class="nt">Accept wildcard characters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
 </code></pre></div>
 <h3 id="-githubtoken">-GitHubToken</h3>
-<p>GitHub Token with access to the Users' Gist.</p>
+<p>The token for that gist.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">Type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">String</span><span class="w"></span>
-<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Private, List</span><span class="w"></span>
+<span class="nt">Parameter Sets</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Private</span><span class="w"></span>
 <span class="nt">Aliases</span><span class="p">:</span><span class="w"></span>
 
 <span class="nt">Required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span><span class="w"></span>
@@ -206,11 +188,21 @@ Use * to select all modules in the list.</p>
 
   <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
     
-    <div class="wm-article-nav">
-      <a href="../Show-PWSHModule/" class="btn btn-xs btn-default pull-left">
-        <i class="fa fa-chevron-left" aria-hidden="true"></i>
-        Previous</a><a href="../Show-PWSHModule/" class="btn btn-xs btn-link">
+    <div class="wm-article-nav pull-right">
+      <a href="../Show-PWSHModule/" class="btn btn-xs btn-default pull-right">
+        Next
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      <a href="../Show-PWSHModule/" class="btn btn-xs btn-link">
         Show-PWSHModule
+      </a>
+    </div>
+    
+    <div class="wm-article-nav">
+      <a href="../Save-PWSHModule/" class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href="../Save-PWSHModule/" class="btn btn-xs btn-link">
+        Save-PWSHModule
       </a>
     </div>
     
@@ -221,7 +213,7 @@ Use * to select all modules in the list.</p>
 
 <footer class="container-fluid wm-page-content">
       <p>
-        <a href="https://github.com/smitpi/PWSHModule/edit/master/docs/Uninstall-PWSHModule.md">Edit on smitpi/PWSHModule</a>
+        <a href="https://github.com/smitpi/PWSHModule/edit/master/docs/Save-PWSHModuleList.md">Edit on smitpi/PWSHModule</a>
       </p><p>(c) 2022 Pierre Smit. All rights reserved.</p>
   <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
 </footer>
