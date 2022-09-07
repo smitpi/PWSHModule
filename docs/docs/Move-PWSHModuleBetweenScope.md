@@ -14,7 +14,7 @@ Moves modules between scopes (CurrentUser and AllUsers).
 
 ```
 Move-PWSHModuleBetweenScope [-SourceScope] <DirectoryInfo> [-DestinationScope] <DirectoryInfo>
- [-ModuleName] <String[]> [[-PSRepository] <String>] [<CommonParameters>]
+ [-ModuleName] <String[]> [[-Repository] <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -24,7 +24,7 @@ Moves modules between scopes (CurrentUser and AllUsers).
 
 ### EXAMPLE 1
 ```
-Move-PWSHModuleBetweenScope -SourceScope D:\Documents\PowerShell\Modules -DestinationScope C:\Program Files\PowerShell\Modules -ModuleName PWSHMOdule -PSRepository psgallery
+Move-PWSHModuleBetweenScope -SourceScope D:\Documents\PowerShell\Modules -DestinationScope C:\Program Files\PowerShell\Modules -ModuleName PWSHMOdule -Repository psgallery
 ```
 
 ## PARAMETERS
@@ -75,7 +75,7 @@ Accept pipeline input: True (ByValue)
 Accept wildcard characters: False
 ```
 
-### -PSRepository
+### -Repository
 The repository will be used to install the module at the destination.
 
 ```yaml

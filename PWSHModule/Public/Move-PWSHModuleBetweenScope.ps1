@@ -56,11 +56,11 @@ To there the modules will be copied.
 .PARAMETER ModuleName
 Name of the modules to move. You can select multiple names or you can use * to select all.
 
-.PARAMETER PSRepository
+.PARAMETER Repository
 The repository will be used to install the module at the destination.
 
 .EXAMPLE
-Move-PWSHModuleBetweenScope -SourceScope D:\Documents\PowerShell\Modules -DestinationScope C:\Program Files\PowerShell\Modules -ModuleName PWSHMOdule -PSRepository psgallery
+Move-PWSHModuleBetweenScope -SourceScope D:\Documents\PowerShell\Modules -DestinationScope C:\Program Files\PowerShell\Modules -ModuleName PWSHMOdule -Repository psgallery
 
 #>
 Function Move-PWSHModuleBetweenScope {
@@ -80,7 +80,7 @@ Function Move-PWSHModuleBetweenScope {
 		[Alias('Name')]
 		[string[]]$ModuleName,
 
-		[string]$PSRepository = 'PSGallery'
+		[string]$Repository = 'PSGallery'
 	)
 
 	if ($ModuleName -like 'All') {$ModuleName = (Get-ChildItem -Path $($SourceScope) -Directory).Name }
@@ -90,16 +90,15 @@ Function Move-PWSHModuleBetweenScope {
 		try {
 			$MoveMod = Get-Module -Name $mod -ListAvailable -ErrorAction Stop | Where-Object {$_.path -like "$($SourceScope)*"} | Sort-Object -Property Version -Descending | Select-Object -First 1
 		} catch {Write-Warning "Did not find $($ModuleName) in $($SourceScope)"}
+		Write-Host '[Moving] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($MoveMod.Name)($($MoveMod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($DestinationScope)" -ForegroundColor DarkRed			
 		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) ADDING] to archive"
+				(Get-Item $MoveMod.Path).directory.Parent | Compress-Archive -DestinationPath (Join-Path -Path $SourceScope -ChildPath 'PWSHModule_Move') -Update -ErrorAction Stop
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Deleteing folder"
+				(Get-Item $MoveMod.Path).directory.Parent | Remove-Item -Recurse -Force
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Saving] Module $($MoveMod.name)"
-			Write-Host '[Moving] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($MoveMod.Name)($($MoveMod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($DestinationScope)" -ForegroundColor DarkRed			
-			Save-Module -Name $MoveMod.Name -RequiredVersion $MoveMod.Version -Repository $PSRepository -Force -AllowPrerelease -AcceptLicense -Path (Get-Item $DestinationScope).FullName -ErrorAction Stop
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Uninstalling] Module $($MoveMod.name)"
-			Write-Host "`t[Deleteing] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($MoveMod.Name)($($MoveMod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($SourceScope)" -ForegroundColor DarkRed			
-			if (Test-Path (Join-Path $DestinationScope -ChildPath "$($MoveMod.Name)\$($MoveMod.Version)")) {
-				Join-Path -Path (Get-Item $MoveMod.Path) -ChildPath '..\..' -Resolve -ErrorAction Stop | Remove-Item -Recurse -Force
-			} else {Write-Warning 'Move failed, leaving source directory.'}
-		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			Save-Module -Name $MoveMod.Name -RequiredVersion $MoveMod.Version -Repository $Repository -Force -AllowPrerelease -AcceptLicense -Path (Get-Item $DestinationScope).FullName -ErrorAction Stop
+		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"; return}
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) Complete"
 	}
 } #end Function
@@ -115,12 +114,12 @@ $scriptblock2 = {
 	$ModList = @()
 	$ModList += 'All'
 	$ModList += ($fakeBoundParameters.SourceScope | Get-ChildItem -Directory).Name
-	$ModList  | Where-Object {$_ -like "*$wordToComplete*"}
+	$ModList | Where-Object {$_ -like "*$wordToComplete*"}
 }
 Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName ModuleName -ScriptBlock $scriptBlock2
 
 $scriptblock3 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	(Get-PSRepository).name | Where-Object {$_ -like "*$wordToComplete*"}
+	(Get-Repository).name | Where-Object {$_ -like "*$wordToComplete*"}
 }
-Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName PSRepository -ScriptBlock $scriptBlock3
+Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName Repository -ScriptBlock $scriptBlock3

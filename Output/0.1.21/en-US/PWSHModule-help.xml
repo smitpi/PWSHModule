@@ -15,7 +15,7 @@
     <command:syntax>
       <command:syntaxItem>
         <maml:name>Add-PWSHModule</maml:name>
-        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName)" position="1" aliases="none">
+        <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
           <maml:name>ListName</maml:name>
           <maml:description>
             <maml:para>The File Name on GitHub Gist.</maml:para>
@@ -90,7 +90,7 @@
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
-      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="True (ByPropertyName)" position="1" aliases="none">
+      <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
         <maml:name>ListName</maml:name>
         <maml:description>
           <maml:para>The File Name on GitHub Gist.</maml:para>
@@ -872,7 +872,7 @@
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
-          <maml:name>PSRepository</maml:name>
+          <maml:name>Repository</maml:name>
           <maml:description>
             <maml:para>The repository will be used to install the module at the destination.</maml:para>
           </maml:description>
@@ -923,7 +923,7 @@
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="4" aliases="none">
-        <maml:name>PSRepository</maml:name>
+        <maml:name>Repository</maml:name>
         <maml:description>
           <maml:para>The repository will be used to install the module at the destination.</maml:para>
         </maml:description>
@@ -954,7 +954,7 @@
     <command:examples>
       <command:example>
         <maml:title>-------------------------- EXAMPLE 1 --------------------------</maml:title>
-        <dev:code>Move-PWSHModuleBetweenScope -SourceScope D:\Documents\PowerShell\Modules -DestinationScope C:\Program Files\PowerShell\Modules -ModuleName PWSHMOdule -PSRepository psgallery</dev:code>
+        <dev:code>Move-PWSHModuleBetweenScope -SourceScope D:\Documents\PowerShell\Modules -DestinationScope C:\Program Files\PowerShell\Modules -ModuleName PWSHMOdule -Repository psgallery</dev:code>
         <dev:remarks>
           <maml:para></maml:para>
         </dev:remarks>

@@ -3,11 +3,11 @@
 ######## Function 1 of 12 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
-# ModifiedOn:       2022/09/07 17:32:17
+# ModifiedOn:       2022/09/08 00:32:01
 # Synopsis:         Adds a new module to the GitHub Gist List.
 #############################################
  
@@ -43,9 +43,9 @@ Add-PWSHModule -ListName base -ModuleName pslauncher -Repository PSgallery -Requ
 Function Add-PWSHModule {
 	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Add-PWSHModule')]
 	PARAM(
-		[Parameter(Mandatory,ValueFromPipelineByPropertyName)]
+		[Parameter(Mandatory)]
 		[string[]]$ListName,
-		[Parameter(Mandatory,ValueFromPipeline)]
+		[Parameter(Mandatory, ValueFromPipeline)]
 		[Alias('Name')]
 		[string[]]$ModuleName,
 		[String]$Repository = 'PSGallery',
@@ -70,8 +70,64 @@ Function Add-PWSHModule {
 			$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
 			$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
 		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+		[System.Collections.generic.List[PSObject]]$NewModuleObject = @()
 	}
 	process {
+		foreach ($ModName in $ModuleName) {
+			Write-Host '[Searching]' -NoNewline -ForegroundColor Yellow; Write-Host ' for Module: ' -NoNewline -ForegroundColor Cyan; Write-Host "$($ModName)" -ForegroundColor Green
+			$index = 0
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Finding modules"
+			$FilterMod = Find-Module -Filter $ModName -Repository $Repository | ForEach-Object {
+				[PSCustomObject]@{
+					Index       = $index
+					Name        = $_.Name
+					Version     = $_.version
+					Description = $_.Description
+					ProjectURI  = $_.ProjectUri.AbsoluteUri
+				}
+				$index++
+			}
+
+			if ($filtermod.name.count -gt 1) {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] More than one module found"
+				$FilterMod | Select-Object Index, Name, Description | Format-Table -AutoSize -Wrap
+				$num = Read-Host 'Index Number '
+				$ModuleToAdd = $filtermod[$num]
+			} elseif ($filtermod.name.Count -eq 1) {
+				$ModuleToAdd = $filtermod
+			} else {Write-Error 'Module not found'}
+
+			if ($RequiredVersion) {
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Looking for versions"
+					Find-Module -Name $ModuleToAdd.name -RequiredVersion $RequiredVersion -Repository $Repository -ErrorAction Stop | Out-Null
+					$VersionToAdd = $RequiredVersion
+				} catch {
+					$index = 0
+					Find-Module -Name $ModuleToAdd.name -AllVersions -Repository $Repository | ForEach-Object {
+						[PSCustomObject]@{
+							Index   = $index
+							Version = $_.Version
+						}
+						$index++
+					} | Tee-Object -Variable Version | Format-Table
+					$versionnum = Read-Host 'Index Number '
+					$VersionToAdd = $version[$versionnum].Version
+				}
+			} else {$VersionToAdd = 'Latest'}
+
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create new Object"
+			$NewModuleObject.Add([PSCustomObject]@{
+					Name        = $ModuleToAdd.Name
+					Version     = $VersionToAdd
+					Description = $ModuleToAdd.Description
+					Repository  = $Repository
+					Projecturi  = $ModuleToAdd.ProjectUri
+				})
+				
+		}
+	}
+	end {
 		foreach ($List in $ListName) {
 			try {
 				Write-Verbose "[$(Get-Date -Format HH:mm:ss) Checking Config File"
@@ -79,67 +135,16 @@ Function Add-PWSHModule {
 			} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
 
-			[System.Collections.ArrayList]$ModuleObject = @()
-			$Content.Modules | ForEach-Object {[void]$ModuleObject.Add($_)}
-
-			foreach ($ModName in $ModuleName) {
-				$index = 0
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Finding modules"
-				$FilterMod = Find-Module -Filter $ModName -Repository $Repository | ForEach-Object {
-					[PSCustomObject]@{
-						Index       = $index
-						Name        = $_.Name
-						Version     = $_.version
-						Description = $_.Description
-						ProjectURI  = $_.ProjectUri.AbsoluteUri
-					}
-					$index++
-				}
-
-				if ($filtermod.name.count -gt 1) {
-					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] More than one module found"
-					$FilterMod | Select-Object Index, Name, Description | Format-Table -AutoSize -Wrap
-					$num = Read-Host 'Index Number '
-					$ModuleToAdd = $filtermod[$num]
-				} elseif ($filtermod.name.Count -eq 1) {
-					$ModuleToAdd = $filtermod
-				} else {Write-Error 'Module not found'}
-
-				if ($RequiredVersion) {
-					try {
-						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Looking for versions"
-						Find-Module -Name $ModuleToAdd.name -RequiredVersion $RequiredVersion -Repository $Repository -ErrorAction Stop | Out-Null
-						$VersionToAdd = $RequiredVersion
-					} catch {
-						$index = 0
-						Find-Module -Name $ModuleToAdd.name -AllVersions -Repository $Repository | ForEach-Object {
-							[PSCustomObject]@{
-								Index   = $index
-								Version = $_.Version
-							}
-							$index++
-						} | Tee-Object -Variable Version | Format-Table
-						$versionnum = Read-Host 'Index Number '
-						$VersionToAdd = $version[$versionnum].Version
-					}
-				} else {$VersionToAdd = 'Latest'}
-
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create new Object"
-
-				if (-not($ModuleObject.Name.Contains($ModuleToAdd.Name))) {
-					[void]$ModuleObject.Add([PSCustomObject]@{
-							Name        = $ModuleToAdd.Name
-							Version     = $VersionToAdd
-							Description = $ModuleToAdd.Description
-							Repository  = $Repository
-							Projecturi  = $ModuleToAdd.ProjectUri
-						})
-					Write-Host '[Added]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ModuleToAdd.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to $($List)" -ForegroundColor Green
-				} else {
-					Write-Host '[Duplicate]' -NoNewline -ForegroundColor DarkRed; Write-Host " $($ModuleToAdd.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to $($List)" -ForegroundColor Green
-				}
-			}
+			[System.Collections.generic.List[PSObject]]$ModuleObject = @()
+			$Content.Modules | ForEach-Object {$ModuleObject.Add($_)}
 			
+			$NewModuleObject | ForEach-Object {
+				if ($_.name -notin $ModuleObject.Name) {
+					$ModuleObject.Add($_)
+					Write-Host '[Added]' -NoNewline -ForegroundColor Yellow; Write-Host " $($_.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to List: $($List)" -ForegroundColor Green
+				} else {Write-Host '[Duplicate]' -NoNewline -ForegroundColor red; Write-Host " $($_.Name)" -NoNewline -ForegroundColor Cyan; Write-Host " to List: $($List)" -ForegroundColor Green}
+			}
+
 			$Content.Modules = $ModuleObject | Sort-Object -Property name
 			$Content.ModifiedDate = "$(Get-Date -Format u)"
 			$content.ModifiedUser = "$($env:USERNAME.ToLower())"
@@ -158,7 +163,6 @@ Function Add-PWSHModule {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 		}
 	}
-	end {}
 } #end Function
 
 
@@ -181,7 +185,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 12 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
@@ -280,7 +284,7 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 ######## Function 3 of 12 ##################
 # Function:         Get-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -368,11 +372,11 @@ Export-ModuleMember -Function Get-PWSHModuleList
 ######## Function 4 of 12 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
-# ModifiedOn:       2022/09/07 17:57:05
+# ModifiedOn:       2022/09/07 23:36:35
 # Synopsis:         Install modules from the specified list.
 #############################################
  
@@ -476,11 +480,7 @@ Function Install-PWSHModule {
 			}
 			if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Adding to list."
-			$Content.Modules | Where-Object {$_ -notlike $null} | ForEach-Object {
-				if ($CombinedModules.Exists({ -not (Compare-Object $args[0].psobject.properties.value $_.psobject.Properties.value) })) {
-					Write-Warning "Duplicate Found $($_.name)"
-				} else {$CombinedModules.Add($_)}
-			}
+			$Content.Modules | Where-Object {$_ -notlike $null -and $_.name -notin $CombinedModules.name} | ForEach-Object {$CombinedModules.Add($_)}
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception)"}
 	}
 
@@ -491,7 +491,7 @@ Function Install-PWSHModule {
 	}
 	if ($AllowPrerelease) {$InstallModuleSettings.add('AllowPrerelease', $true)}
 
-	foreach ($module in $CombinedModules) {
+	foreach ($module in ($CombinedModules | Sort-Object -Property name -Unique)) {
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module"
 		if ($module.Version -like 'Latest') {
 			$mod = Get-Module -Name $module.Name
@@ -564,11 +564,11 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 5 of 12 ##################
 # Function:         Move-PWSHModuleBetweenScope
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/08/20 12:38:44
-# ModifiedOn:       2022/09/02 12:48:34
+# ModifiedOn:       2022/09/08 00:57:09
 # Synopsis:         Moves modules between scopes (CurrentUser and AllUsers).
 #############################################
  
@@ -588,11 +588,11 @@ To there the modules will be copied.
 .PARAMETER ModuleName
 Name of the modules to move. You can select multiple names or you can use * to select all.
 
-.PARAMETER PSRepository
+.PARAMETER Repository
 The repository will be used to install the module at the destination.
 
 .EXAMPLE
-Move-PWSHModuleBetweenScope -SourceScope D:\Documents\PowerShell\Modules -DestinationScope C:\Program Files\PowerShell\Modules -ModuleName PWSHMOdule -PSRepository psgallery
+Move-PWSHModuleBetweenScope -SourceScope D:\Documents\PowerShell\Modules -DestinationScope C:\Program Files\PowerShell\Modules -ModuleName PWSHMOdule -Repository psgallery
 
 #>
 Function Move-PWSHModuleBetweenScope {
@@ -612,7 +612,7 @@ Function Move-PWSHModuleBetweenScope {
 		[Alias('Name')]
 		[string[]]$ModuleName,
 
-		[string]$PSRepository = 'PSGallery'
+		[string]$Repository = 'PSGallery'
 	)
 
 	if ($ModuleName -like 'All') {$ModuleName = (Get-ChildItem -Path $($SourceScope) -Directory).Name }
@@ -622,16 +622,15 @@ Function Move-PWSHModuleBetweenScope {
 		try {
 			$MoveMod = Get-Module -Name $mod -ListAvailable -ErrorAction Stop | Where-Object {$_.path -like "$($SourceScope)*"} | Sort-Object -Property Version -Descending | Select-Object -First 1
 		} catch {Write-Warning "Did not find $($ModuleName) in $($SourceScope)"}
+		Write-Host '[Moving] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($MoveMod.Name)($($MoveMod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($DestinationScope)" -ForegroundColor DarkRed			
 		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) ADDING] to archive"
+				(Get-Item $MoveMod.Path).directory.Parent | Compress-Archive -DestinationPath (Join-Path -Path $SourceScope -ChildPath 'PWSHModule_Move') -Update -ErrorAction Stop
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Deleteing folder"
+				(Get-Item $MoveMod.Path).directory.Parent | Remove-Item -Recurse -Force
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Saving] Module $($MoveMod.name)"
-			Write-Host '[Moving] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($MoveMod.Name)($($MoveMod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($DestinationScope)" -ForegroundColor DarkRed			
-			Save-Module -Name $MoveMod.Name -RequiredVersion $MoveMod.Version -Repository $PSRepository -Force -AllowPrerelease -AcceptLicense -Path (Get-Item $DestinationScope).FullName -ErrorAction Stop
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Uninstalling] Module $($MoveMod.name)"
-			Write-Host "`t[Deleteing] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($MoveMod.Name)($($MoveMod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($SourceScope)" -ForegroundColor DarkRed			
-			if (Test-Path (Join-Path $DestinationScope -ChildPath "$($MoveMod.Name)\$($MoveMod.Version)")) {
-				Join-Path -Path (Get-Item $MoveMod.Path) -ChildPath '..\..' -Resolve -ErrorAction Stop | Remove-Item -Recurse -Force
-			} else {Write-Warning 'Move failed, leaving source directory.'}
-		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			Save-Module -Name $MoveMod.Name -RequiredVersion $MoveMod.Version -Repository $Repository -Force -AllowPrerelease -AcceptLicense -Path (Get-Item $DestinationScope).FullName -ErrorAction Stop
+		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"; return}
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) Complete"
 	}
 } #end Function
@@ -647,15 +646,15 @@ $scriptblock2 = {
 	$ModList = @()
 	$ModList += 'All'
 	$ModList += ($fakeBoundParameters.SourceScope | Get-ChildItem -Directory).Name
-	$ModList  | Where-Object {$_ -like "*$wordToComplete*"}
+	$ModList | Where-Object {$_ -like "*$wordToComplete*"}
 }
 Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName ModuleName -ScriptBlock $scriptBlock2
 
 $scriptblock3 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	(Get-PSRepository).name | Where-Object {$_ -like "*$wordToComplete*"}
+	(Get-Repository).name | Where-Object {$_ -like "*$wordToComplete*"}
 }
-Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName PSRepository -ScriptBlock $scriptBlock3
+Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName Repository -ScriptBlock $scriptBlock3
  
 Export-ModuleMember -Function Move-PWSHModuleBetweenScope
 #endregion
@@ -664,7 +663,7 @@ Export-ModuleMember -Function Move-PWSHModuleBetweenScope
 ######## Function 6 of 12 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -791,7 +790,7 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 7 of 12 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
@@ -936,7 +935,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 8 of 12 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
@@ -1024,7 +1023,7 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 ######## Function 9 of 12 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -1149,7 +1148,7 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 10 of 12 ##################
 # Function:         Save-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/09/07 16:36:26
@@ -1236,7 +1235,7 @@ Export-ModuleMember -Function Save-PWSHModuleList
 ######## Function 11 of 12 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -1394,7 +1393,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 12 of 12 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.19
+# ModuleVersion:    0.1.21
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13

@@ -140,11 +140,7 @@ Function Install-PWSHModule {
 			}
 			if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Adding to list."
-			$Content.Modules | Where-Object {$_ -notlike $null} | ForEach-Object {
-				if ($CombinedModules.Exists({ -not (Compare-Object $args[0].psobject.properties.value $_.psobject.Properties.value) })) {
-					Write-Warning "Duplicate Found $($_.name)"
-				} else {$CombinedModules.Add($_)}
-			}
+			$Content.Modules | Where-Object {$_ -notlike $null -and $_.name -notin $CombinedModules.name} | ForEach-Object {$CombinedModules.Add($_)}
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception)"}
 	}
 
@@ -155,7 +151,7 @@ Function Install-PWSHModule {
 	}
 	if ($AllowPrerelease) {$InstallModuleSettings.add('AllowPrerelease', $true)}
 
-	foreach ($module in $CombinedModules) {
+	foreach ($module in ($CombinedModules | Sort-Object -Property name -Unique)) {
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module"
 		if ($module.Version -like 'Latest') {
 			$mod = Get-Module -Name $module.Name
