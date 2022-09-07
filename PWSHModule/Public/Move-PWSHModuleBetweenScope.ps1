@@ -93,12 +93,12 @@ Function Move-PWSHModuleBetweenScope {
 		Write-Host '[Moving] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($MoveMod.Name)($($MoveMod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($DestinationScope)" -ForegroundColor DarkRed			
 		try {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) ADDING] to archive"
-				(Get-Item $MoveMod.Path).directory.Parent | Compress-Archive -DestinationPath (Join-Path -Path $SourceScope -ChildPath 'PWSHModule_Move') -Update -ErrorAction Stop
+				(Get-Item $MoveMod.Path).directory.Parent.FullName | Compress-Archive -DestinationPath (Join-Path -Path $SourceScope -ChildPath 'PWSHModule_Move.zip') -Update -ErrorAction Stop
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Deleteing folder"
-				(Get-Item $MoveMod.Path).directory.Parent | Remove-Item -Recurse -Force
+				(Get-Item $MoveMod.Path).directory.Parent.FullName | Remove-Item -Recurse -Force
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Saving] Module $($MoveMod.name)"
 			Save-Module -Name $MoveMod.Name -RequiredVersion $MoveMod.Version -Repository $Repository -Force -AllowPrerelease -AcceptLicense -Path (Get-Item $DestinationScope).FullName -ErrorAction Stop
-		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"; return}
+		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) Complete"
 	}
 } #end Function
