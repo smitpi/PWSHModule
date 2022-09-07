@@ -58,11 +58,12 @@ Select if the list is hosted publicly.
 GitHub Token with access to the Users' Gist.
 
 .EXAMPLE
-Show-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken
+Get-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken
 
 #>
-Function Show-PWSHModuleList {
-	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModuleList')]
+Function Get-PWSHModuleList {
+	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Get-PWSHModuleList')]
+	[Alias ('Show-PWSHModuleList')]
 	PARAM(
 		[Parameter(Mandatory)]
 		[string]$GitHubUserID, 

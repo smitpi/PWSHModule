@@ -1,13 +1,13 @@
 ﻿#region Public Functions
 #region Add-PWSHModule.ps1
-######## Function 1 of 11 ##################
+######## Function 1 of 12 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.1
+# ModuleVersion:    0.1.17.2
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
-# ModifiedOn:       2022/09/02 13:18:05
+# ModifiedOn:       2022/09/07 17:32:17
 # Synopsis:         Adds a new module to the GitHub Gist List.
 #############################################
  
@@ -170,7 +170,7 @@ Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName Repository
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock2
  
@@ -178,10 +178,10 @@ Export-ModuleMember -Function Add-PWSHModule
 #endregion
  
 #region Add-PWSHModuleDefaultsToProfile.ps1
-######## Function 2 of 11 ##################
+######## Function 2 of 12 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.1
+# ModuleVersion:    0.1.17.2
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
@@ -276,15 +276,103 @@ Function Add-PWSHModuleDefaultsToProfile {
 Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 #endregion
  
+#region Get-PWSHModuleList.ps1
+######## Function 3 of 12 ##################
+# Function:         Get-PWSHModuleList
+# Module:           PWSHModule
+# ModuleVersion:    0.1.17.2
+# Author:           Pierre Smit
+# Company:          HTPCZA Tech
+# CreatedOn:        2022/07/13 01:15:39
+# ModifiedOn:       2022/09/07 17:34:02
+# Synopsis:         List all the GitHub Gist Lists.
+#############################################
+ 
+<#
+.SYNOPSIS
+List all the GitHub Gist Lists.
+
+.DESCRIPTION
+List all the GitHub Gist Lists.
+
+.PARAMETER GitHubUserID
+The GitHub User ID.
+
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
+
+.PARAMETER GitHubToken
+GitHub Token with access to the Users' Gist.
+
+.EXAMPLE
+Get-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken
+
+#>
+Function Get-PWSHModuleList {
+	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Get-PWSHModuleList')]
+	[Alias ('Show-PWSHModuleList')]
+	PARAM(
+		[Parameter(Mandatory)]
+		[string]$GitHubUserID, 
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
+		[string]$GitHubToken
+	)
+
+	
+	try {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to gist"
+		$headers = @{}
+		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+		$base64 = [System.Convert]::ToBase64String($bytes)
+		$headers.Authorization = 'Basic {0}' -f $base64
+
+		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+
+
+	[System.Collections.ArrayList]$GistObject = @()
+	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create object"
+	$PRGist.files | Get-Member -MemberType NoteProperty | ForEach-Object {
+		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($_.name)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
+		if ($Content.modifiedDate -notlike 'Unknown') {
+			$modifiedDate = [datetime]$Content.ModifiedDate
+			$modifiedUser = $Content.ModifiedUser
+		} else { 
+			$modifiedDate = 'Unknown'
+			$modifiedUser = 'Unknown'
+		}
+		[void]$GistObject.Add([PSCustomObject]@{
+				Name         = $_.Name
+				Description  = $Content.Description
+				Date         = [datetime]$Content.CreateDate
+				Author       = $Content.Author
+				ModifiedDate = $modifiedDate
+				ModifiedUser = $modifiedUser
+			})
+	}
+
+	$GistObject
+	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
+
+} #end Function
+ 
+Export-ModuleMember -Function Get-PWSHModuleList
+#endregion
+ 
 #region Install-PWSHModule.ps1
-######## Function 3 of 11 ##################
+######## Function 4 of 12 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.1
+# ModuleVersion:    0.1.17.2
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
-# ModifiedOn:       2022/09/02 12:56:32
+# ModifiedOn:       2022/09/07 17:57:05
 # Synopsis:         Install modules from the specified list.
 #############################################
  
@@ -313,6 +401,12 @@ Select if the list is hosted publicly.
 .PARAMETER GitHubToken
 GitHub Token with access to the Users' Gist.
 
+.PARAMETER LocalList
+Select if the list is saved locally.
+
+.PARAMETER Path
+Directory where files are saved.
+
 .EXAMPLE
 Install-PWSHModule -Filename extended -Scope CurrentUser -GitHubUserID smitpi -GitHubToken $GitHubToken
 
@@ -326,12 +420,17 @@ Function Install-PWSHModule {
 		[ValidateSet('AllUsers', 'CurrentUser')]
 		[string]$Scope,
 		[switch]$AllowPrerelease,
-		[Parameter(Mandatory = $true)]
+		[Parameter(Mandatory, ParameterSetName = 'Public')]
+		[Parameter(Mandatory, ParameterSetName = 'Private')]
 		[string]$GitHubUserID,
 		[Parameter(ParameterSetName = 'Public')]
 		[switch]$PublicGist,
 		[Parameter(ParameterSetName = 'Private')]
-		[string]$GitHubToken
+		[string]$GitHubToken,
+		[Parameter(ParameterSetName = 'local')]
+		[switch]$LocalList,
+		[Parameter(ParameterSetName = 'local')]
+		[System.IO.DirectoryInfo]$Path
 	)
 
 	if ($scope -like 'AllUsers') {
@@ -340,104 +439,121 @@ Function Install-PWSHModule {
 		if (-not($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) { Write-Error 'Must be running an elevated prompt.' }
 	}
 
-	try {
-		if ($PublicGist) {
-			Write-Host '[Using] ' -NoNewline -ForegroundColor Yellow 
-			Write-Host 'Public Gist:' -NoNewline -ForegroundColor Cyan 
-			Write-Host ' for list:' -ForegroundColor Green -NoNewline 
-			Write-Host "$($ListName)" -ForegroundColor Cyan
-		}
+	if ($GitHubUserID) {
+		try {
+			if ($PublicGist) {
+				Write-Host '[Using] ' -NoNewline -ForegroundColor Yellow 
+				Write-Host 'Public Gist:' -NoNewline -ForegroundColor Cyan 
+				Write-Host ' for list:' -ForegroundColor Green -NoNewline 
+				Write-Host "$($ListName)" -ForegroundColor Cyan
+			}
 
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
-		$headers = @{}
-		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
-		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
-		$base64 = [System.Convert]::ToBase64String($bytes)
-		$headers.Authorization = 'Basic {0}' -f $base64
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
+			$headers = @{}
+			$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+			$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+			$base64 = [System.Convert]::ToBase64String($bytes)
+			$headers.Authorization = 'Basic {0}' -f $base64
 
-		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
-		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
-		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
-	} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
-
+			$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+			$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+			$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+	}
+	[System.Collections.generic.List[PSObject]]$CombinedModules = @()
 	foreach ($List in $ListName) {
 		try {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking Config File"
-			$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($List)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
-		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-		if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
+			if ($LocalList) {
+				$ListPath = Join-Path $Path -ChildPath "$($list).json"
+				if (Test-Path $ListPath) { 
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Collecting Content"
+					$Content = Get-Content $ListPath | ConvertFrom-Json
+    			} else {Write-Warning "List file $($List) does not exist"}
+			} else {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Collecting Content"
+				$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($List)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
+			}
+			if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Adding to list."
+			$Content.Modules | Where-Object {$_ -notlike $null} | ForEach-Object {
+				if ($CombinedModules.Exists({ -not (Compare-Object $args[0].psobject.properties.value $_.psobject.Properties.value) })) {
+					Write-Warning "Duplicate Found $($_.name)"
+				} else {$CombinedModules.Add($_)}
+			}
+		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception)"}
+	}
 
+	$InstallModuleSettings = @{
+		AllowClobber       = $true
+		Force              = $true
+		SkipPublisherCheck = $true
+	}
+	if ($AllowPrerelease) {$InstallModuleSettings.add('AllowPrerelease', $true)}
 
-		$InstallModuleSettings = @{
-			AllowClobber       = $true
-			Force              = $true
-			SkipPublisherCheck = $true
-		}
-		if ($AllowPrerelease) {$InstallModuleSettings.add('AllowPrerelease', $true)}
-
-		foreach ($module in $Content.Modules) {
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module"
-			if ($module.Version -like 'Latest') {
-				$mod = Get-Module -Name $module.Name
-				if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
-				if (-not($mod)) { 
+	foreach ($module in $CombinedModules) {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module"
+		if ($module.Version -like 'Latest') {
+			$mod = Get-Module -Name $module.Name
+			if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
+			if (-not($mod)) { 
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
+					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
+					Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope @InstallModuleSettings
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			} else {
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking versions"
+					Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
+					$OnlineMod = Find-Module -Name $module.name -Repository $module.Repository
+					[version]$Onlineversion = $OnlineMod.version 
+					[version]$Localversion = ($mod | Sort-Object -Property Version -Descending)[0].Version
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+				if ($Localversion -lt $Onlineversion) {
+					Write-Host "`t[Upgrading] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline; Write-Host " v$($OnlineMod.version)" -ForegroundColor DarkRed
 					try {
-						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
-						Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
-						Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope @InstallModuleSettings
-					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-				} else {
-					try {
-						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking versions"
-						Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
-						$OnlineMod = Find-Module -Name $module.name -Repository $module.Repository
-						[version]$Onlineversion = $OnlineMod.version 
-						[version]$Localversion = ($mod | Sort-Object -Property Version -Descending)[0].Version
-					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-					if ($Localversion -lt $Onlineversion) {
-						Write-Host "`t[Upgrading] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline; Write-Host " v$($OnlineMod.version)" -ForegroundColor DarkRed
+						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Updating module"
+						Update-Module -Name $module.Name -Force -ErrorAction Stop
+					} catch {
 						try {
-							Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Updating module"
-							Update-Module -Name $module.Name -Force -ErrorAction Stop
-						} catch {
-							try {
-								Install-Module -Name $module.name -Scope $Scope -Repository $module.Repository @InstallModuleSettings
-							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-						}
-						Get-Module $module.name -ListAvailable | Remove-Module -Force -ErrorAction SilentlyContinue
-						$mods = (Get-Module $module.name -ListAvailable | Sort-Object -Property version -Descending) | Select-Object -Skip 1
-						foreach ($mod in $mods) {
-							Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] UnInstalling module"
-							Write-Host "`t[Uninstalling] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($mod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
-							try {
-								Uninstall-Module -Name $mod.name -RequiredVersion $mod.Version -Force
-							} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-						}
+							Install-Module -Name $module.name -Scope $Scope -Repository $module.Repository @InstallModuleSettings
+						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+					}
+					Get-Module $module.name -ListAvailable | Remove-Module -Force -ErrorAction SilentlyContinue
+					$mods = (Get-Module $module.name -ListAvailable | Sort-Object -Property version -Descending) | Select-Object -Skip 1
+					foreach ($mod in $mods) {
+						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] UnInstalling module"
+						Write-Host "`t[Uninstalling] " -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($mod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
+						try {
+							Uninstall-Module -Name $mod.name -RequiredVersion $mod.Version -Force
+						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 					}
 				}
-			} else {
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking installed module"
-				$mod = Get-Module -Name $module.Name
-				if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
-				if ((-not($mod)) -or $mod.Version -lt $module.Version) {
-					try {
-						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
-						Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($module.Version))" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
-						Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope @InstallModuleSettings
-					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-				} else {
-					Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
-				}
 			}
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
+		} else {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking installed module"
+			$mod = Get-Module -Name $module.Name
+			if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
+			if ((-not($mod)) -or $mod.Version -lt $module.Version) {
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
+					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($module.Version))" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
+					Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope @InstallModuleSettings
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			} else {
+				Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
+			}
 		}
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
+
 } #end Function
 
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 Register-ArgumentCompleter -CommandName Install-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
@@ -445,10 +561,10 @@ Export-ModuleMember -Function Install-PWSHModule
 #endregion
  
 #region Move-PWSHModuleBetweenScope.ps1
-######## Function 4 of 11 ##################
+######## Function 5 of 12 ##################
 # Function:         Move-PWSHModuleBetweenScope
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.1
+# ModuleVersion:    0.1.17.2
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/08/20 12:38:44
@@ -545,10 +661,10 @@ Export-ModuleMember -Function Move-PWSHModuleBetweenScope
 #endregion
  
 #region New-PWSHModuleList.ps1
-######## Function 5 of 11 ##################
+######## Function 6 of 12 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.1
+# ModuleVersion:    0.1.17.2
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -672,14 +788,14 @@ Export-ModuleMember -Function New-PWSHModuleList
 #endregion
  
 #region Remove-PWSHModule.ps1
-######## Function 6 of 11 ##################
+######## Function 7 of 12 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.1
+# ModuleVersion:    0.1.17.2
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
-# ModifiedOn:       2022/09/02 12:50:19
+# ModifiedOn:       2022/09/07 17:32:17
 # Synopsis:         Remove module from the specified list.
 #############################################
  
@@ -801,7 +917,7 @@ Function Remove-PWSHModule {
 } #end Function
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	if ([bool]($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 
 $scriptblock2 = {
@@ -817,14 +933,14 @@ Export-ModuleMember -Function Remove-PWSHModule
 #endregion
  
 #region Remove-PWSHModuleList.ps1
-######## Function 7 of 11 ##################
+######## Function 8 of 12 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.1
+# ModuleVersion:    0.1.17.2
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
-# ModifiedOn:       2022/09/02 12:56:08
+# ModifiedOn:       2022/09/07 17:32:17
 # Synopsis:         Deletes a list from GitHub Gist
 #############################################
  
@@ -897,7 +1013,7 @@ Function Remove-PWSHModuleList {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 Register-ArgumentCompleter -CommandName Remove-PWSHModuleList -ParameterName ListName -ScriptBlock $scriptBlock
  
@@ -905,14 +1021,14 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 #endregion
  
 #region Save-PWSHModule.ps1
-######## Function 8 of 11 ##################
+######## Function 9 of 12 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.1
+# ModuleVersion:    0.1.17.2
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
-# ModifiedOn:       2022/09/02 12:51:34
+# ModifiedOn:       2022/09/07 17:32:17
 # Synopsis:         Saves the modules from the specified list to a folder.
 #############################################
  
@@ -1022,18 +1138,105 @@ Function Save-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	if ([bool]($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 Register-ArgumentCompleter -CommandName Save-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
 Export-ModuleMember -Function Save-PWSHModule
 #endregion
  
+#region Save-PWSHModuleList.ps1
+######## Function 10 of 12 ##################
+# Function:         Save-PWSHModuleList
+# Module:           PWSHModule
+# ModuleVersion:    0.1.17.2
+# Author:           Pierre Smit
+# Company:          HTPCZA Tech
+# CreatedOn:        2022/09/07 16:36:26
+# ModifiedOn:       2022/09/07 17:58:18
+# Synopsis:         Save the Gist file to a local file
+#############################################
+ 
+<#
+.SYNOPSIS
+Save the Gist file to a local file
+
+.DESCRIPTION
+Save the Gist file to a local file
+
+.PARAMETER ListName
+Name of the list.
+
+.PARAMETER GitHubUserID
+User with access to the gist.
+
+.PARAMETER PublicGist
+Select if the list is hosted publicly.
+
+.PARAMETER GitHubToken
+The token for that gist.
+
+.PARAMETER Path
+Directory where files will be saved.
+
+.EXAMPLE
+Save-PWSHModuleList -ListName Base,twee -Path C:\temp
+
+#>
+Function Save-PWSHModuleList {
+	[Cmdletbinding(DefaultParameterSetName = 'Set1', HelpURI = 'https://smitpi.github.io/PWSHModule/Save-PWSHModuleList')]
+	PARAM(
+		[Parameter(Mandatory)]
+		[string[]]$ListName,
+		[Parameter(Mandatory)]
+		[System.IO.DirectoryInfo]$Path,
+		[Parameter(Mandatory)]
+		[string]$GitHubUserID, 
+		[Parameter(ParameterSetName = 'Public')]
+		[switch]$PublicGist,
+		[Parameter(ParameterSetName = 'Private')]
+		[string]$GitHubToken
+	)
+
+	try {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to gist"
+		$headers = @{}
+		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+		$base64 = [System.Convert]::ToBase64String($bytes)
+		$headers.Authorization = 'Basic {0}' -f $base64
+
+		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+
+	foreach ($List in $ListName) {
+		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking Config File"
+			$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($List)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
+		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+		if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
+		$Content | ConvertTo-Json -Depth 5 | Set-Content -Path (Join-Path $Path -ChildPath "$($list).json") -Force
+		Write-Host '[Saved]' -NoNewline -ForegroundColor Yellow; Write-Host " $($List) " -NoNewline -ForegroundColor Cyan; Write-Host "to $((Join-Path $Path -ChildPath "$($list).json"))" -ForegroundColor Green
+	}
+	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
+} #end Function
+
+$scriptblock = {
+	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+}
+Register-ArgumentCompleter -CommandName Save-PWSHModuleList -ParameterName ListName -ScriptBlock $scriptBlock
+ 
+Export-ModuleMember -Function Save-PWSHModuleList
+#endregion
+ 
 #region Show-PWSHModule.ps1
-######## Function 9 of 11 ##################
+######## Function 11 of 12 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.1
+# ModuleVersion:    0.1.17.2
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -1187,102 +1390,15 @@ Register-ArgumentCompleter -CommandName Show-PWSHModule -ParameterName ListName 
 Export-ModuleMember -Function Show-PWSHModule
 #endregion
  
-#region Show-PWSHModuleList.ps1
-######## Function 10 of 11 ##################
-# Function:         Show-PWSHModuleList
-# Module:           PWSHModule
-# ModuleVersion:    0.1.17.1
-# Author:           Pierre Smit
-# Company:          HTPCZA Tech
-# CreatedOn:        2022/07/13 01:15:39
-# ModifiedOn:       2022/08/25 23:25:48
-# Synopsis:         List all the GitHub Gist Lists.
-#############################################
- 
-<#
-.SYNOPSIS
-List all the GitHub Gist Lists.
-
-.DESCRIPTION
-List all the GitHub Gist Lists.
-
-.PARAMETER GitHubUserID
-The GitHub User ID.
-
-.PARAMETER PublicGist
-Select if the list is hosted publicly.
-
-.PARAMETER GitHubToken
-GitHub Token with access to the Users' Gist.
-
-.EXAMPLE
-Show-PWSHModuleList -GitHubUserID smitpi -GitHubToken $GitHubToken
-
-#>
-Function Show-PWSHModuleList {
-	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Show-PWSHModuleList')]
-	PARAM(
-		[Parameter(Mandatory)]
-		[string]$GitHubUserID, 
-		[Parameter(ParameterSetName = 'Public')]
-		[switch]$PublicGist,
-		[Parameter(ParameterSetName = 'Private')]
-		[string]$GitHubToken
-	)
-
-	
-	try {
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to gist"
-		$headers = @{}
-		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
-		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
-		$base64 = [System.Convert]::ToBase64String($bytes)
-		$headers.Authorization = 'Basic {0}' -f $base64
-
-		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
-		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
-		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
-	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
-
-
-	[System.Collections.ArrayList]$GistObject = @()
-	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create object"
-	$PRGist.files | Get-Member -MemberType NoteProperty | ForEach-Object {
-		$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($_.name)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
-		if ($Content.modifiedDate -notlike 'Unknown') {
-			$modifiedDate = [datetime]$Content.ModifiedDate
-			$modifiedUser = $Content.ModifiedUser
-		} else { 
-			$modifiedDate = 'Unknown'
-			$modifiedUser = 'Unknown'
-		}
-		[void]$GistObject.Add([PSCustomObject]@{
-				Name         = $_.Name
-				Description  = $Content.Description
-				Date         = [datetime]$Content.CreateDate
-				Author       = $Content.Author
-				ModifiedDate = $modifiedDate
-				ModifiedUser = $modifiedUser
-			})
-	}
-
-	$GistObject
-	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
-
-} #end Function
- 
-Export-ModuleMember -Function Show-PWSHModuleList
-#endregion
- 
 #region Uninstall-PWSHModule.ps1
-######## Function 11 of 11 ##################
+######## Function 12 of 12 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.17.1
+# ModuleVersion:    0.1.17.2
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
-# ModifiedOn:       2022/09/02 12:45:46
+# ModifiedOn:       2022/09/07 17:32:17
 # Synopsis:         Will uninstall the module from the system.
 #############################################
  
@@ -1420,7 +1536,7 @@ Function Uninstall-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 

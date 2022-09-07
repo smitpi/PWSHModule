@@ -159,7 +159,7 @@ Function Remove-PWSHModule {
 } #end Function
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {(Show-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	if ([bool]($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 
 $scriptblock2 = {
