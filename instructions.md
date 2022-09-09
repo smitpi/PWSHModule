@@ -8,9 +8,14 @@ Creates a GitHub (Private or Public) Gist to install and maintain the installed 
 ```
 Install-Module -Name PWSHModule -Verbose
 ```
-- or from GitHub [GitHub Repo](https://github.com/smitpi/PWSHModule)
+- or run this script to install from GitHub [GitHub Repo](https://github.com/smitpi/PWSHModule)
 ```
-git clone https://github.com/smitpi/PWSHModule (Join-Path (get-item (Join-Path (Get-Item $profile).Directory 'Modules')).FullName -ChildPath PWSHModule)
+$CurrentLocation = Get-Item .
+$ModuleDestination = (Join-Path (Get-Item (Join-Path (Get-Item $profile).Directory 'Modules')).FullName -ChildPath PWSHModule)
+git clone --depth 1 https://github.com/smitpi/PWSHModule $ModuleDestination 2>&1 | Write-Host -ForegroundColor Yellow
+Set-Location $ModuleDestination
+git filter-branch --prune-empty --subdirectory-filter Output HEAD 2>&1 | Write-Host -ForegroundColor Yellow
+Set-Location $CurrentLocation
 ```
 - Then import the module into your session
 ```
