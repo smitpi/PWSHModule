@@ -1,4 +1,4 @@
-﻿#region Public Functions
+#region Public Functions
 #region Add-PWSHModule.ps1
 ######## Function 1 of 12 ##################
 # Function:         Add-PWSHModule

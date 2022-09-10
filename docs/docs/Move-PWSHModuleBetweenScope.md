@@ -14,7 +14,7 @@ Moves modules between scopes (CurrentUser and AllUsers).
 
 ```
 Move-PWSHModuleBetweenScope [-SourceScope] <DirectoryInfo> [-DestinationScope] <DirectoryInfo>
- [-ModuleName] <String[]> [[-Repository] <String>] [<CommonParameters>]
+ [[-ModuleName] <String[]>] [[-Repository] <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -68,9 +68,9 @@ Type: String[]
 Parameter Sets: (All)
 Aliases: Name
 
-Required: True
+Required: False
 Position: 3
-Default value: None
+Default value: All
 Accept pipeline input: True (ByValue)
 Accept wildcard characters: False
 ```
