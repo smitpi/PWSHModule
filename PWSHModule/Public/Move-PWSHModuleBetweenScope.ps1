@@ -76,9 +76,9 @@ Function Move-PWSHModuleBetweenScope {
 		[Parameter(Mandatory = $true)]
 		[System.IO.DirectoryInfo]$DestinationScope,
 
-		[Parameter(ValueFromPipeline, Mandatory)]
+		[Parameter(ValueFromPipeline)]
 		[Alias('Name')]
-		[string[]]$ModuleName,
+		[string[]]$ModuleName = 'All',
 
 		[string]$Repository = 'PSGallery'
 	)
@@ -86,20 +86,28 @@ Function Move-PWSHModuleBetweenScope {
 	if ($ModuleName -like 'All') {$ModuleName = (Get-ChildItem -Path $($SourceScope) -Directory).Name }
 
 	foreach ($mod in $ModuleName) {
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module $($mod)"
-		try {
-			$MoveMod = Get-Module -Name $mod -ListAvailable -ErrorAction Stop | Where-Object {$_.path -like "$($SourceScope)*"} | Sort-Object -Property Version -Descending | Select-Object -First 1
-		} catch {Write-Warning "Did not find $($ModuleName) in $($SourceScope)"}
-		Write-Host '[Moving] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($MoveMod.Name)($($MoveMod.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($DestinationScope)" -ForegroundColor DarkRed			
-		try {
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) ADDING] to archive"
-				(Get-Item $MoveMod.Path).directory.Parent.FullName | Compress-Archive -DestinationPath (Join-Path -Path $SourceScope -ChildPath 'PWSHModule_Move.zip') -Update -ErrorAction Stop
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Deleteing folder"
-				(Get-Item $MoveMod.Path).directory.Parent.FullName | Remove-Item -Recurse -Force
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Saving] Module $($MoveMod.name)"
-			Save-Module -Name $MoveMod.Name -RequiredVersion $MoveMod.Version -Repository $Repository -Force -AllowPrerelease -AcceptLicense -Path (Get-Item $DestinationScope).FullName -ErrorAction Stop
-		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) Complete"
+		$CheckModInFolder = Get-ChildItem -Path (Join-Path $SourceScope -ChildPath "$($mod)\*\$($mod).psm1") | Sort-Object -Property directory -Descending | Select-Object -First 1
+		if ([string]::IsNullOrEmpty($CheckModInFolder)) {
+			Write-Warning "$($mod) is not a valid module in folder: $($SourceScope)"
+		} else {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module $($mod)"
+			try {
+				$CheckModule = Get-Module -FullyQualifiedName $CheckModInFolder.FullName -ListAvailable
+				if ($CheckModule.Version.ToString() -eq '0.0') {[version]$ModuleVersion = (Import-PowerShellDataFile $CheckModInFolder.FullName.Replace('psm1', 'psd1')).ModuleVersion}
+				else {[version]$ModuleVersion = $CheckModule.Version}
+				Remove-Module $mod -Force -ErrorAction SilentlyContinue
+			} catch {Write-Warning "Did not find $($ModuleName) in $($SourceScope)"}
+			Write-Host '[Moving] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($CheckModule.Name)($($CheckModule.Version)) " -ForegroundColor Green -NoNewline ; Write-Host "$($DestinationScope)" -ForegroundColor DarkRed			
+			try {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) ADDING] to archive"
+				    (Get-Item $CheckModule.Path).directory.Parent.FullName | Compress-Archive -DestinationPath (Join-Path -Path $SourceScope -ChildPath 'PWSHModule_Move.zip') -Update -ErrorAction Stop
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) Deleteing folder"
+    				(Get-Item $CheckModule.Path).directory.Parent.FullName | Remove-Item -Recurse -Force -ErrorAction Stop
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) Saving] Module $($MoveMod.name)"
+					Save-Module -Name $CheckModule.Name -RequiredVersion $ModuleVersion -Repository $Repository -Force -AcceptLicense -Path (Get-Item $DestinationScope).FullName -ErrorAction Stop
+			} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) Complete"
+		}
 	}
 } #end Function
 $scriptblock = {
@@ -108,15 +116,6 @@ $scriptblock = {
 }
 Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName SourceScope -ScriptBlock $scriptBlock
 Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName DestinationScope -ScriptBlock $scriptBlock
-
-$scriptblock2 = {
-	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	$ModList = @()
-	$ModList += 'All'
-	$ModList += ($fakeBoundParameters.SourceScope | Get-ChildItem -Directory).Name
-	$ModList | Where-Object {$_ -like "*$wordToComplete*"}
-}
-Register-ArgumentCompleter -CommandName Move-PWSHModuleBetweenScope -ParameterName ModuleName -ScriptBlock $scriptBlock2
 
 $scriptblock3 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
