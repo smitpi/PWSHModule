@@ -64,7 +64,7 @@ New-PWSHModuleList -ListName Base -Description "These modules needs to be instal
 
 #>
 Function New-PWSHModuleList {
-	[Cmdletbinding( HelpURI = 'https://smitpi.github.io/PWSHModule/New-PWSHModuleList')]
+	[Cmdletbinding(SupportsShouldProcess = $true, HelpURI = 'https://smitpi.github.io/PWSHModule/New-PWSHModuleList')]
 	PARAM(
 		[Parameter(Mandatory)]
 		[string]$ListName,
@@ -75,79 +75,78 @@ Function New-PWSHModuleList {
 		[Parameter(Mandatory)]
 		[string]$GitHubToken
 	)
+	if ($pscmdlet.ShouldProcess('Target', 'Operation')) {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating config"
+		$NewConfig = [PSCustomObject]@{
+			CreateDate   = (Get-Date -Format u)
+			Description  = $Description
+			Author       = "$($env:USERNAME.ToLower())"
+			ModifiedDate = 'Unknown'
+			ModifiedUser = 'Unknown'
+			Modules      = [PSCustomObject]@{
+				Name        = 'PWSHModule'
+				Version     = 'Latest'
+				Description = 'Uses a GitHub Gist File to install and maintain a list of PowerShell Modules'
+				Repository  = 'PSGallery'
+				Projecturi  = 'https://github.com/smitpi/PWSHModule'
+			}
+		} | ConvertTo-Json
 
-	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating config"
-	$NewConfig = [PSCustomObject]@{
-		CreateDate   = (Get-Date -Format u)
-		Description  = $Description
-		Author       = "$($env:USERNAME.ToLower())"
-		ModifiedDate = 'Unknown'
-		ModifiedUser = 'Unknown'
-		Modules      = [PSCustomObject]@{
-			Name        = 'PWSHModule'
-			Version     = 'Latest'
-			Description = 'Uses a GitHub Gist File to install and maintain a list of PowerShell Modules'
-			Repository  = 'PSGallery'
-			Projecturi  = 'https://github.com/smitpi/PWSHModule'
+		$ConfigFile = Join-Path $env:TEMP -ChildPath "$($ListName).json"
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create temp file"
+		if (Test-Path $ConfigFile) {
+			Write-Warning "Config File exists, Renaming file to $($ListName)-$(Get-Date -Format yyyyMMdd_HHmm).json"	
+			try {
+				Rename-Item $ConfigFile -NewName "$($ListName)-$(Get-Date -Format yyyyMMdd_HHmm).json" -Force -ErrorAction Stop | Out-Null
+			} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message);exit"}
 		}
- } | ConvertTo-Json
-
-	$ConfigFile = Join-Path $env:TEMP -ChildPath "$($ListName).json"
-	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create temp file"
-	if (Test-Path $ConfigFile) {
-		Write-Warning "Config File exists, Renaming file to $($ListName)-$(Get-Date -Format yyyyMMdd_HHmm).json"	
 		try {
-			Rename-Item $ConfigFile -NewName "$($ListName)-$(Get-Date -Format yyyyMMdd_HHmm).json" -Force -ErrorAction Stop | Out-Null
-		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message);exit"}
-	}
-	try {
-		$NewConfig | Set-Content -Path $ConfigFile -Encoding utf8 -ErrorAction Stop
-	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			$NewConfig | Set-Content -Path $ConfigFile -Encoding utf8 -ErrorAction Stop
+		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 
 
-	try {
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connecting to Gist"
-		$headers = @{}
-		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
-		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
-		$base64 = [System.Convert]::ToBase64String($bytes)
-		$headers.Authorization = 'Basic {0}' -f $base64
+		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connecting to Gist"
+			$headers = @{}
+			$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+			$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+			$base64 = [System.Convert]::ToBase64String($bytes)
+			$headers.Authorization = 'Basic {0}' -f $base64
 
-		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
-		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
-		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
-	} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+			$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+			$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+			$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 
 		
-	if ([string]::IsNullOrEmpty($PRGist)) {
-		try {
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to gist"
-			$Body = @{}
-			$files = @{}
-			$Files["$($ListName)"] = @{content = ( Get-Content (Get-Item $ConfigFile).FullName -Encoding UTF8 | Out-String ) }
-			$Body.files = $Files
-			$Body.description = 'PWSHModule-ConfigFile'
-			$json = ConvertTo-Json -InputObject $Body
-			$json = [System.Text.Encoding]::UTF8.GetBytes($json)
-			$null = Invoke-WebRequest -Headers $headers -Uri https://api.github.com/gists -Method Post -Body $json -ErrorAction Stop
-			Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
+		if ([string]::IsNullOrEmpty($PRGist)) {
+			try {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to gist"
+				$Body = @{}
+				$files = @{}
+				$Files["$($ListName)"] = @{content = ( Get-Content (Get-Item $ConfigFile).FullName -Encoding UTF8 | Out-String ) }
+				$Body.files = $Files
+				$Body.description = 'PWSHModule-ConfigFile'
+				$json = ConvertTo-Json -InputObject $Body
+				$json = [System.Text.Encoding]::UTF8.GetBytes($json)
+				$null = Invoke-WebRequest -Headers $headers -Uri https://api.github.com/gists -Method Post -Body $json -ErrorAction Stop
+				Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
 
-		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
-	} else {
-		try {
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to Gist"
-			$Body = @{}
-			$files = @{}
-			$Files["$($ListName)"] = @{content = ( Get-Content (Get-Item $ConfigFile).FullName -Encoding UTF8 | Out-String ) }
-			$Body.files = $Files
-			$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
-			$json = ConvertTo-Json -InputObject $Body
-			$json = [System.Text.Encoding]::UTF8.GetBytes($json)
-			$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
-			Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
-		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+			} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+		} else {
+			try {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to Gist"
+				$Body = @{}
+				$files = @{}
+				$Files["$($ListName)"] = @{content = ( Get-Content (Get-Item $ConfigFile).FullName -Encoding UTF8 | Out-String ) }
+				$Body.files = $Files
+				$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
+				$json = ConvertTo-Json -InputObject $Body
+				$json = [System.Text.Encoding]::UTF8.GetBytes($json)
+				$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
+				Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
+			} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+		}
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
-	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
-
-
 } #end Function

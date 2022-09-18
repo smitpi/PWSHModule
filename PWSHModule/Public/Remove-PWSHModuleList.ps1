@@ -62,7 +62,7 @@ Remove-PWSHModuleList -ListName Base  -GitHubUserID smitpi -GitHubToken $GitHubT
 
 #>
 Function Remove-PWSHModuleList {
-	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Remove-PWSHModuleList')]
+	[Cmdletbinding(SupportsShouldProcess = $true, HelpURI = 'https://smitpi.github.io/PWSHModule/Remove-PWSHModuleList')]
 	[OutputType([System.Object[]])]
 	PARAM(
 		[Parameter(Mandatory = $true)]
@@ -73,38 +73,41 @@ Function Remove-PWSHModuleList {
 		[string]$GitHubToken
 	)
 
-	try {
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to gist"
-		$headers = @{}
-		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
-		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
-		$base64 = [System.Convert]::ToBase64String($bytes)
-		$headers.Authorization = 'Basic {0}' -f $base64
 
-		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
-		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
-		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
-	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+	if ($pscmdlet.ShouldProcess('Target', 'Operation')) {
+		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to gist"
+			$headers = @{}
+			$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+			$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+			$base64 = [System.Convert]::ToBase64String($bytes)
+			$headers.Authorization = 'Basic {0}' -f $base64
 
-	foreach ($List in $ListName) {
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create object"
-		$CheckExist = $PRGist.files | Get-Member -MemberType NoteProperty | Where-Object {$_.name -like $List}
-		if (-not([string]::IsNullOrEmpty($CheckExist))) {
-			try {
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Remove list from Gist"
-				$Body = @{}
-				$files = @{}
-				$Files["$($List)"] = $null
-				$Body.files = $Files
-				$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
-				$json = ConvertTo-Json -InputObject $Body
-				$json = [System.Text.Encoding]::UTF8.GetBytes($json)
-				$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
-				Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($List)" -NoNewline -ForegroundColor Cyan; Write-Host ' from Github Gist' -ForegroundColor DarkRed
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] updated gist."
-			} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+			$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+			$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+			$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+		} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+
+		foreach ($List in $ListName) {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create object"
+			$CheckExist = $PRGist.files | Get-Member -MemberType NoteProperty | Where-Object {$_.name -like $List}
+			if (-not([string]::IsNullOrEmpty($CheckExist))) {
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Remove list from Gist"
+					$Body = @{}
+					$files = @{}
+					$Files["$($List)"] = $null
+					$Body.files = $Files
+					$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
+					$json = ConvertTo-Json -InputObject $Body
+					$json = [System.Text.Encoding]::UTF8.GetBytes($json)
+					$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
+					Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($List)" -NoNewline -ForegroundColor Cyan; Write-Host ' from Github Gist' -ForegroundColor DarkRed
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] updated gist."
+				} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+			}
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 		}
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
 } #end Function
 

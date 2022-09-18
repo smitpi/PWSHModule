@@ -3,7 +3,7 @@
 ######## Function 1 of 12 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23.0
+# ModuleVersion:    0.1.23.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
@@ -185,7 +185,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 12 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23.0
+# ModuleVersion:    0.1.23.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
@@ -284,7 +284,7 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 ######## Function 3 of 12 ##################
 # Function:         Get-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23.0
+# ModuleVersion:    0.1.23.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -371,7 +371,7 @@ Export-ModuleMember -Function Get-PWSHModuleList
 ######## Function 4 of 12 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23.0
+# ModuleVersion:    0.1.23.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
@@ -576,7 +576,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 5 of 12 ##################
 # Function:         Move-PWSHModuleBetweenScope
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23.0
+# ModuleVersion:    0.1.23.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/08/20 12:38:44
@@ -674,11 +674,11 @@ Export-ModuleMember -Function Move-PWSHModuleBetweenScope
 ######## Function 6 of 12 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23.0
+# ModuleVersion:    0.1.23.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
-# ModifiedOn:       2022/08/25 23:29:18
+# ModifiedOn:       2022/09/19 01:31:11
 # Synopsis:         Add a new list to GitHub Gist.
 #############################################
  
@@ -706,7 +706,7 @@ New-PWSHModuleList -ListName Base -Description "These modules needs to be instal
 
 #>
 Function New-PWSHModuleList {
-	[Cmdletbinding( HelpURI = 'https://smitpi.github.io/PWSHModule/New-PWSHModuleList')]
+	[Cmdletbinding(SupportsShouldProcess = $true, HelpURI = 'https://smitpi.github.io/PWSHModule/New-PWSHModuleList')]
 	PARAM(
 		[Parameter(Mandatory)]
 		[string]$ListName,
@@ -717,81 +717,80 @@ Function New-PWSHModuleList {
 		[Parameter(Mandatory)]
 		[string]$GitHubToken
 	)
+	if ($pscmdlet.ShouldProcess('Target', 'Operation')) {
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating config"
+		$NewConfig = [PSCustomObject]@{
+			CreateDate   = (Get-Date -Format u)
+			Description  = $Description
+			Author       = "$($env:USERNAME.ToLower())"
+			ModifiedDate = 'Unknown'
+			ModifiedUser = 'Unknown'
+			Modules      = [PSCustomObject]@{
+				Name        = 'PWSHModule'
+				Version     = 'Latest'
+				Description = 'Uses a GitHub Gist File to install and maintain a list of PowerShell Modules'
+				Repository  = 'PSGallery'
+				Projecturi  = 'https://github.com/smitpi/PWSHModule'
+			}
+		} | ConvertTo-Json
 
-	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Creating config"
-	$NewConfig = [PSCustomObject]@{
-		CreateDate   = (Get-Date -Format u)
-		Description  = $Description
-		Author       = "$($env:USERNAME.ToLower())"
-		ModifiedDate = 'Unknown'
-		ModifiedUser = 'Unknown'
-		Modules      = [PSCustomObject]@{
-			Name        = 'PWSHModule'
-			Version     = 'Latest'
-			Description = 'Uses a GitHub Gist File to install and maintain a list of PowerShell Modules'
-			Repository  = 'PSGallery'
-			Projecturi  = 'https://github.com/smitpi/PWSHModule'
+		$ConfigFile = Join-Path $env:TEMP -ChildPath "$($ListName).json"
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create temp file"
+		if (Test-Path $ConfigFile) {
+			Write-Warning "Config File exists, Renaming file to $($ListName)-$(Get-Date -Format yyyyMMdd_HHmm).json"	
+			try {
+				Rename-Item $ConfigFile -NewName "$($ListName)-$(Get-Date -Format yyyyMMdd_HHmm).json" -Force -ErrorAction Stop | Out-Null
+			} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message);exit"}
 		}
- } | ConvertTo-Json
-
-	$ConfigFile = Join-Path $env:TEMP -ChildPath "$($ListName).json"
-	Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create temp file"
-	if (Test-Path $ConfigFile) {
-		Write-Warning "Config File exists, Renaming file to $($ListName)-$(Get-Date -Format yyyyMMdd_HHmm).json"	
 		try {
-			Rename-Item $ConfigFile -NewName "$($ListName)-$(Get-Date -Format yyyyMMdd_HHmm).json" -Force -ErrorAction Stop | Out-Null
-		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message);exit"}
-	}
-	try {
-		$NewConfig | Set-Content -Path $ConfigFile -Encoding utf8 -ErrorAction Stop
-	} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			$NewConfig | Set-Content -Path $ConfigFile -Encoding utf8 -ErrorAction Stop
+		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 
 
-	try {
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connecting to Gist"
-		$headers = @{}
-		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
-		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
-		$base64 = [System.Convert]::ToBase64String($bytes)
-		$headers.Authorization = 'Basic {0}' -f $base64
+		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connecting to Gist"
+			$headers = @{}
+			$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+			$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+			$base64 = [System.Convert]::ToBase64String($bytes)
+			$headers.Authorization = 'Basic {0}' -f $base64
 
-		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
-		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
-		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
-	} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+			$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+			$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+			$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
 
 		
-	if ([string]::IsNullOrEmpty($PRGist)) {
-		try {
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to gist"
-			$Body = @{}
-			$files = @{}
-			$Files["$($ListName)"] = @{content = ( Get-Content (Get-Item $ConfigFile).FullName -Encoding UTF8 | Out-String ) }
-			$Body.files = $Files
-			$Body.description = 'PWSHModule-ConfigFile'
-			$json = ConvertTo-Json -InputObject $Body
-			$json = [System.Text.Encoding]::UTF8.GetBytes($json)
-			$null = Invoke-WebRequest -Headers $headers -Uri https://api.github.com/gists -Method Post -Body $json -ErrorAction Stop
-			Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
+		if ([string]::IsNullOrEmpty($PRGist)) {
+			try {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to gist"
+				$Body = @{}
+				$files = @{}
+				$Files["$($ListName)"] = @{content = ( Get-Content (Get-Item $ConfigFile).FullName -Encoding UTF8 | Out-String ) }
+				$Body.files = $Files
+				$Body.description = 'PWSHModule-ConfigFile'
+				$json = ConvertTo-Json -InputObject $Body
+				$json = [System.Text.Encoding]::UTF8.GetBytes($json)
+				$null = Invoke-WebRequest -Headers $headers -Uri https://api.github.com/gists -Method Post -Body $json -ErrorAction Stop
+				Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
 
-		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
-	} else {
-		try {
-			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to Gist"
-			$Body = @{}
-			$files = @{}
-			$Files["$($ListName)"] = @{content = ( Get-Content (Get-Item $ConfigFile).FullName -Encoding UTF8 | Out-String ) }
-			$Body.files = $Files
-			$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
-			$json = ConvertTo-Json -InputObject $Body
-			$json = [System.Text.Encoding]::UTF8.GetBytes($json)
-			$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
-			Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
-		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+			} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+		} else {
+			try {
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Uploading to Gist"
+				$Body = @{}
+				$files = @{}
+				$Files["$($ListName)"] = @{content = ( Get-Content (Get-Item $ConfigFile).FullName -Encoding UTF8 | Out-String ) }
+				$Body.files = $Files
+				$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
+				$json = ConvertTo-Json -InputObject $Body
+				$json = [System.Text.Encoding]::UTF8.GetBytes($json)
+				$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
+				Write-Host '[Uploaded]' -NoNewline -ForegroundColor Yellow; Write-Host " $($ListName).json" -NoNewline -ForegroundColor Cyan; Write-Host ' to Github Gist' -ForegroundColor Green
+			} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+		}
+		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
-	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
-
-
 } #end Function
  
 Export-ModuleMember -Function New-PWSHModuleList
@@ -801,7 +800,7 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 7 of 12 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23.0
+# ModuleVersion:    0.1.23.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
@@ -944,11 +943,11 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 8 of 12 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23.0
+# ModuleVersion:    0.1.23.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
-# ModifiedOn:       2022/09/18 19:44:47
+# ModifiedOn:       2022/09/19 01:32:25
 # Synopsis:         Deletes a list from GitHub Gist
 #############################################
  
@@ -973,7 +972,7 @@ Remove-PWSHModuleList -ListName Base  -GitHubUserID smitpi -GitHubToken $GitHubT
 
 #>
 Function Remove-PWSHModuleList {
-	[Cmdletbinding(HelpURI = 'https://smitpi.github.io/PWSHModule/Remove-PWSHModuleList')]
+	[Cmdletbinding(SupportsShouldProcess = $true, HelpURI = 'https://smitpi.github.io/PWSHModule/Remove-PWSHModuleList')]
 	[OutputType([System.Object[]])]
 	PARAM(
 		[Parameter(Mandatory = $true)]
@@ -984,38 +983,41 @@ Function Remove-PWSHModuleList {
 		[string]$GitHubToken
 	)
 
-	try {
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to gist"
-		$headers = @{}
-		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
-		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
-		$base64 = [System.Convert]::ToBase64String($bytes)
-		$headers.Authorization = 'Basic {0}' -f $base64
 
-		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
-		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
-		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
-	} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+	if ($pscmdlet.ShouldProcess('Target', 'Operation')) {
+		try {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to gist"
+			$headers = @{}
+			$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+			$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+			$base64 = [System.Convert]::ToBase64String($bytes)
+			$headers.Authorization = 'Basic {0}' -f $base64
 
-	foreach ($List in $ListName) {
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create object"
-		$CheckExist = $PRGist.files | Get-Member -MemberType NoteProperty | Where-Object {$_.name -like $List}
-		if (-not([string]::IsNullOrEmpty($CheckExist))) {
-			try {
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Remove list from Gist"
-				$Body = @{}
-				$files = @{}
-				$Files["$($List)"] = $null
-				$Body.files = $Files
-				$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
-				$json = ConvertTo-Json -InputObject $Body
-				$json = [System.Text.Encoding]::UTF8.GetBytes($json)
-				$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
-				Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($List)" -NoNewline -ForegroundColor Cyan; Write-Host ' from Github Gist' -ForegroundColor DarkRed
-				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] updated gist."
-			} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+			$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+			$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+			$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+		} catch {throw "Can't connect to gist:`n $($_.Exception.Message)"}
+
+		foreach ($List in $ListName) {
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Create object"
+			$CheckExist = $PRGist.files | Get-Member -MemberType NoteProperty | Where-Object {$_.name -like $List}
+			if (-not([string]::IsNullOrEmpty($CheckExist))) {
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Remove list from Gist"
+					$Body = @{}
+					$files = @{}
+					$Files["$($List)"] = $null
+					$Body.files = $Files
+					$Uri = 'https://api.github.com/gists/{0}' -f $PRGist.id
+					$json = ConvertTo-Json -InputObject $Body
+					$json = [System.Text.Encoding]::UTF8.GetBytes($json)
+					$null = Invoke-WebRequest -Headers $headers -Uri $Uri -Method Patch -Body $json -ErrorAction Stop
+					Write-Host '[Removed]' -NoNewline -ForegroundColor Yellow; Write-Host " $($List)" -NoNewline -ForegroundColor Cyan; Write-Host ' from Github Gist' -ForegroundColor DarkRed
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] updated gist."
+				} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+			}
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 		}
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
 } #end Function
 
@@ -1032,7 +1034,7 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 ######## Function 9 of 12 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23.0
+# ModuleVersion:    0.1.23.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -1239,7 +1241,7 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 10 of 12 ##################
 # Function:         Save-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23.0
+# ModuleVersion:    0.1.23.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/09/07 16:36:26
@@ -1326,7 +1328,7 @@ Export-ModuleMember -Function Save-PWSHModuleList
 ######## Function 11 of 12 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23.0
+# ModuleVersion:    0.1.23.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -1484,7 +1486,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 12 of 12 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23.0
+# ModuleVersion:    0.1.23.1
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
