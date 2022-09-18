@@ -69,6 +69,12 @@ Select if the list is hosted publicly.
 .PARAMETER GitHubToken
 GitHub Token with access to the Users' Gist.
 
+.PARAMETER LocalList
+Select if the list is saved locally.
+
+.PARAMETER ListPath
+Directory where list files are saved.
+
 .EXAMPLE
 Save-PWSHModule -ListName extended -AsNuGet -Path c:\temp\ -GitHubUserID smitpi -GitHubToken $GitHubToken
 
@@ -94,76 +100,100 @@ Function Save-PWSHModule {
 		[Parameter(ParameterSetName = 'Public')]
 		[switch]$PublicGist,
 		[Parameter(ParameterSetName = 'Private')]
-		[string]$GitHubToken
+		[string]$GitHubToken,
+		[Parameter(ParameterSetName = 'local')]
+		[switch]$LocalList,
+		[Parameter(ParameterSetName = 'local')]
+		[System.IO.DirectoryInfo]$ListPath
 	)
 
-	try {
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
-		$headers = @{}
-		$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
-		$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
-		$base64 = [System.Convert]::ToBase64String($bytes)
-		$headers.Authorization = 'Basic {0}' -f $base64
+	if ($GitHubUserID) {
+		try {
+			if ($PublicGist) {
+				Write-Host '[Using] ' -NoNewline -ForegroundColor Yellow 
+				Write-Host 'Public Gist:' -NoNewline -ForegroundColor Cyan 
+				Write-Host ' for list:' -ForegroundColor Green -NoNewline 
+				Write-Host "$($ListName)" -ForegroundColor Cyan
+			}
 
-		$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
-		$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
-		$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
-	} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Connect to Gist"
+			$headers = @{}
+			$auth = '{0}:{1}' -f $GitHubUserID, $GitHubToken
+			$bytes = [System.Text.Encoding]::ASCII.GetBytes($auth)
+			$base64 = [System.Convert]::ToBase64String($bytes)
+			$headers.Authorization = 'Basic {0}' -f $base64
 
-	foreach ($list in $ListName) {
+			$url = 'https://api.github.com/users/{0}/gists' -f $GitHubUserID
+			$AllGist = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ErrorAction Stop
+			$PRGist = $AllGist | Select-Object | Where-Object { $_.description -like 'PWSHModule-ConfigFile' }
+		} catch {Write-Error "Can't connect to gist:`n $($_.Exception.Message)"}
+	}
+	[System.Collections.generic.List[PSObject]]$CombinedModules = @()
+	foreach ($List in $ListName) {
 		try {
 			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking Config File"
-			$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($List)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
-		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-		if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
-
-		foreach ($module in $Content.Modules) {
-			if ($module.Version -like 'Latest') {
-				if ($AsNuGet) {
-					try {
-						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
-						Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'NuGet: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-						Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -Path $Path | Out-Null
-					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-				} else {
-					try {
-						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
-						Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-						Save-Module -Name $module.name -Repository $module.Repository -Path $Path
-					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-				}
+			if ($LocalList) {
+				$ListPath = Join-Path $ListPath -ChildPath "$($list).json"
+				if (Test-Path $ListPath) { 
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Collecting Content"
+					$Content = Get-Content $ListPath | ConvertFrom-Json
+				} else {Write-Warning "List file $($List) does not exist"}
 			} else {
-				if ($AsNuGet) {
-					try {
-						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
-						Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'NuGet: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)(ver $($module.version)) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-						Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -RequiredVersion $module.Version -Path $Path | Out-Null
-					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-				} else {
-					try {
-						Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
-						Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)(ver $($module.version)) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-						Save-Module -Name $module.name -Repository $module.Repository -RequiredVersion $module.Version -Path $Path
-					} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
-				}
-
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Collecting Content"
+				$Content = (Invoke-WebRequest -Uri ($PRGist.files.$($List)).raw_url -Headers $headers).content | ConvertFrom-Json -ErrorAction Stop
 			}
+			if ([string]::IsNullOrEmpty($Content.CreateDate) -or [string]::IsNullOrEmpty($Content.Modules)) {Write-Error 'Invalid Config File'}
+			Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Adding to list."
+			$Content.Modules | Where-Object {$_ -notlike $null -and $_.name -notin $CombinedModules.name} | ForEach-Object {$CombinedModules.Add($_)}
+		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception)"}
+	}
+
+	foreach ($module in ($CombinedModules | Sort-Object -Property name -Unique)) {
+		if ($module.Version -like 'Latest') {
+			if ($AsNuGet) {
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'NuGet: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
+					Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -Path $Path | Out-Null
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			} else {
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
+					Save-Module -Name $module.name -Repository $module.Repository -Path $Path
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			}
+		} else {
+			if ($AsNuGet) {
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'NuGet: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)(ver $($module.version)) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
+					Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -RequiredVersion $module.Version -Path $Path | Out-Null
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			} else {
+				try {
+					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)(ver $($module.version)) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
+					Save-Module -Name $module.name -Repository $module.Repository -RequiredVersion $module.Version -Path $Path
+				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+			}
+
 		}
 	}
+	
 	if ($AddToPSModulePath) {
 		try {
-			#[System.Collections.generic.List[PSObject]]$ModuleList = @()
-			#$ModuleList.Add($path.FullName)
-			#$env:PSModulePath.Split(';') | ForEach-Object {$ModuleList.Add($_)}
-			#[System.Environment]::SetEnvironmentVariable('PSModulePath', ($ModuleList | Join-String -Separator ';'), 'Machine')
-			$key = (Get-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager').OpenSubKey('Environment', $true)
-			$regpath = $key.GetValue('PSModulePath', '', 'DoNotExpandEnvironmentNames')
-			$regpath += ";$($path.FullName)"
-			$key.SetValue('PSModulePath', $regpath, [Microsoft.Win32.RegistryValueKind]::ExpandString)
+			if ($env:PSModulePath.Split(';') -notcontains $Path.FullName) {
+				$key = (Get-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager').OpenSubKey('Environment', $true)
+				$regpath = $key.GetValue('PSModulePath', '', 'DoNotExpandEnvironmentNames')
+				$regpath += ";$($path.FullName)"
+				$key.SetValue('PSModulePath', $regpath, [Microsoft.Win32.RegistryValueKind]::ExpandString)
+			}
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 	}
 	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
-} #end Function
+
+}#end Function
 
 
 $scriptblock = {
