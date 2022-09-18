@@ -23,8 +23,7 @@
 		"sshd": "latest",
 		"desktop-lite": "latest",
 		"homebrew": "latest",
-		"powershell": "latest",
-		"jupyterlab": "latest"
+		"powershell": "latest"
 	},
 	"customizations": {
 		"vscode": {
@@ -50,7 +49,8 @@
 				"mohsen1.prettify-json",
 				"ban.spellright",
 				"redhat.vscode-yaml",
-				"DotJoshJohnson.xml"
+				"DotJoshJohnson.xml",
+				"ms-vscode-remote.vscode-remote-extensionpack"
 			]
 		}
 	}
