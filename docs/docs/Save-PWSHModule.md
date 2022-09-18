@@ -14,32 +14,32 @@ Saves the modules from the specified list to a folder.
 
 ### Private (Default)
 ```
-Save-PWSHModule -ListName <String[]> [-Path <DirectoryInfo>] -GitHubUserID <String> [-GitHubToken <String>]
- [<CommonParameters>]
-```
-
-### nuget
-```
-Save-PWSHModule -ListName <String[]> [-AsNuGet] [-Path <DirectoryInfo>] -GitHubUserID <String> [-PublicGist]
- [-GitHubToken <String>] [-LocalList] [-ListPath <DirectoryInfo>] [<CommonParameters>]
-```
-
-### modulepath
-```
-Save-PWSHModule -ListName <String[]> [-AddToPSModulePath] [-Path <DirectoryInfo>] -GitHubUserID <String>
- [-PublicGist] [-GitHubToken <String>] [-LocalList] [-ListPath <DirectoryInfo>] [<CommonParameters>]
-```
-
-### Public
-```
-Save-PWSHModule -ListName <String[]> [-Path <DirectoryInfo>] -GitHubUserID <String> [-PublicGist]
+Save-PWSHModule [-ListName] <String[]> -Path <DirectoryInfo> [-AddPathToPSModulePath] [-Repository <String>]
  [<CommonParameters>]
 ```
 
 ### local
 ```
-Save-PWSHModule -ListName <String[]> [-Path <DirectoryInfo>] -GitHubUserID <String> [-LocalList]
- [-ListPath <DirectoryInfo>] [<CommonParameters>]
+Save-PWSHModule [-ListName] <String[]> [-AsNuGet] -Path <DirectoryInfo> [-AddPathToPSModulePath]
+ [-Repository <String>] [-LocalList] -ListPath <DirectoryInfo> [<CommonParameters>]
+```
+
+### private
+```
+Save-PWSHModule [-ListName] <String[]> [-AsNuGet] -Path <DirectoryInfo> [-AddPathToPSModulePath]
+ [-Repository <String>] -GitHubUserID <String> -GitHubToken <String> [<CommonParameters>]
+```
+
+### public
+```
+Save-PWSHModule [-ListName] <String[]> [-AsNuGet] -Path <DirectoryInfo> [-AddPathToPSModulePath]
+ [-Repository <String>] -GitHubUserID <String> [-PublicGist] [<CommonParameters>]
+```
+
+### nuget
+```
+Save-PWSHModule [-ListName] <String[]> [-AsNuGet] -Path <DirectoryInfo> [-AddPathToPSModulePath]
+ [-Repository <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -63,7 +63,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: Named
+Position: 1
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -74,7 +74,7 @@ Save in the NuGet format
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: nuget
+Parameter Sets: local, private, public
 Aliases:
 
 Required: False
@@ -84,15 +84,12 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -AddToPSModulePath
-Add path to environmental variable PSModulePath.
-
 ```yaml
 Type: SwitchParameter
-Parameter Sets: modulepath
+Parameter Sets: nuget
 Aliases:
 
-Required: False
+Required: True
 Position: Named
 Default value: False
 Accept pipeline input: False
@@ -100,16 +97,46 @@ Accept wildcard characters: False
 ```
 
 ### -Path
-Where to save
+Where to save.
 
 ```yaml
 Type: DirectoryInfo
 Parameter Sets: (All)
 Aliases:
 
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -AddPathToPSModulePath
+Add path to environmental variable PSModulePath.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
 Required: False
 Position: Named
-Default value: C:\Temp
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Repository
+Override the repository listed in the config file.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -119,7 +146,7 @@ The GitHub User ID.
 
 ```yaml
 Type: String
-Parameter Sets: (All)
+Parameter Sets: private, public
 Aliases:
 
 Required: True
@@ -134,10 +161,10 @@ Select if the list is hosted publicly.
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: nuget, modulepath, Public
+Parameter Sets: public
 Aliases:
 
-Required: False
+Required: True
 Position: Named
 Default value: False
 Accept pipeline input: False
@@ -149,10 +176,10 @@ GitHub Token with access to the Users' Gist.
 
 ```yaml
 Type: String
-Parameter Sets: Private, nuget, modulepath
+Parameter Sets: private
 Aliases:
 
-Required: False
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -164,10 +191,10 @@ Select if the list is saved locally.
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: nuget, modulepath, local
+Parameter Sets: local
 Aliases:
 
-Required: False
+Required: True
 Position: Named
 Default value: False
 Accept pipeline input: False
@@ -179,10 +206,10 @@ Directory where list files are saved.
 
 ```yaml
 Type: DirectoryInfo
-Parameter Sets: nuget, modulepath, local
+Parameter Sets: local
 Aliases:
 
-Required: False
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False

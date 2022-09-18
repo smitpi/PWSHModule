@@ -3,7 +3,7 @@
 ######## Function 1 of 12 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.4
+# ModuleVersion:    0.1.23
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
@@ -184,7 +184,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 12 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.4
+# ModuleVersion:    0.1.23
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
@@ -283,7 +283,7 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 ######## Function 3 of 12 ##################
 # Function:         Get-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.4
+# ModuleVersion:    0.1.23
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -370,7 +370,7 @@ Export-ModuleMember -Function Get-PWSHModuleList
 ######## Function 4 of 12 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.4
+# ModuleVersion:    0.1.23
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
@@ -575,7 +575,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 5 of 12 ##################
 # Function:         Move-PWSHModuleBetweenScope
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.4
+# ModuleVersion:    0.1.23
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/08/20 12:38:44
@@ -673,7 +673,7 @@ Export-ModuleMember -Function Move-PWSHModuleBetweenScope
 ######## Function 6 of 12 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.4
+# ModuleVersion:    0.1.23
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -800,7 +800,7 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 7 of 12 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.4
+# ModuleVersion:    0.1.23
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
@@ -945,7 +945,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 8 of 12 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.4
+# ModuleVersion:    0.1.23
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
@@ -1032,7 +1032,7 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 ######## Function 9 of 12 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.4
+# ModuleVersion:    0.1.23
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
@@ -1238,7 +1238,7 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 10 of 12 ##################
 # Function:         Save-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.4
+# ModuleVersion:    0.1.23
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/09/07 16:36:26
@@ -1324,7 +1324,7 @@ Export-ModuleMember -Function Save-PWSHModuleList
 ######## Function 11 of 12 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.4
+# ModuleVersion:    0.1.23
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -1482,7 +1482,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 12 of 12 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.4
+# ModuleVersion:    0.1.23
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13

@@ -14,12 +14,12 @@ List all the GitHub Gist Lists.
 
 ### Private (Default)
 ```
-Get-PWSHModuleList -GitHubUserID <String> [-GitHubToken <String>] [<CommonParameters>]
+Get-PWSHModuleList [-GitHubUserID <String>] [-GitHubToken <String>] [<CommonParameters>]
 ```
 
 ### Public
 ```
-Get-PWSHModuleList -GitHubUserID <String> [-PublicGist] [<CommonParameters>]
+Get-PWSHModuleList [-GitHubUserID <String>] [-PublicGist] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -42,7 +42,7 @@ Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
