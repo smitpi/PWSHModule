@@ -98,12 +98,20 @@ Function Save-PWSHModule {
 		[Parameter(Mandatory = $true)]
 		[string]$GitHubUserID, 
 		[Parameter(ParameterSetName = 'Public')]
+		[Parameter(ParameterSetName = 'nuget')]
+		[Parameter(ParameterSetName = 'modulepath')]
 		[switch]$PublicGist,
 		[Parameter(ParameterSetName = 'Private')]
+		[Parameter(ParameterSetName = 'nuget')]
+		[Parameter(ParameterSetName = 'modulepath')]
 		[string]$GitHubToken,
 		[Parameter(ParameterSetName = 'local')]
+		[Parameter(ParameterSetName = 'nuget')]
+		[Parameter(ParameterSetName = 'modulepath')]
 		[switch]$LocalList,
 		[Parameter(ParameterSetName = 'local')]
+		[Parameter(ParameterSetName = 'nuget')]
+		[Parameter(ParameterSetName = 'modulepath')]
 		[System.IO.DirectoryInfo]$ListPath
 	)
 
