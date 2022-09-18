@@ -15,19 +15,19 @@ Install modules from the specified list.
 ### Private (Default)
 ```
 Install-PWSHModule [[-ListName] <String[]>] [[-Scope] <String>] [-AllowPrerelease] -GitHubUserID <String>
- [-GitHubToken <String>] [<CommonParameters>]
+ [-GitHubToken <String>] [-Repository <String>] [<CommonParameters>]
 ```
 
 ### Public
 ```
 Install-PWSHModule [[-ListName] <String[]>] [[-Scope] <String>] [-AllowPrerelease] -GitHubUserID <String>
- [-PublicGist] [<CommonParameters>]
+ [-PublicGist] [-Repository <String>] [<CommonParameters>]
 ```
 
 ### local
 ```
 Install-PWSHModule [[-ListName] <String[]>] [[-Scope] <String>] [-AllowPrerelease] [-LocalList]
- [-Path <DirectoryInfo>] [<CommonParameters>]
+ [-Path <DirectoryInfo>] [-Repository <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -154,6 +154,21 @@ Directory where files are saved.
 ```yaml
 Type: DirectoryInfo
 Parameter Sets: local
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Repository
+Override the repository listed in the config file.
+
+```yaml
+Type: String
+Parameter Sets: (All)
 Aliases:
 
 Required: False

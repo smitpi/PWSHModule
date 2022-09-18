@@ -14,14 +14,32 @@ Saves the modules from the specified list to a folder.
 
 ### Private (Default)
 ```
-Save-PWSHModule -ListName <String[]> [-AsNuGet] [-Path <DirectoryInfo>] -GitHubUserID <String>
- [-GitHubToken <String>] [<CommonParameters>]
+Save-PWSHModule -ListName <String[]> [-Path <DirectoryInfo>] -GitHubUserID <String> [-GitHubToken <String>]
+ [<CommonParameters>]
+```
+
+### nuget
+```
+Save-PWSHModule -ListName <String[]> [-AsNuGet] [-Path <DirectoryInfo>] -GitHubUserID <String> [-PublicGist]
+ [-GitHubToken <String>] [-LocalList] [-ListPath <DirectoryInfo>] [<CommonParameters>]
+```
+
+### modulepath
+```
+Save-PWSHModule -ListName <String[]> [-AddToPSModulePath] [-Path <DirectoryInfo>] -GitHubUserID <String>
+ [-PublicGist] [-GitHubToken <String>] [-LocalList] [-ListPath <DirectoryInfo>] [<CommonParameters>]
 ```
 
 ### Public
 ```
-Save-PWSHModule -ListName <String[]> [-AsNuGet] [-Path <DirectoryInfo>] -GitHubUserID <String> [-PublicGist]
+Save-PWSHModule -ListName <String[]> [-Path <DirectoryInfo>] -GitHubUserID <String> [-PublicGist]
  [<CommonParameters>]
+```
+
+### local
+```
+Save-PWSHModule -ListName <String[]> [-Path <DirectoryInfo>] -GitHubUserID <String> [-LocalList]
+ [-ListPath <DirectoryInfo>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -56,7 +74,22 @@ Save in the NuGet format
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: (All)
+Parameter Sets: nuget
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -AddToPSModulePath
+Add path to environmental variable PSModulePath.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: modulepath
 Aliases:
 
 Required: False
@@ -101,7 +134,7 @@ Select if the list is hosted publicly.
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: Public
+Parameter Sets: nuget, modulepath, Public
 Aliases:
 
 Required: False
@@ -116,7 +149,37 @@ GitHub Token with access to the Users' Gist.
 
 ```yaml
 Type: String
-Parameter Sets: Private
+Parameter Sets: Private, nuget, modulepath
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -LocalList
+Select if the list is saved locally.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: nuget, modulepath, local
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ListPath
+Directory where list files are saved.
+
+```yaml
+Type: DirectoryInfo
+Parameter Sets: nuget, modulepath, local
 Aliases:
 
 Required: False

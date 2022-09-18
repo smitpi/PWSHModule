@@ -54,7 +54,7 @@ The File Name on GitHub Gist.
 .PARAMETER AsNuGet
 Save in the NuGet format
 
-.PARAMETER AddToPSModulePath
+.PARAMETER AddPathToPSModulePath
 Add path to environmental variable PSModulePath.
 
 .PARAMETER Path
@@ -82,36 +82,40 @@ Save-PWSHModule -ListName extended -AsNuGet -Path c:\temp\ -GitHubUserID smitpi 
 Function Save-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Save-PWSHModule')]
 	PARAM(
-		[Parameter(Mandatory)]
+		[Parameter(Mandatory, Position = 0)]
 		[string[]]$ListName,
-		[Parameter(ParameterSetName = 'nuget')]
+		
+		[Parameter(Mandatory, ParameterSetName = 'nuget')]
+		[Parameter(ParameterSetName = 'public')]
+		[Parameter(ParameterSetName = 'private')]
+		[Parameter(ParameterSetName = 'local')]
 		[switch]$AsNuGet,
-		[ValidateScript( { $IsAdmin = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
-				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
-				else { Throw 'Must be running an elevated prompt.' } })]
-		[Parameter(ParameterSetName = 'modulepath')]
-		[switch]$AddToPSModulePath,
+			
 		[ValidateScript( { if (Test-Path $_) { $true }
 				else { New-Item -Path $_ -ItemType Directory -Force | Out-Null; $true }
 			})]
-		[System.IO.DirectoryInfo]$Path = 'C:\Temp',
-		[Parameter(Mandatory = $true)]
+		[Parameter(Mandatory)]
+		[System.IO.DirectoryInfo]$Path,
+
+		[ValidateScript( { $IsAdmin = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
+				else { Throw 'Must be running an elevated prompt.' } })]
+		[switch]$AddPathToPSModulePath,
+		
+		[Parameter(mandatory, ParameterSetName = 'public')]
+		[Parameter(mandatory, ParameterSetName = 'private')]
 		[string]$GitHubUserID, 
-		[Parameter(ParameterSetName = 'Public')]
-		[Parameter(ParameterSetName = 'nuget')]
-		[Parameter(ParameterSetName = 'modulepath')]
+		
+		[Parameter(mandatory, ParameterSetName = 'public')]
 		[switch]$PublicGist,
-		[Parameter(ParameterSetName = 'Private')]
-		[Parameter(ParameterSetName = 'nuget')]
-		[Parameter(ParameterSetName = 'modulepath')]
+		
+		[Parameter(mandatory, ParameterSetName = 'private')]
 		[string]$GitHubToken,
-		[Parameter(ParameterSetName = 'local')]
-		[Parameter(ParameterSetName = 'nuget')]
-		[Parameter(ParameterSetName = 'modulepath')]
+		
+		[Parameter(mandatory, ParameterSetName = 'local')]
 		[switch]$LocalList,
-		[Parameter(ParameterSetName = 'local')]
-		[Parameter(ParameterSetName = 'nuget')]
-		[Parameter(ParameterSetName = 'modulepath')]
+		
+		[Parameter(mandatory, ParameterSetName = 'local')]
 		[System.IO.DirectoryInfo]$ListPath
 	)
 
@@ -189,13 +193,20 @@ Function Save-PWSHModule {
 		}
 	}
 	
-	if ($AddToPSModulePath) {
+	if ($AddPathToPSModulePath) {
 		try {
-			if ($env:PSModulePath.Split(';') -notcontains $Path.FullName) {
+			$NugetCheck = Get-ChildItem -Path "$($Path.FullName)\*.nuget"
+			if (($env:PSModulePath.Split(';') -notcontains $Path.FullName) -and (-not($NugetCheck))) {
 				$key = (Get-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager').OpenSubKey('Environment', $true)
 				$regpath = $key.GetValue('PSModulePath', '', 'DoNotExpandEnvironmentNames')
 				$regpath += ";$($path.FullName)"
 				$key.SetValue('PSModulePath', $regpath, [Microsoft.Win32.RegistryValueKind]::ExpandString)
+				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
+				Write-Host '[Adding] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Path: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($path.FullName) " -ForegroundColor Green -NoNewline ; Write-Host 'to: $env:PSModulePath' -ForegroundColor Green
+			}
+			else {
+				if ($NugetCheck) {Write-warning "Can't add nuget repository to PSModulePath. Path needs to be extracted modules folders."}
+				else {Write-Host '[Adding] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Path: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($path.FullName) " -ForegroundColor Green -NoNewline ; Write-Host 'to: $env:PSModulePath' -ForegroundColor Green -NoNewline; Write-Host ' - Already added.' -ForegroundColor DarkRed}
 			}
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 	}
