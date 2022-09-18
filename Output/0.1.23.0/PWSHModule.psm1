@@ -3,11 +3,11 @@
 ######## Function 1 of 12 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.23.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
-# ModifiedOn:       2022/09/18 17:22:27
+# ModifiedOn:       2022/09/18 19:40:39
 # Synopsis:         Adds a new module to the GitHub Gist List.
 #############################################
  
@@ -174,7 +174,8 @@ Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName Repository
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	Get-PWSHModuleList | ForEach-Object {$_.Name} | Where-Object {$_ -like "*$wordToComplete*"}
+}
 Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock2
  
 Export-ModuleMember -Function Add-PWSHModule
@@ -184,7 +185,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 12 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.23.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
@@ -283,7 +284,7 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 ######## Function 3 of 12 ##################
 # Function:         Get-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.23.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -370,11 +371,11 @@ Export-ModuleMember -Function Get-PWSHModuleList
 ######## Function 4 of 12 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.23.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
-# ModifiedOn:       2022/09/18 17:22:00
+# ModifiedOn:       2022/09/18 19:46:56
 # Synopsis:         Install modules from the specified list.
 #############################################
  
@@ -558,7 +559,7 @@ Function Install-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}
+	Get-PWSHModuleList | ForEach-Object {$_.Name} | Where-Object {$_ -like "*$wordToComplete*"}
 }
 Register-ArgumentCompleter -CommandName Install-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 
@@ -575,7 +576,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 5 of 12 ##################
 # Function:         Move-PWSHModuleBetweenScope
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.23.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/08/20 12:38:44
@@ -673,7 +674,7 @@ Export-ModuleMember -Function Move-PWSHModuleBetweenScope
 ######## Function 6 of 12 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.23.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -800,11 +801,11 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 7 of 12 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.23.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
-# ModifiedOn:       2022/09/07 17:32:17
+# ModifiedOn:       2022/09/18 19:44:11
 # Synopsis:         Remove module from the specified list.
 #############################################
  
@@ -840,7 +841,7 @@ Function Remove-PWSHModule {
 	PARAM(
 		[Parameter(Mandatory, ValueFromPipelineByPropertyName)]
 		[string[]]$ListName,
-		[Parameter(Mandatory,ValueFromPipelineByPropertyName)]
+		[Parameter(Mandatory, ValueFromPipelineByPropertyName)]
 		[Alias('Name')]
 		[string[]]$ModuleName,
 		[Parameter(Mandatory)]
@@ -926,16 +927,14 @@ Function Remove-PWSHModule {
 } #end Function
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	Get-PWSHModuleList | ForEach-Object {$_.Name} | Where-Object {$_ -like "*$wordToComplete*"}
 }
+Register-ArgumentCompleter -CommandName Remove-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {
-	(Show-PWSHModule -ListName $fakeBoundParameters.Listname -ErrorAction SilentlyContinue).name | Where-Object {$_ -like "*$wordToComplete*"}
-	}
+	Show-PWSHModule -ListName $fakeBoundParameters.Listname -ErrorAction SilentlyContinue | ForEach-Object {$_.Name} | Where-Object {$_ -like "*$wordToComplete*"}
 }
-Register-ArgumentCompleter -CommandName Remove-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 Register-ArgumentCompleter -CommandName Remove-PWSHModule -ParameterName ModuleName -ScriptBlock $scriptBlock2
  
 Export-ModuleMember -Function Remove-PWSHModule
@@ -945,11 +944,11 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 8 of 12 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.23.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
-# ModifiedOn:       2022/09/18 17:22:27
+# ModifiedOn:       2022/09/18 19:44:47
 # Synopsis:         Deletes a list from GitHub Gist
 #############################################
  
@@ -1022,7 +1021,8 @@ Function Remove-PWSHModuleList {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	Get-PWSHModuleList | ForEach-Object {$_.Name} | Where-Object {$_ -like "*$wordToComplete*"}
+}
 Register-ArgumentCompleter -CommandName Remove-PWSHModuleList -ParameterName ListName -ScriptBlock $scriptBlock
  
 Export-ModuleMember -Function Remove-PWSHModuleList
@@ -1032,11 +1032,11 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 ######## Function 9 of 12 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.23.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
-# ModifiedOn:       2022/09/18 17:33:13
+# ModifiedOn:       2022/09/18 19:42:06
 # Synopsis:         Saves the modules from the specified list to a folder.
 #############################################
  
@@ -1222,7 +1222,8 @@ Function Save-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	Get-PWSHModuleList | ForEach-Object {$_.Name} | Where-Object {$_ -like "*$wordToComplete*"}
+}
 Register-ArgumentCompleter -CommandName Save-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 
 $scriptblock1 = {
@@ -1238,11 +1239,11 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 10 of 12 ##################
 # Function:         Save-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.23.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/09/07 16:36:26
-# ModifiedOn:       2022/09/18 17:22:27
+# ModifiedOn:       2022/09/18 19:44:58
 # Synopsis:         Save the Gist file to a local file
 #############################################
  
@@ -1314,7 +1315,8 @@ Function Save-PWSHModuleList {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	Get-PWSHModuleList | ForEach-Object {$_.Name} | Where-Object {$_ -like "*$wordToComplete*"}
+}
 Register-ArgumentCompleter -CommandName Save-PWSHModuleList -ParameterName ListName -ScriptBlock $scriptBlock
  
 Export-ModuleMember -Function Save-PWSHModuleList
@@ -1324,7 +1326,7 @@ Export-ModuleMember -Function Save-PWSHModuleList
 ######## Function 11 of 12 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.23.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -1482,11 +1484,11 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 12 of 12 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.23
+# ModuleVersion:    0.1.23.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
-# ModifiedOn:       2022/09/18 17:22:27
+# ModifiedOn:       2022/09/18 19:45:59
 # Synopsis:         Will uninstall the module from the system.
 #############################################
  
@@ -1624,14 +1626,13 @@ Function Uninstall-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	Get-PWSHModuleList | ForEach-Object {$_.Name} | Where-Object {$_ -like "*$wordToComplete*"}
+}
 Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {
-	(Show-PWSHModule -ListName $fakeBoundParameters.Listname -ErrorAction SilentlyContinue).name | Where-Object {$_ -like "*$wordToComplete*"}
-	}
+	Show-PWSHModule -ListName $fakeBoundParameters.Listname -ErrorAction SilentlyContinue | ForEach-Object {$_.Name} | Where-Object {$_ -like "*$wordToComplete*"}
 }
 Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ModuleName -ScriptBlock $scriptBlock2
 

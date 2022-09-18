@@ -220,7 +220,7 @@ Function Install-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}
+	Get-PWSHModuleList | ForEach-Object {$_.Name} | Where-Object {$_ -like "*$wordToComplete*"}
 }
 Register-ArgumentCompleter -CommandName Install-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 

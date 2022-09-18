@@ -73,7 +73,7 @@ Function Remove-PWSHModule {
 	PARAM(
 		[Parameter(Mandatory, ValueFromPipelineByPropertyName)]
 		[string[]]$ListName,
-		[Parameter(Mandatory,ValueFromPipelineByPropertyName)]
+		[Parameter(Mandatory, ValueFromPipelineByPropertyName)]
 		[Alias('Name')]
 		[string[]]$ModuleName,
 		[Parameter(Mandatory)]
@@ -159,14 +159,12 @@ Function Remove-PWSHModule {
 } #end Function
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	Get-PWSHModuleList | ForEach-Object {$_.Name} | Where-Object {$_ -like "*$wordToComplete*"}
 }
+Register-ArgumentCompleter -CommandName Remove-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {
-	(Show-PWSHModule -ListName $fakeBoundParameters.Listname -ErrorAction SilentlyContinue).name | Where-Object {$_ -like "*$wordToComplete*"}
-	}
+	Show-PWSHModule -ListName $fakeBoundParameters.Listname -ErrorAction SilentlyContinue | ForEach-Object {$_.Name} | Where-Object {$_ -like "*$wordToComplete*"}
 }
-Register-ArgumentCompleter -CommandName Remove-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 Register-ArgumentCompleter -CommandName Remove-PWSHModule -ParameterName ModuleName -ScriptBlock $scriptBlock2

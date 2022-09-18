@@ -108,5 +108,6 @@ Function Save-PWSHModuleList {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	Get-PWSHModuleList | ForEach-Object {$_.Name} | Where-Object {$_ -like "*$wordToComplete*"}
+}
 Register-ArgumentCompleter -CommandName Save-PWSHModuleList -ParameterName ListName -ScriptBlock $scriptBlock

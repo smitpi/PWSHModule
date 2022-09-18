@@ -174,14 +174,13 @@ Function Uninstall-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	Get-PWSHModuleList | ForEach-Object {$_.Name} | Where-Object {$_ -like "*$wordToComplete*"}
+}
 Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if (($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {
-	(Show-PWSHModule -ListName $fakeBoundParameters.Listname -ErrorAction SilentlyContinue).name | Where-Object {$_ -like "*$wordToComplete*"}
-	}
+	Show-PWSHModule -ListName $fakeBoundParameters.Listname -ErrorAction SilentlyContinue | ForEach-Object {$_.Name} | Where-Object {$_ -like "*$wordToComplete*"}
 }
 Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ModuleName -ScriptBlock $scriptBlock2
 
