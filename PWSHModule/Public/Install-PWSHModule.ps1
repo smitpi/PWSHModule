@@ -71,6 +71,9 @@ Select if the list is saved locally.
 .PARAMETER Path
 Directory where files are saved.
 
+.PARAMETER Repository
+Override the repository listed in the config file.
+
 .EXAMPLE
 Install-PWSHModule -Filename extended -Scope CurrentUser -GitHubUserID smitpi -GitHubToken $GitHubToken
 
@@ -94,7 +97,8 @@ Function Install-PWSHModule {
 		[Parameter(ParameterSetName = 'local')]
 		[switch]$LocalList,
 		[Parameter(ParameterSetName = 'local')]
-		[System.IO.DirectoryInfo]$Path
+		[System.IO.DirectoryInfo]$Path,
+		[string]$Repository
 	)
 
 	if ($scope -like 'AllUsers') {
@@ -144,15 +148,18 @@ Function Install-PWSHModule {
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception)"}
 	}
 
-	$InstallModuleSettings = @{
-		AllowClobber       = $true
-		Force              = $true
-		SkipPublisherCheck = $true
-	}
-	if ($AllowPrerelease) {$InstallModuleSettings.add('AllowPrerelease', $true)}
-
 	foreach ($module in ($CombinedModules | Sort-Object -Property name -Unique)) {
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module"
+		$InstallModuleSettings = @{
+			AllowClobber       = $true
+			Force              = $true
+			SkipPublisherCheck = $true
+			Repository         = $module.Repository
+			Scope              = $Scope
+		}
+		if ($AllowPrerelease) {$InstallModuleSettings.add('AllowPrerelease', $true)}
+		if ($Repository) {$InstallModuleSettings.Repository = $Repository}
+
 		if ($module.Version -like 'Latest') {
 			$mod = Get-Module -Name $module.Name
 			if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
@@ -160,13 +167,13 @@ Function Install-PWSHModule {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
 					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
-					Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope @InstallModuleSettings
+					Install-Module -Name $module.Name @InstallModuleSettings
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking versions"
 					Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
-					$OnlineMod = Find-Module -Name $module.name -Repository $module.Repository
+					$OnlineMod = Find-Module -Name $module.name -Repository $InstallModuleSettings.Repository
 					[version]$Onlineversion = $OnlineMod.version 
 					[version]$Localversion = ($mod | Sort-Object -Property Version -Descending)[0].Version
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
@@ -177,7 +184,7 @@ Function Install-PWSHModule {
 						Update-Module -Name $module.Name -Force -ErrorAction Stop
 					} catch {
 						try {
-							Install-Module -Name $module.name -Scope $Scope -Repository $module.Repository @InstallModuleSettings
+							Install-Module -Name $module.name @InstallModuleSettings
 						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 					}
 					Get-Module $module.name -ListAvailable | Remove-Module -Force -ErrorAction SilentlyContinue
@@ -199,7 +206,7 @@ Function Install-PWSHModule {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
 					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($module.Version))" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
-					Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope @InstallModuleSettings
+					Install-Module -Name $module.Name -RequiredVersion $module.Version @InstallModuleSettings
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
 				Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed

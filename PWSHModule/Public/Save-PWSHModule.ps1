@@ -54,6 +54,9 @@ The File Name on GitHub Gist.
 .PARAMETER AsNuGet
 Save in the NuGet format
 
+.PARAMETER AddToPSModulePath
+Add path to environmental variable PSModulePath.
+
 .PARAMETER Path
 Where to save
 
@@ -73,9 +76,15 @@ Save-PWSHModule -ListName extended -AsNuGet -Path c:\temp\ -GitHubUserID smitpi 
 Function Save-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Save-PWSHModule')]
 	PARAM(
-		[Parameter(Mandatory = $true)]
+		[Parameter(Mandatory)]
 		[string[]]$ListName,
+		[Parameter(ParameterSetName = 'nuget')]
 		[switch]$AsNuGet,
+		[ValidateScript( { $IsAdmin = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
+				else { Throw 'Must be running an elevated prompt.' } })]
+		[Parameter(ParameterSetName = 'modulepath')]
+		[switch]$AddToPSModulePath,
 		[ValidateScript( { if (Test-Path $_) { $true }
 				else { New-Item -Path $_ -ItemType Directory -Force | Out-Null; $true }
 			})]
@@ -140,13 +149,25 @@ Function Save-PWSHModule {
 
 			}
 		}
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
+	if ($AddToPSModulePath) {
+		try {
+			#[System.Collections.generic.List[PSObject]]$ModuleList = @()
+			#$ModuleList.Add($path.FullName)
+			#$env:PSModulePath.Split(';') | ForEach-Object {$ModuleList.Add($_)}
+			#[System.Environment]::SetEnvironmentVariable('PSModulePath', ($ModuleList | Join-String -Separator ';'), 'Machine')
+			$key = (Get-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager').OpenSubKey('Environment', $true)
+			$regpath = $key.GetValue('PSModulePath', '', 'DoNotExpandEnvironmentNames')
+			$regpath += ";$($path.FullName)"
+			$key.SetValue('PSModulePath', $regpath, [Microsoft.Win32.RegistryValueKind]::ExpandString)
+		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+	}
+	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 } #end Function
 
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 Register-ArgumentCompleter -CommandName Save-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock

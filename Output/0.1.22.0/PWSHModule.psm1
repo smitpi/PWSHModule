@@ -1,9 +1,9 @@
-#region Public Functions
+﻿#region Public Functions
 #region Add-PWSHModule.ps1
 ######## Function 1 of 12 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22
+# ModuleVersion:    0.1.22.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
@@ -185,7 +185,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 12 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22
+# ModuleVersion:    0.1.22.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
@@ -284,7 +284,7 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 ######## Function 3 of 12 ##################
 # Function:         Get-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22
+# ModuleVersion:    0.1.22.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
@@ -372,11 +372,11 @@ Export-ModuleMember -Function Get-PWSHModuleList
 ######## Function 4 of 12 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22
+# ModuleVersion:    0.1.22.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
-# ModifiedOn:       2022/09/07 23:36:35
+# ModifiedOn:       2022/09/18 11:08:36
 # Synopsis:         Install modules from the specified list.
 #############################################
  
@@ -411,6 +411,9 @@ Select if the list is saved locally.
 .PARAMETER Path
 Directory where files are saved.
 
+.PARAMETER Repository
+Override the repository listed in the config file.
+
 .EXAMPLE
 Install-PWSHModule -Filename extended -Scope CurrentUser -GitHubUserID smitpi -GitHubToken $GitHubToken
 
@@ -434,7 +437,8 @@ Function Install-PWSHModule {
 		[Parameter(ParameterSetName = 'local')]
 		[switch]$LocalList,
 		[Parameter(ParameterSetName = 'local')]
-		[System.IO.DirectoryInfo]$Path
+		[System.IO.DirectoryInfo]$Path,
+		[string]$Repository
 	)
 
 	if ($scope -like 'AllUsers') {
@@ -484,15 +488,18 @@ Function Install-PWSHModule {
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception)"}
 	}
 
-	$InstallModuleSettings = @{
-		AllowClobber       = $true
-		Force              = $true
-		SkipPublisherCheck = $true
-	}
-	if ($AllowPrerelease) {$InstallModuleSettings.add('AllowPrerelease', $true)}
-
 	foreach ($module in ($CombinedModules | Sort-Object -Property name -Unique)) {
 		Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking for installed module"
+		$InstallModuleSettings = @{
+			AllowClobber       = $true
+			Force              = $true
+			SkipPublisherCheck = $true
+			Repository         = $module.Repository
+			Scope              = $Scope
+		}
+		if ($AllowPrerelease) {$InstallModuleSettings.add('AllowPrerelease', $true)}
+		if ($Repository) {$InstallModuleSettings.Repository = $Repository}
+
 		if ($module.Version -like 'Latest') {
 			$mod = Get-Module -Name $module.Name
 			if (-not($mod)) {$mod = Get-Module -Name $module.name -ListAvailable}
@@ -500,13 +507,13 @@ Function Install-PWSHModule {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
 					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
-					Install-Module -Name $module.Name -Repository $module.Repository -Scope $Scope @InstallModuleSettings
+					Install-Module -Name $module.Name @InstallModuleSettings
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Checking versions"
 					Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
-					$OnlineMod = Find-Module -Name $module.name -Repository $module.Repository
+					$OnlineMod = Find-Module -Name $module.name -Repository $InstallModuleSettings.Repository
 					[version]$Onlineversion = $OnlineMod.version 
 					[version]$Localversion = ($mod | Sort-Object -Property Version -Descending)[0].Version
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
@@ -517,7 +524,7 @@ Function Install-PWSHModule {
 						Update-Module -Name $module.Name -Force -ErrorAction Stop
 					} catch {
 						try {
-							Install-Module -Name $module.name -Scope $Scope -Repository $module.Repository @InstallModuleSettings
+							Install-Module -Name $module.name @InstallModuleSettings
 						} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 					}
 					Get-Module $module.name -ListAvailable | Remove-Module -Force -ErrorAction SilentlyContinue
@@ -539,7 +546,7 @@ Function Install-PWSHModule {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Installing module"
 					Write-Host '[Installing] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)($($module.Version))" -ForegroundColor Green -NoNewline ; Write-Host ' to scope: ' -ForegroundColor DarkRed -NoNewline ; Write-Host "$($scope)" -ForegroundColor Cyan
-					Install-Module -Name $module.Name -Repository $module.Repository -RequiredVersion $module.Version -Scope $Scope @InstallModuleSettings
+					Install-Module -Name $module.Name -RequiredVersion $module.Version @InstallModuleSettings
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
 				Write-Host '[Installed] ' -NoNewline -ForegroundColor Green ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "$($mod.Path)" -ForegroundColor DarkRed
@@ -564,7 +571,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 5 of 12 ##################
 # Function:         Move-PWSHModuleBetweenScope
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22
+# ModuleVersion:    0.1.22.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/08/20 12:38:44
@@ -662,7 +669,7 @@ Export-ModuleMember -Function Move-PWSHModuleBetweenScope
 ######## Function 6 of 12 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22
+# ModuleVersion:    0.1.22.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -789,7 +796,7 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 7 of 12 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22
+# ModuleVersion:    0.1.22.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
@@ -934,7 +941,7 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 8 of 12 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22
+# ModuleVersion:    0.1.22.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
@@ -1022,11 +1029,11 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 ######## Function 9 of 12 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22
+# ModuleVersion:    0.1.22.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
-# ModifiedOn:       2022/09/07 17:32:17
+# ModifiedOn:       2022/09/18 10:55:14
 # Synopsis:         Saves the modules from the specified list to a folder.
 #############################################
  
@@ -1042,6 +1049,9 @@ The File Name on GitHub Gist.
 
 .PARAMETER AsNuGet
 Save in the NuGet format
+
+.PARAMETER AddToPSModulePath
+Add path to environmental variable PSModulePath.
 
 .PARAMETER Path
 Where to save
@@ -1062,9 +1072,15 @@ Save-PWSHModule -ListName extended -AsNuGet -Path c:\temp\ -GitHubUserID smitpi 
 Function Save-PWSHModule {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Save-PWSHModule')]
 	PARAM(
-		[Parameter(Mandatory = $true)]
+		[Parameter(Mandatory)]
 		[string[]]$ListName,
+		[Parameter(ParameterSetName = 'nuget')]
 		[switch]$AsNuGet,
+		[ValidateScript( { $IsAdmin = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
+				else { Throw 'Must be running an elevated prompt.' } })]
+		[Parameter(ParameterSetName = 'modulepath')]
+		[switch]$AddToPSModulePath,
 		[ValidateScript( { if (Test-Path $_) { $true }
 				else { New-Item -Path $_ -ItemType Directory -Force | Out-Null; $true }
 			})]
@@ -1129,14 +1145,26 @@ Function Save-PWSHModule {
 
 			}
 		}
-		Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 	}
+	if ($AddToPSModulePath) {
+		try {
+			#[System.Collections.generic.List[PSObject]]$ModuleList = @()
+			#$ModuleList.Add($path.FullName)
+			#$env:PSModulePath.Split(';') | ForEach-Object {$ModuleList.Add($_)}
+			#[System.Environment]::SetEnvironmentVariable('PSModulePath', ($ModuleList | Join-String -Separator ';'), 'Machine')
+			$key = (Get-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager').OpenSubKey('Environment', $true)
+			$regpath = $key.GetValue('PSModulePath', '', 'DoNotExpandEnvironmentNames')
+			$regpath += ";$($path.FullName)"
+			$key.SetValue('PSModulePath', $regpath, [Microsoft.Win32.RegistryValueKind]::ExpandString)
+		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
+	}
+	Write-Verbose "[$(Get-Date -Format HH:mm:ss) DONE]"
 } #end Function
 
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like "*:GitHubUserID")) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 }
 Register-ArgumentCompleter -CommandName Save-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
  
@@ -1147,7 +1175,7 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 10 of 12 ##################
 # Function:         Save-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22
+# ModuleVersion:    0.1.22.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/09/07 16:36:26
@@ -1234,7 +1262,7 @@ Export-ModuleMember -Function Save-PWSHModuleList
 ######## Function 11 of 12 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22
+# ModuleVersion:    0.1.22.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -1392,7 +1420,7 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 12 of 12 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22
+# ModuleVersion:    0.1.22.0
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
