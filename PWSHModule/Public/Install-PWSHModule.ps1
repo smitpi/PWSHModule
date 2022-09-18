@@ -220,6 +220,12 @@ Function Install-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}
 }
 Register-ArgumentCompleter -CommandName Install-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
+
+$scriptblock1 = {
+	(Get-PSRepository).Name
+}
+Register-ArgumentCompleter -CommandName Install-PWSHModule -ParameterName Repository -ScriptBlock $scriptBlock1
+

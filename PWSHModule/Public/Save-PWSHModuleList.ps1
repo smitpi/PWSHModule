@@ -108,6 +108,5 @@ Function Save-PWSHModuleList {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
-}
+(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 Register-ArgumentCompleter -CommandName Save-PWSHModuleList -ParameterName ListName -ScriptBlock $scriptBlock

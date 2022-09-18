@@ -65,7 +65,6 @@ Function Get-PWSHModuleList {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Get-PWSHModuleList')]
 	[Alias ('Show-PWSHModuleList')]
 	PARAM(
-		[Parameter(Mandatory)]
 		[string]$GitHubUserID, 
 		[Parameter(ParameterSetName = 'Public')]
 		[switch]$PublicGist,

@@ -58,7 +58,10 @@ Save in the NuGet format
 Add path to environmental variable PSModulePath.
 
 .PARAMETER Path
-Where to save
+Where to save.
+
+.PARAMETER Repository
+Override the repository listed in the config file.
 
 .PARAMETER GitHubUserID
 The GitHub User ID.
@@ -101,6 +104,8 @@ Function Save-PWSHModule {
 				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
 				else { Throw 'Must be running an elevated prompt.' } })]
 		[switch]$AddPathToPSModulePath,
+
+		[string]$Repository,
 		
 		[Parameter(mandatory, ParameterSetName = 'public')]
 		[Parameter(mandatory, ParameterSetName = 'private')]
@@ -161,18 +166,20 @@ Function Save-PWSHModule {
 	}
 
 	foreach ($module in ($CombinedModules | Sort-Object -Property name -Unique)) {
+		if ($Repository) {$UseRepo = $Repository}
+		else {$UseRepo = $module.Repository}
 		if ($module.Version -like 'Latest') {
 			if ($AsNuGet) {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
 					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'NuGet: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-					Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -Path $Path | Out-Null
+					Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $UseRepo).SourceLocation -Path $Path.FullName | Out-Null
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
 					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-					Save-Module -Name $module.name -Repository $module.Repository -Path $Path
+					Save-Module -Name $module.name -Repository $UseRepo -Path $Path.FullName -Force -AcceptLicense
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			}
 		} else {
@@ -180,13 +187,13 @@ Function Save-PWSHModule {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
 					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'NuGet: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)(ver $($module.version)) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-					Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -RequiredVersion $module.Version -Path $Path | Out-Null
+					Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $UseRepo).SourceLocation -RequiredVersion $module.Version -Path $Path.FullName | Out-Null
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
 					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)(ver $($module.version)) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-					Save-Module -Name $module.name -Repository $module.Repository -RequiredVersion $module.Version -Path $Path
+					Save-Module -Name $module.name -Repository $UseRepo -RequiredVersion $module.Version -Path $Path.FullName -Force -AcceptLicense
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			}
 
@@ -203,9 +210,8 @@ Function Save-PWSHModule {
 				$key.SetValue('PSModulePath', $regpath, [Microsoft.Win32.RegistryValueKind]::ExpandString)
 				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
 				Write-Host '[Adding] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Path: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($path.FullName) " -ForegroundColor Green -NoNewline ; Write-Host 'to: $env:PSModulePath' -ForegroundColor Green
-			}
-			else {
-				if ($NugetCheck) {Write-warning "Can't add nuget repository to PSModulePath. Path needs to be extracted modules folders."}
+			} else {
+				if ($NugetCheck) {Write-Warning "Can't add nuget repository to PSModulePath. Path needs to be extracted modules folders."}
 				else {Write-Host '[Adding] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Path: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($path.FullName) " -ForegroundColor Green -NoNewline ; Write-Host 'to: $env:PSModulePath' -ForegroundColor Green -NoNewline; Write-Host ' - Already added.' -ForegroundColor DarkRed}
 			}
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
@@ -217,6 +223,11 @@ Function Save-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
-}
+(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 Register-ArgumentCompleter -CommandName Save-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
+
+$scriptblock1 = {
+	(Get-PSRepository).Name
+}
+Register-ArgumentCompleter -CommandName Save-PWSHModule -ParameterName Repository -ScriptBlock $scriptBlock1
+

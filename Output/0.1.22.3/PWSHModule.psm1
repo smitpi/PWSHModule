@@ -1,13 +1,13 @@
-#region Public Functions
+﻿#region Public Functions
 #region Add-PWSHModule.ps1
 ######## Function 1 of 12 ##################
 # Function:         Add-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.2
+# ModuleVersion:    0.1.22.3
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:31
-# ModifiedOn:       2022/09/08 00:32:01
+# ModifiedOn:       2022/09/18 17:22:27
 # Synopsis:         Adds a new module to the GitHub Gist List.
 #############################################
  
@@ -174,8 +174,7 @@ Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName Repository
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
-}
+(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock2
  
 Export-ModuleMember -Function Add-PWSHModule
@@ -185,7 +184,7 @@ Export-ModuleMember -Function Add-PWSHModule
 ######## Function 2 of 12 ##################
 # Function:         Add-PWSHModuleDefaultsToProfile
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.2
+# ModuleVersion:    0.1.22.3
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:51:50
@@ -284,11 +283,11 @@ Export-ModuleMember -Function Add-PWSHModuleDefaultsToProfile
 ######## Function 3 of 12 ##################
 # Function:         Get-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.2
+# ModuleVersion:    0.1.22.3
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 01:15:39
-# ModifiedOn:       2022/09/07 17:34:02
+# ModifiedOn:       2022/09/18 17:21:05
 # Synopsis:         List all the GitHub Gist Lists.
 #############################################
  
@@ -316,7 +315,6 @@ Function Get-PWSHModuleList {
 	[Cmdletbinding(DefaultParameterSetName = 'Private', HelpURI = 'https://smitpi.github.io/PWSHModule/Get-PWSHModuleList')]
 	[Alias ('Show-PWSHModuleList')]
 	PARAM(
-		[Parameter(Mandatory)]
 		[string]$GitHubUserID, 
 		[Parameter(ParameterSetName = 'Public')]
 		[switch]$PublicGist,
@@ -372,11 +370,11 @@ Export-ModuleMember -Function Get-PWSHModuleList
 ######## Function 4 of 12 ##################
 # Function:         Install-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.2
+# ModuleVersion:    0.1.22.3
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/12 07:38:48
-# ModifiedOn:       2022/09/18 11:08:36
+# ModifiedOn:       2022/09/18 17:22:00
 # Synopsis:         Install modules from the specified list.
 #############################################
  
@@ -560,9 +558,15 @@ Function Install-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
+	(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}
 }
 Register-ArgumentCompleter -CommandName Install-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
+
+$scriptblock1 = {
+	(Get-PSRepository).Name
+}
+Register-ArgumentCompleter -CommandName Install-PWSHModule -ParameterName Repository -ScriptBlock $scriptBlock1
+
  
 Export-ModuleMember -Function Install-PWSHModule
 #endregion
@@ -571,7 +575,7 @@ Export-ModuleMember -Function Install-PWSHModule
 ######## Function 5 of 12 ##################
 # Function:         Move-PWSHModuleBetweenScope
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.2
+# ModuleVersion:    0.1.22.3
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/08/20 12:38:44
@@ -669,7 +673,7 @@ Export-ModuleMember -Function Move-PWSHModuleBetweenScope
 ######## Function 6 of 12 ##################
 # Function:         New-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.2
+# ModuleVersion:    0.1.22.3
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:22:20
@@ -796,7 +800,7 @@ Export-ModuleMember -Function New-PWSHModuleList
 ######## Function 7 of 12 ##################
 # Function:         Remove-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.2
+# ModuleVersion:    0.1.22.3
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 11:14:06
@@ -941,11 +945,11 @@ Export-ModuleMember -Function Remove-PWSHModule
 ######## Function 8 of 12 ##################
 # Function:         Remove-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.2
+# ModuleVersion:    0.1.22.3
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/31 11:14:51
-# ModifiedOn:       2022/09/07 17:32:17
+# ModifiedOn:       2022/09/18 17:22:27
 # Synopsis:         Deletes a list from GitHub Gist
 #############################################
  
@@ -1018,8 +1022,7 @@ Function Remove-PWSHModuleList {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
-}
+(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 Register-ArgumentCompleter -CommandName Remove-PWSHModuleList -ParameterName ListName -ScriptBlock $scriptBlock
  
 Export-ModuleMember -Function Remove-PWSHModuleList
@@ -1029,11 +1032,11 @@ Export-ModuleMember -Function Remove-PWSHModuleList
 ######## Function 9 of 12 ##################
 # Function:         Save-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.2
+# ModuleVersion:    0.1.22.3
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/13 10:26:41
-# ModifiedOn:       2022/09/18 16:57:19
+# ModifiedOn:       2022/09/18 17:22:27
 # Synopsis:         Saves the modules from the specified list to a folder.
 #############################################
  
@@ -1054,7 +1057,10 @@ Save in the NuGet format
 Add path to environmental variable PSModulePath.
 
 .PARAMETER Path
-Where to save
+Where to save.
+
+.PARAMETER Repository
+Override the repository listed in the config file.
 
 .PARAMETER GitHubUserID
 The GitHub User ID.
@@ -1097,6 +1103,8 @@ Function Save-PWSHModule {
 				if ($IsAdmin.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { $True }
 				else { Throw 'Must be running an elevated prompt.' } })]
 		[switch]$AddPathToPSModulePath,
+
+		[string]$Repository,
 		
 		[Parameter(mandatory, ParameterSetName = 'public')]
 		[Parameter(mandatory, ParameterSetName = 'private')]
@@ -1157,18 +1165,20 @@ Function Save-PWSHModule {
 	}
 
 	foreach ($module in ($CombinedModules | Sort-Object -Property name -Unique)) {
+		if ($Repository) {$UseRepo = $Repository}
+		else {$UseRepo = $module.Repository}
 		if ($module.Version -like 'Latest') {
 			if ($AsNuGet) {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
 					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'NuGet: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-					Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -Path $Path | Out-Null
+					Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $UseRepo).SourceLocation -Path $Path.FullName | Out-Null
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
 					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-					Save-Module -Name $module.name -Repository $module.Repository -Path $Path
+					Save-Module -Name $module.name -Repository $UseRepo -Path $Path.FullName -Force -AcceptLicense
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			}
 		} else {
@@ -1176,13 +1186,13 @@ Function Save-PWSHModule {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
 					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'NuGet: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)(ver $($module.version)) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-					Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $module.Repository).SourceLocation -RequiredVersion $module.Version -Path $Path | Out-Null
+					Save-Package -Name $module.Name -Provider NuGet -Source (Get-PSRepository -Name $UseRepo).SourceLocation -RequiredVersion $module.Version -Path $Path.FullName | Out-Null
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			} else {
 				try {
 					Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
 					Write-Host '[Downloading] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Module: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($module.Name)(ver $($module.version)) " -ForegroundColor Green -NoNewline ; Write-Host "Path: $($Path)" -ForegroundColor DarkRed
-					Save-Module -Name $module.name -Repository $module.Repository -RequiredVersion $module.Version -Path $Path
+					Save-Module -Name $module.name -Repository $UseRepo -RequiredVersion $module.Version -Path $Path.FullName -Force -AcceptLicense
 				} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
 			}
 
@@ -1199,9 +1209,8 @@ Function Save-PWSHModule {
 				$key.SetValue('PSModulePath', $regpath, [Microsoft.Win32.RegistryValueKind]::ExpandString)
 				Write-Verbose "[$(Get-Date -Format HH:mm:ss) PROCESS] Downloading"
 				Write-Host '[Adding] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Path: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($path.FullName) " -ForegroundColor Green -NoNewline ; Write-Host 'to: $env:PSModulePath' -ForegroundColor Green
-			}
-			else {
-				if ($NugetCheck) {Write-warning "Can't add nuget repository to PSModulePath. Path needs to be extracted modules folders."}
+			} else {
+				if ($NugetCheck) {Write-Warning "Can't add nuget repository to PSModulePath. Path needs to be extracted modules folders."}
 				else {Write-Host '[Adding] ' -NoNewline -ForegroundColor Yellow ; Write-Host 'Path: ' -NoNewline -ForegroundColor Cyan ; Write-Host "$($path.FullName) " -ForegroundColor Green -NoNewline ; Write-Host 'to: $env:PSModulePath' -ForegroundColor Green -NoNewline; Write-Host ' - Already added.' -ForegroundColor DarkRed}
 			}
 		} catch {Write-Warning "Error: `n`tMessage:$($_.Exception.Message)"}
@@ -1213,9 +1222,14 @@ Function Save-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
-}
+(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 Register-ArgumentCompleter -CommandName Save-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
+
+$scriptblock1 = {
+	(Get-PSRepository).Name
+}
+Register-ArgumentCompleter -CommandName Save-PWSHModule -ParameterName Repository -ScriptBlock $scriptBlock1
+
  
 Export-ModuleMember -Function Save-PWSHModule
 #endregion
@@ -1224,11 +1238,11 @@ Export-ModuleMember -Function Save-PWSHModule
 ######## Function 10 of 12 ##################
 # Function:         Save-PWSHModuleList
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.2
+# ModuleVersion:    0.1.22.3
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/09/07 16:36:26
-# ModifiedOn:       2022/09/07 17:58:18
+# ModifiedOn:       2022/09/18 17:22:27
 # Synopsis:         Save the Gist file to a local file
 #############################################
  
@@ -1300,8 +1314,7 @@ Function Save-PWSHModuleList {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
-}
+(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 Register-ArgumentCompleter -CommandName Save-PWSHModuleList -ParameterName ListName -ScriptBlock $scriptBlock
  
 Export-ModuleMember -Function Save-PWSHModuleList
@@ -1311,7 +1324,7 @@ Export-ModuleMember -Function Save-PWSHModuleList
 ######## Function 11 of 12 ##################
 # Function:         Show-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.2
+# ModuleVersion:    0.1.22.3
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/09 15:57:20
@@ -1469,11 +1482,11 @@ Export-ModuleMember -Function Show-PWSHModule
 ######## Function 12 of 12 ##################
 # Function:         Uninstall-PWSHModule
 # Module:           PWSHModule
-# ModuleVersion:    0.1.22.2
+# ModuleVersion:    0.1.22.3
 # Author:           Pierre Smit
 # Company:          HTPCZA Tech
 # CreatedOn:        2022/07/20 19:06:13
-# ModifiedOn:       2022/09/07 17:32:17
+# ModifiedOn:       2022/09/18 17:22:27
 # Synopsis:         Will uninstall the module from the system.
 #############################################
  
@@ -1611,8 +1624,7 @@ Function Uninstall-PWSHModule {
 
 $scriptblock = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
-}
+(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 Register-ArgumentCompleter -CommandName Uninstall-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock
 
 $scriptblock2 = {

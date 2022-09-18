@@ -204,6 +204,5 @@ Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName Repository
 
 $scriptblock2 = {
 	param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-	if ([bool]($PSDefaultParameterValues.Keys -like '*:GitHubUserID')) {(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
-}
+(Get-PWSHModuleList).name | Where-Object {$_ -like "*$wordToComplete*"}}
 Register-ArgumentCompleter -CommandName Add-PWSHModule -ParameterName ListName -ScriptBlock $scriptBlock2
