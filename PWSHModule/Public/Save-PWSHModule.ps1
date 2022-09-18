@@ -202,7 +202,7 @@ Function Save-PWSHModule {
 	
 	if ($AddPathToPSModulePath) {
 		try {
-			$NugetCheck = Get-ChildItem -Path "$($Path.FullName)\*.nuget"
+			$NugetCheck = Get-ChildItem -Path "$($Path.FullName)\*.nupkg"
 			if (($env:PSModulePath.Split(';') -notcontains $Path.FullName) -and (-not($NugetCheck))) {
 				$key = (Get-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager').OpenSubKey('Environment', $true)
 				$regpath = $key.GetValue('PSModulePath', '', 'DoNotExpandEnvironmentNames')
