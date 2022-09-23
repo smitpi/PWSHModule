@@ -1,0 +1,28 @@
+﻿
+PWSHModule
+about_PWSHModule
+ 
+SHORT DESCRIPTION
+Creates a GitHub (Private or Public) Gist to install and maintain the installed PowerShell Modules on your systems, you can create more than one list and use it to custom install modules from different repositories or different versions.
+
+ 
+NOTES
+Functions in this module:
+Add-PWSHModule -- Adds a new module to the GitHub Gist List.
+Add-PWSHModuleDefaultsToProfile -- Creates PSDefaultParameterValues in the users profile files.
+Get-PWSHModuleList -- List all the GitHub Gist Lists.
+Install-PWSHModule -- Install modules from the specified list.
+Move-PWSHModuleBetweenScope -- Moves modules between scopes (CurrentUser and AllUsers).
+New-PWSHModuleList -- Add a new list to GitHub Gist.
+Remove-PWSHModule -- Remove module from the specified list.
+Remove-PWSHModuleList -- Deletes a list from GitHub Gist
+Save-PWSHModule -- Saves the modules from the specified list to a folder.
+Save-PWSHModuleList -- Save the Gist file to a local file
+Show-PWSHModule -- Show the details of the modules in a list.
+Uninstall-PWSHModule -- Will uninstall the module from the system.
+ 
+SEE ALSO
+https://github.com/smitpi/PWSHModule
+
+https://smitpi.github.io/PWSHModule/
+
